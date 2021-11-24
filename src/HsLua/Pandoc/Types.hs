@@ -6,10 +6,8 @@ Maintainer: Albert Krewinkel <albert@zeitkraut.de>
 Use pandoc types in Lua
 -}
 
-module HsluaPandocTypes
-       ( someFunc
-       ) where
+module HsLua.Pandoc.Types
+  ( module HsLua.Pandoc.Types.ListAttributes
+  ) where
 
-
-someFunc :: IO ()
-someFunc = putStrLn ("someFunc" :: String)
+import HsLua.Pandoc.Types.ListAttributes
