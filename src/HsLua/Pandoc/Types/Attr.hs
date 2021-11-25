@@ -120,7 +120,7 @@ typeAttributeList = deftype "AttributeList"
 
 data Key = StringKey Text | IntKey Int
 
-peekKey :: LuaError e => Peeker e (Maybe Key)
+peekKey :: Peeker e (Maybe Key)
 peekKey idx = liftLua (ltype idx) >>= \case
   TypeNumber -> Just . IntKey <$!> peekIntegral idx
   TypeString -> Just . StringKey <$!> peekText idx
