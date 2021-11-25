@@ -24,6 +24,11 @@ import Test.Tasty.Lua (translateResultsFromFile)
 
 main :: IO ()
 main = do
+  listTests <- run @Lua.Exception $ do
+    openlibs
+    pushListModule
+    setglobal "List"
+    translateResultsFromFile "test/test-list-module.lua"
   listAttributeTests <- run @Lua.Exception $ do
     openlibs
     register' mkListAttributes
@@ -34,18 +39,21 @@ main = do
       pushString c
       setglobal (fromString c)
     translateResultsFromFile "test/test-listattributes.lua"
-  listTest <- run @Lua.Exception $ do
+  attrTests <- run @Lua.Exception $ do
     openlibs
     pushListModule
     setglobal "List"
-    translateResultsFromFile "test/test-list-module.lua"
+    register' mkAttr
+    register' mkAttributeList
+    translateResultsFromFile "test/test-attr.lua"
   luaTest <- run @Lua.Exception $ do
     openlibs
     translateResultsFromFile "test/test-pandoc-types.lua"
   defaultMain $ testGroup "hslua-pandoc-types"
     [ tests
+    , listTests
     , listAttributeTests
-    , listTest
+    , attrTests
     , luaTest
     ]
 
