@@ -12,16 +12,14 @@ module HsLua.Pandoc.Types.Citation
   , pushCitation
   , typeCitation
   , mkCitation
-    -- * CitationMode
-  , peekCitationMode
-  , pushCitationMode
   ) where
 
 import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import HsLua as Lua
-import {-# SOURCE #-}HsLua.Pandoc.Types.Inline (peekInlinesFuzzy, pushInlines)
-import Text.Pandoc.Definition (Inline, Citation (..), CitationMode (..))
+import HsLua.Pandoc.Types.CitationMode (peekCitationMode, pushCitationMode)
+import HsLua.Pandoc.Types.Inline (peekInlinesFuzzy, pushInlines)
+import Text.Pandoc.Definition (Citation (..))
 
 -- | Pushes a Citation value as userdata object.
 pushCitation :: LuaError e
@@ -96,13 +94,3 @@ mkCitation = defun "Citation"
   <#> optionalParameter peekIntegral "hash" "integer" "hash number"
   =#> functionResult pushCitation "Citation" "new citation object"
   #? "Creates a single citation."
-
--- | Retrieves a Citation value from a string.
-peekCitationMode :: LuaError e => Peeker e CitationMode
-peekCitationMode = peekRead
-{-# INLINE peekCitationMode #-}
-
--- | Pushes a CitationMode value as string.
-pushCitationMode :: LuaError e => Pusher e CitationMode
-pushCitationMode = pushString . show
-{-# INLINE pushCitationMode #-}
