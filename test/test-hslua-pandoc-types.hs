@@ -29,12 +29,14 @@ main = do
     pushListModule
     setglobal "List"
     translateResultsFromFile "test/test-list-module.lua"
+
   listAttributeTests <- run @Lua.Exception $ do
     openlibs
     register' mkListAttributes
     registerConstants (Proxy @ListNumberStyle)
     registerConstants (Proxy @ListNumberDelim)
     translateResultsFromFile "test/test-listattributes.lua"
+
   attrTests <- run @Lua.Exception $ do
     openlibs
     pushListModule
@@ -42,6 +44,7 @@ main = do
     register' mkAttr
     register' mkAttributeList
     translateResultsFromFile "test/test-attr.lua"
+
   citationTests <- run @Lua.Exception $ do
     openlibs
     pushListModule *> setglobal "List"
@@ -49,6 +52,7 @@ main = do
     registerConstants (Proxy @CitationMode)
     forM_ inlineConstructors register'
     translateResultsFromFile "test/test-citation.lua"
+
   inlineTests <- run @Lua.Exception $ do
     openlibs
     pushListModule *> setglobal "List"
@@ -59,6 +63,19 @@ main = do
     registerConstants (Proxy @QuoteType)
     forM_ inlineConstructors register'
     translateResultsFromFile "test/test-inline.lua"
+
+  blockTests <- run @Lua.Exception $ do
+    openlibs
+    pushListModule *> setglobal "List"
+    register' mkAttr
+    register' mkListAttributes
+    registerConstants (Proxy @Alignment)
+    registerConstants (Proxy @ListNumberStyle)
+    registerConstants (Proxy @ListNumberStyle)
+    forM_ inlineConstructors register'
+    forM_ blockConstructors register'
+    translateResultsFromFile "test/test-block.lua"
+
   defaultMain $ testGroup "hslua-pandoc-types"
     [ tests
     , listTests
@@ -66,6 +83,7 @@ main = do
     , attrTests
     , citationTests
     , inlineTests
+    , blockTests
     ]
 
 -- | Basic tests

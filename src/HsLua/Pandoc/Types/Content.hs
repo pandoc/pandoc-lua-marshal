@@ -13,11 +13,11 @@ module HsLua.Pandoc.Types.Content
   , contentTypeDescription
   , peekContent
   , pushContent
+  , peekDefinitionItem
   ) where
 
 import Control.Applicative ((<|>))
 import Control.Monad ((<$!>))
-import Data.Text (Text)
 import HsLua
 import {-# SOURCE #-} HsLua.Pandoc.Types.Block
   ( peekBlocksFuzzy, pushBlocks )
