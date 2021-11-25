@@ -19,9 +19,9 @@ import Control.Applicative ((<|>))
 import Control.Monad ((<$!>))
 import Data.Text (Text)
 import HsLua
-import HsLua.Pandoc.Types.Block
+import {-# SOURCE #-} HsLua.Pandoc.Types.Block
   ( peekBlocksFuzzy, pushBlocks )
-import HsLua.Pandoc.Types.Inline
+import {-# SOURCE #-} HsLua.Pandoc.Types.Inline
   ( peekInlinesFuzzy, pushInlines )
 import HsLua.Pandoc.Types.List (pushPandocList)
 import Text.Pandoc.Definition (Inline, Block)
@@ -40,7 +40,7 @@ data Content
   | ContentListItems [[Block]]
 
 -- | Gets the text property of an Inline, if present.
-contentTypeDescription :: Content -> Text
+contentTypeDescription :: Content -> String
 contentTypeDescription = \case
   ContentBlocks {}    -> "list of Block items"
   ContentInlines {}   -> "list of Inline items"

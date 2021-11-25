@@ -18,7 +18,7 @@ import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import HsLua as Lua
 import HsLua.Pandoc.Types.CitationMode (peekCitationMode, pushCitationMode)
-import HsLua.Pandoc.Types.Inline (peekInlinesFuzzy, pushInlines)
+import {-# SOURCE #-} HsLua.Pandoc.Types.Inline (peekInlinesFuzzy, pushInlines)
 import Text.Pandoc.Definition (Citation (..))
 
 -- | Pushes a Citation value as userdata object.

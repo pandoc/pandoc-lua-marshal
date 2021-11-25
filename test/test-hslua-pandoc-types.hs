@@ -17,7 +17,7 @@ import Data.Proxy (Proxy (Proxy))
 import Data.String (fromString)
 import HsLua as Lua
 import HsLua.Pandoc.Types
-import Text.Pandoc.Definition (CitationMode, ListNumberStyle, ListNumberDelim)
+import Text.Pandoc.Definition
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase)
 import Test.Tasty.Lua (translateResultsFromFile)
@@ -32,12 +32,8 @@ main = do
   listAttributeTests <- run @Lua.Exception $ do
     openlibs
     register' mkListAttributes
-    forM_ (constructors (Proxy @ListNumberStyle)) $ \c -> do
-      pushString c
-      setglobal (fromString c)
-    forM_ (constructors (Proxy @ListNumberDelim)) $ \c -> do
-      pushString c
-      setglobal (fromString c)
+    registerConstants (Proxy @ListNumberStyle)
+    registerConstants (Proxy @ListNumberDelim)
     translateResultsFromFile "test/test-listattributes.lua"
   attrTests <- run @Lua.Exception $ do
     openlibs
@@ -50,16 +46,26 @@ main = do
     openlibs
     pushListModule *> setglobal "List"
     register' mkCitation
-    forM_ (constructors (Proxy @CitationMode)) $ \c -> do
-      pushString c
-      setglobal (fromString c)
+    registerConstants (Proxy @CitationMode)
+    forM_ inlineConstructors register'
     translateResultsFromFile "test/test-citation.lua"
+  inlineTests <- run @Lua.Exception $ do
+    openlibs
+    pushListModule *> setglobal "List"
+    register' mkAttr
+    register' mkCitation
+    registerConstants (Proxy @CitationMode)
+    registerConstants (Proxy @MathType)
+    registerConstants (Proxy @QuoteType)
+    forM_ inlineConstructors register'
+    translateResultsFromFile "test/test-inline.lua"
   defaultMain $ testGroup "hslua-pandoc-types"
     [ tests
     , listTests
     , listAttributeTests
     , attrTests
     , citationTests
+    , inlineTests
     ]
 
 -- | Basic tests
@@ -73,6 +79,12 @@ register' :: LuaError e => DocumentedFunction e -> LuaE e ()
 register' f = do
   pushDocumentedFunction f
   setglobal (functionName f)
+
+registerConstants :: forall a e. (Data a, LuaError e) => Proxy a -> LuaE e ()
+registerConstants proxy =
+  forM_ (constructors proxy) $ \c -> do
+    pushString c
+    setglobal (fromString c)
 
 constructors :: forall a. Data a => Proxy a -> [String]
 constructors _ = map showConstr . dataTypeConstrs . dataTypeOf @a $ undefined

@@ -44,12 +44,12 @@ return {
       end)
     },
     group 'field `prefix`' {
-      -- test('can be read', function ()
-      --   assert.are_equal(
-      --     Citation('einstein1905', 'NormalCitation', {'x'}).prefix,
-      --     {'x'}
-      --   )
-      -- end),
+      test('can be read', function ()
+        assert.are_same(
+          Citation('einstein1905', 'NormalCitation', {'x'}).prefix,
+          {Str 'x'}
+        )
+      end),
       test('can be set', function ()
         local c = Citation('Poincaré1905', 'NormalCitation')
         c.prefix = {'y'}
@@ -60,12 +60,12 @@ return {
       end),
     },
     group 'field `suffix`' {
-      -- test('can be read', function ()
-      --   assert.are_equal(
-      --     Citation('einstein1905', 'NormalCitation', {}, {'a'}).suffix,
-      --     {'a'}
-      --   )
-      -- end),
+      test('can be read', function ()
+        assert.are_same(
+          Citation('einstein1905', 'NormalCitation', {}, 'is great').suffix,
+          {Str 'is', Space(), Str 'great'}
+        )
+      end),
       test('can be set', function ()
         local c = Citation('Poincaré1905', 'NormalCitation')
         c.suffix = {'why'}
