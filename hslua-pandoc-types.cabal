@@ -54,7 +54,7 @@ test-suite hslua-pandoc-types-test
   import:              common-options
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             hslua-pandoc-types-test.hs
+  main-is:             test-hslua-pandoc-types.hs
   build-depends:       hslua-pandoc-types
                      , tasty                >= 0.11
                      , tasty-hunit          >= 0.9
