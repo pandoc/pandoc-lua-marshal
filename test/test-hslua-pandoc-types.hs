@@ -17,7 +17,7 @@ import Data.Proxy (Proxy (Proxy))
 import Data.String (fromString)
 import HsLua as Lua
 import HsLua.Pandoc.Types
-import Text.Pandoc.Definition (ListNumberStyle, ListNumberDelim)
+import Text.Pandoc.Definition (CitationMode, ListNumberStyle, ListNumberDelim)
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase)
 import Test.Tasty.Lua (translateResultsFromFile)
@@ -46,15 +46,20 @@ main = do
     register' mkAttr
     register' mkAttributeList
     translateResultsFromFile "test/test-attr.lua"
-  luaTest <- run @Lua.Exception $ do
+  citationTests <- run @Lua.Exception $ do
     openlibs
-    translateResultsFromFile "test/test-pandoc-types.lua"
+    pushListModule *> setglobal "List"
+    register' mkCitation
+    forM_ (constructors (Proxy @CitationMode)) $ \c -> do
+      pushString c
+      setglobal (fromString c)
+    translateResultsFromFile "test/test-citation.lua"
   defaultMain $ testGroup "hslua-pandoc-types"
     [ tests
     , listTests
     , listAttributeTests
     , attrTests
-    , luaTest
+    , citationTests
     ]
 
 -- | Basic tests

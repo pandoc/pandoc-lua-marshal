@@ -51,6 +51,8 @@ library
   c-sources:           cbits/listmod.c
   exposed-modules:     HsLua.Pandoc.Types
                      , HsLua.Pandoc.Types.Attr
+                     , HsLua.Pandoc.Types.Citation
+                     , HsLua.Pandoc.Types.Inline
                      , HsLua.Pandoc.Types.List
                      , HsLua.Pandoc.Types.ListAttributes
 
