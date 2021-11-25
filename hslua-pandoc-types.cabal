@@ -54,6 +54,7 @@ library
                      , HsLua.Pandoc.Types.Block
                      , HsLua.Pandoc.Types.Citation
                      , HsLua.Pandoc.Types.CitationMode
+                     , HsLua.Pandoc.Types.Content
                      , HsLua.Pandoc.Types.Format
                      , HsLua.Pandoc.Types.Inline
                      , HsLua.Pandoc.Types.List
