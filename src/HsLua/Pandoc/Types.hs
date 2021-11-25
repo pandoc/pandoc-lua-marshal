@@ -9,6 +9,7 @@ Use pandoc types in Lua
 module HsLua.Pandoc.Types
   ( module HsLua.Pandoc.Types.List
   , module HsLua.Pandoc.Types.Attr
+  , module HsLua.Pandoc.Types.Block
   , module HsLua.Pandoc.Types.Citation
   , module HsLua.Pandoc.Types.CitationMode
   , module HsLua.Pandoc.Types.Format
@@ -19,6 +20,7 @@ module HsLua.Pandoc.Types
   ) where
 
 import HsLua.Pandoc.Types.Attr
+import HsLua.Pandoc.Types.Block
 import HsLua.Pandoc.Types.Citation
 import HsLua.Pandoc.Types.CitationMode
 import HsLua.Pandoc.Types.Format
