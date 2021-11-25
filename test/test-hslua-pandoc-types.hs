@@ -34,12 +34,18 @@ main = do
       pushString c
       setglobal (fromString c)
     translateResultsFromFile "test/test-listattributes.lua"
+  listTest <- run @Lua.Exception $ do
+    openlibs
+    pushListModule
+    setglobal "List"
+    translateResultsFromFile "test/test-list-module.lua"
   luaTest <- run @Lua.Exception $ do
     openlibs
     translateResultsFromFile "test/test-pandoc-types.lua"
   defaultMain $ testGroup "hslua-pandoc-types"
     [ tests
     , listAttributeTests
+    , listTest
     , luaTest
     ]
 
