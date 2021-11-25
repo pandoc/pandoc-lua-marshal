@@ -18,6 +18,11 @@ tested-with:         GHC == 8.6.5
                      GHC == 8.8.4
                      GHC == 8.10.7
                      GHC == 9.0.1
+extra-source-files:  test/test-attr.lua
+                   , test/test-citation.lua
+                   , test/test-inline.lua
+                   , test/test-listattributes.lua
+                   , test/test-list-module.lua
 
 source-repository head
   type:                git
