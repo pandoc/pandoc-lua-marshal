@@ -7,9 +7,9 @@ homepage:            https://github.com/tarleb/hslua-pandoc-types
 bug-reports:         https://github.com/tarleb/hslua-pandoc-types/issues
 license:             MIT
 license-file:        LICENSE
-author:              Albert Krewinkel
+author:              Albert Krewinkel, John MacFarlane
 maintainer:          Albert Krewinkel <albert@zeitkraut.de>
-copyright:           2021 Albert Krewinkel
+copyright:           © 2017-2021 Albert Krewinkel, John MacFarlane
 category:            Foreign
 build-type:          Simple
 extra-doc-files:     README.md
