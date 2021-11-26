@@ -20,7 +20,7 @@ module HsLua.Pandoc.Types.Block
   , blockConstructors
   ) where
 
-import Control.Applicative ((<|>), optional)
+import Control.Applicative ((<|>))
 import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
 import Data.Data (showConstr, toConstr)
@@ -33,9 +33,16 @@ import HsLua.Pandoc.Types.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent
   , peekDefinitionItem )
 import HsLua.Pandoc.Types.Format (peekFormat, pushFormat)
-import HsLua.Pandoc.Types.Inline (peekInlinesFuzzy, pushInlines)
+import HsLua.Pandoc.Types.Inline (peekInlinesFuzzy)
 import HsLua.Pandoc.Types.List (pushPandocList)
 import HsLua.Pandoc.Types.ListAttributes (peekListAttributes, pushListAttributes)
+import HsLua.Pandoc.Types.TableParts
+  ( peekCaption, pushCaption
+  , peekColSpec, pushColSpec
+  , peekTableBody, pushTableBody
+  , peekTableFoot, pushTableFoot
+  , peekTableHead, pushTableHead
+  )
 import Text.Pandoc.Definition
 
 -- | Pushes an Block value as userdata object.
@@ -256,137 +263,6 @@ setBlockText = \case
   CodeBlock attr _ -> Actual . CodeBlock attr
   RawBlock f _     -> Actual . RawBlock f
   _                -> const Absent
-
---
--- Table components
---
-
--- | Push Caption element
-pushCaption :: LuaError e => Caption -> LuaE e ()
-pushCaption (Caption shortCaption longCaption) = do
-  newtable
-  addField "short" (maybe pushnil pushInlines shortCaption)
-  addField "long" (pushBlocks longCaption)
-
--- | Peek Caption element
-peekCaption :: LuaError e => Peeker e Caption
-peekCaption = retrieving "Caption" . \idx -> do
-  short <- optional $ peekFieldRaw peekInlinesFuzzy "short" idx
-  long <- peekFieldRaw peekBlocks "long" idx
-  return $! Caption short long
-
--- | Push a ColSpec value as a pair of Alignment and ColWidth.
-pushColSpec :: LuaError e => Pusher e ColSpec
-pushColSpec = pushPair (pushString . show) pushColWidth
-
--- | Peek a ColSpec value as a pair of Alignment and ColWidth.
-peekColSpec :: LuaError e => Peeker e ColSpec
-peekColSpec = peekPair peekRead peekColWidth
-
-peekColWidth :: Peeker e ColWidth
-peekColWidth = retrieving "ColWidth" . \idx -> do
-  maybe ColWidthDefault ColWidth <$!> optional (peekRealFloat idx)
-
--- | Push a ColWidth value by pushing the width as a plain number, or
--- @nil@ for ColWidthDefault.
-pushColWidth :: LuaError e => Pusher e ColWidth
-pushColWidth = \case
-  (ColWidth w)    -> push w
-  ColWidthDefault -> pushnil
-
--- | Push a table row as a pair of attr and the list of cells.
-pushRow :: LuaError e => Pusher e Row
-pushRow (Row attr cells) =
-  pushPair pushAttr (pushPandocList pushCell) (attr, cells)
-
--- | Push a table row from a pair of attr and the list of cells.
-peekRow :: LuaError e => Peeker e Row
-peekRow = ((uncurry Row) <$!>)
-  . retrieving "Row"
-  . peekPair peekAttr (peekList peekCell)
-
--- | Retrieves a 'Alignment' value from a string.
-peekAlignment :: Peeker e Alignment
-peekAlignment = peekRead
-
--- | Pushes a 'Alignment' value as a string.
-pushAlignment :: Pusher e Alignment
-pushAlignment = pushString . show
-
--- | Pushes a 'TableBody' value as a Lua table with fields @attr@,
--- @row_head_columns@, @head@, and @body@.
-pushTableBody :: LuaError e => Pusher e TableBody
-pushTableBody (TableBody attr (RowHeadColumns rowHeadColumns) head' body) = do
-    newtable
-    addField "attr" (pushAttr attr)
-    addField "row_head_columns" (pushIntegral rowHeadColumns)
-    addField "head" (pushPandocList pushRow head')
-    addField "body" (pushPandocList pushRow body)
-
--- | Retrieves a 'TableBody' value from a Lua table with fields @attr@,
--- @row_head_columns@, @head@, and @body@.
-peekTableBody :: LuaError e => Peeker e TableBody
-peekTableBody = fmap (retrieving "TableBody")
-  . typeChecked "table" istable
-  $ \idx -> TableBody
-  <$!> peekFieldRaw peekAttr "attr" idx
-  <*>  peekFieldRaw ((fmap RowHeadColumns) . peekIntegral) "row_head_columns" idx
-  <*>  peekFieldRaw (peekList peekRow) "head" idx
-  <*>  peekFieldRaw (peekList peekRow) "body" idx
-
--- | Push a table head value as the pair of its Attr and rows.
-pushTableHead :: LuaError e => Pusher e TableHead
-pushTableHead (TableHead attr rows) =
-  pushPair pushAttr (pushPandocList pushRow) (attr, rows)
-
--- | Peek a table head value from a pair of Attr and rows.
-peekTableHead :: LuaError e => Peeker e TableHead
-peekTableHead = ((uncurry TableHead) <$!>)
-  . retrieving "TableHead"
-  . peekPair peekAttr (peekList peekRow)
-
--- | Pushes a 'TableFoot' value as a pair of the Attr value and the list
--- of table rows.
-pushTableFoot :: LuaError e => Pusher e TableFoot
-pushTableFoot (TableFoot attr rows) =
-  pushPair pushAttr (pushPandocList pushRow) (attr, rows)
-
--- | Retrieves a 'TableFoot' value from a pair containing an Attr value
--- and a list of table rows.
-peekTableFoot :: LuaError e => Peeker e TableFoot
-peekTableFoot = ((uncurry TableFoot) <$!>)
-  . retrieving "TableFoot"
-  . peekPair peekAttr (peekList peekRow)
-
--- | Push a table cell as a table with fields @attr@, @alignment@,
--- @row_span@, @col_span@, and @contents@.
-pushCell :: LuaError e => Cell -> LuaE e ()
-pushCell (Cell attr align (RowSpan rowSpan) (ColSpan colSpan) contents) = do
-  newtable
-  addField "attr" (pushAttr attr)
-  addField "alignment" (pushAlignment align)
-  addField "row_span" (pushIntegral rowSpan)
-  addField "col_span" (pushIntegral colSpan)
-  addField "contents" (pushBlocks contents)
-
--- | Retrieves a table 'Cell' from the stack.
-peekCell :: LuaError e => Peeker e Cell
-peekCell = fmap (retrieving "Cell")
-  . typeChecked "table" istable
-  $ \idx -> do
-  attr <- peekFieldRaw peekAttr "attr" idx
-  algn <- peekFieldRaw peekAlignment "alignment" idx
-  rs   <- RowSpan <$!> peekFieldRaw peekIntegral "row_span" idx
-  cs   <- ColSpan <$!> peekFieldRaw peekIntegral "col_span" idx
-  blks <- peekFieldRaw peekBlocks "contents" idx
-  return $! Cell attr algn rs cs blks
-
--- | Add a value to the table at the top of the stack at a string-index.
-addField :: LuaError e => Name -> LuaE e () -> LuaE e ()
-addField key pushValue = do
-  pushName key
-  pushValue
-  rawset (nth 3)
 
 -- | Constructor functions for 'Block' elements.
 blockConstructors :: LuaError e => [DocumentedFunction e]
