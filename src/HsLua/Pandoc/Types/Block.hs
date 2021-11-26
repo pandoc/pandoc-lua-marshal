@@ -34,7 +34,7 @@ import HsLua.Pandoc.Types.Content
   , peekDefinitionItem )
 import HsLua.Pandoc.Types.Format (peekFormat, pushFormat)
 import HsLua.Pandoc.Types.Inline (peekInlinesFuzzy)
-import HsLua.Pandoc.Types.List (pushPandocList)
+import HsLua.Pandoc.Types.List (newListMetatable, pushPandocList)
 import HsLua.Pandoc.Types.ListAttributes (peekListAttributes, pushListAttributes)
 import HsLua.Pandoc.Types.TableParts
   ( peekCaption, pushCaption
@@ -64,7 +64,11 @@ peekBlocks = peekList peekBlock
 -- | Pushes a list of Block values.
 pushBlocks :: LuaError e
            => Pusher e [Block]
-pushBlocks = pushPandocList pushBlock
+pushBlocks xs = do
+  pushList pushBlock xs
+  newListMetatable "Blocks" $
+    pure ()
+  setmetatable (nth 2)
 {-# INLINABLE pushBlocks #-}
 
 -- | Try extra hard to retrieve an Block value from the stack. Treats

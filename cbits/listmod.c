@@ -242,14 +242,24 @@ static const luaL_Reg metareg[] = {
   {"__call", list_new}
 };
 
+/*
+** Creates a new metatable for a new List-like type.
+ */
+int lualist_newmetatable (lua_State *L, const char *name) {
+  if (luaL_newmetatable(L, name)) {
+    luaL_setfuncs(L, list_funcs, 0);
+    /* use functions from standard table module. */
+    copyfromtablelib(L, -1);
+    lua_pushvalue(L, -1);
+    lua_setfield(L, -2, "__index");
+    return 1;
+  }
+  return 0;
+}
+
 int luaopen_list (lua_State *L) {
   luaL_checkversion(L);
-  luaL_newmetatable(L, LIST_T);
-  luaL_setfuncs(L, list_funcs, 0);
-  /* use functions from standard table module. */
-  copyfromtablelib(L, -1);
-  lua_pushvalue(L, -1);
-  lua_setfield(L, -2, "__index");
+  lualist_newmetatable(L, LIST_T);
 
   lua_newtable(L);
   luaL_setfuncs(L, metareg, 0);

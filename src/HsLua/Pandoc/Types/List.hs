@@ -12,8 +12,11 @@ module HsLua.Pandoc.Types.List
   ( pushPandocList
   , luaopen_list_ptr
   , pushListModule
+  , newListMetatable
   ) where
 
+import Data.ByteString (useAsCString)
+import Foreign.C
 import HsLua
 
 -- | Pushes a list as a numerically-indexed Lua table, and sets a
@@ -28,10 +31,22 @@ pushPandocList pushItem items = do
 foreign import ccall unsafe "listmod.c &luaopen_list"
   luaopen_list_ptr :: CFunction
 
--- foreign import capi unsafe "listmod.c value LIST_T"
---   c_list_t :: CString
-
 pushListModule :: LuaError e => LuaE e ()
 pushListModule = do
   pushcfunction luaopen_list_ptr
   call 0 1
+
+foreign import ccall "listmod.c lualist_newmetatable"
+  lualist_newmetatable :: State -> CString -> IO CInt
+
+-- | Pushes the metatable of the given List type, creating it if
+-- necessary. The @setup@ operation is run when the metatable did not
+-- exists, was created, and is then at the top of the stack. The
+-- operation may modify the table but must be balanced, and must leave
+-- the stack as it found it.
+newListMetatable :: Name -> LuaE e () {-^ setup -} -> LuaE e ()
+newListMetatable (Name name) setup = do
+  l <- state
+  liftIO (useAsCString name (lualist_newmetatable l)) >>= \case
+    0 -> pure ()   -- metatable already registered; no need to setup again
+    _ -> setup

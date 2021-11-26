@@ -31,6 +31,7 @@ source-repository head
 
 common common-options
   build-depends:       base                  >= 4.12     && < 5
+                     , bytestring            >= 0.10     && < 0.12
                      , exceptions            >= 0.8      && < 0.11
                      , hslua                 >= 2.0.1    && < 2.1
                      , hslua-marshalling     >= 2.0.1    && < 2.1

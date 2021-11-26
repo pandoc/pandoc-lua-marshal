@@ -33,7 +33,7 @@ import HsLua.Pandoc.Types.Citation (peekCitation, pushCitation)
 import HsLua.Pandoc.Types.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent )
 import HsLua.Pandoc.Types.Format (peekFormat, pushFormat)
-import HsLua.Pandoc.Types.List (pushPandocList)
+import HsLua.Pandoc.Types.List (pushPandocList, newListMetatable)
 import HsLua.Pandoc.Types.MathType (peekMathType, pushMathType)
 import HsLua.Pandoc.Types.QuoteType (peekQuoteType, pushQuoteType)
 import Text.Pandoc.Definition ( Inline (..), nullAttr )
@@ -58,7 +58,11 @@ peekInlines = peekList peekInline
 -- | Pushes a list of Inline values.
 pushInlines :: LuaError e
             => Pusher e [Inline]
-pushInlines = pushPandocList pushInline
+pushInlines xs = do
+  pushList pushInline xs
+  newListMetatable "Inlines" $
+    pure ()
+  setmetatable (nth 2)
 {-# INLINABLE pushInlines #-}
 
 -- | Try extra hard to retrieve an Inline value from the stack. Treats
