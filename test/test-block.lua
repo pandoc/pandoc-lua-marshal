@@ -179,7 +179,7 @@ return {
     },
     group 'Null' {
       test('Can be constructed', function ()
-        assert.are_equal(pandoc.Null().t, 'Null')
+        assert.are_equal(Null().t, 'Null')
       end)
     },
     group 'OrderedList' {
