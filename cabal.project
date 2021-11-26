@@ -1,7 +1,1 @@
 packages: hslua-pandoc-types.cabal
-
-source-repository-package
-  type: git
-  location: https://github.com/hslua/hslua.git
-  tag: fb6ef4423e9dc804a66e9f9e5a708748e579ce81
-  subdir: lua
