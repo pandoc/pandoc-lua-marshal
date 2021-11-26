@@ -25,6 +25,7 @@ extra-source-files:  test/test-attr.lua
                    , test/test-listattributes.lua
                    , test/test-list-module.lua
                    , test/test-metavalue.lua
+                   , test/test-pandoc.lua
 
 source-repository head
   type:                git
@@ -72,6 +73,7 @@ library
                      , HsLua.Pandoc.Types.ListAttributes
                      , HsLua.Pandoc.Types.MathType
                      , HsLua.Pandoc.Types.MetaValue
+                     , HsLua.Pandoc.Types.Pandoc
                      , HsLua.Pandoc.Types.QuoteType
                      , HsLua.Pandoc.Types.TableParts
 

@@ -82,6 +82,15 @@ main = do
     forM_ metaValueConstructors register'
     translateResultsFromFile "test/test-metavalue.lua"
 
+  pandocTests <- run @Lua.Exception $ do
+    openlibs
+    pushListModule *> setglobal "List"
+    register' mkMeta
+    register' mkPandoc
+    forM_ inlineConstructors register'
+    forM_ blockConstructors register'
+    translateResultsFromFile "test/test-pandoc.lua"
+
   defaultMain $ testGroup "hslua-pandoc-types"
     [ tests
     , listTests
@@ -91,6 +100,7 @@ main = do
     , inlineTests
     , blockTests
     , metavalueTests
+    , pandocTests
     ]
 
 -- | Basic tests

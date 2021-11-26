@@ -20,6 +20,7 @@ module HsLua.Pandoc.Types
   , module HsLua.Pandoc.Types.ListAttributes
   , module HsLua.Pandoc.Types.MathType
   , module HsLua.Pandoc.Types.MetaValue
+  , module HsLua.Pandoc.Types.Pandoc
   , module HsLua.Pandoc.Types.QuoteType
   , module HsLua.Pandoc.Types.TableParts
   ) where
@@ -37,5 +38,6 @@ import HsLua.Pandoc.Types.List
 import HsLua.Pandoc.Types.ListAttributes
 import HsLua.Pandoc.Types.MathType
 import HsLua.Pandoc.Types.MetaValue
+import HsLua.Pandoc.Types.Pandoc
 import HsLua.Pandoc.Types.QuoteType
 import HsLua.Pandoc.Types.TableParts
