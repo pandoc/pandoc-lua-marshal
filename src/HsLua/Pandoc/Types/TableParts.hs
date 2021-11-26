@@ -13,6 +13,8 @@ module HsLua.Pandoc.Types.TableParts
   , pushCaption
   , peekColSpec
   , pushColSpec
+  , peekRow
+  , pushRow
   , peekTableBody
   , pushTableBody
   , peekTableFoot
