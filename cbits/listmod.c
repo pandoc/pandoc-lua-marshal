@@ -265,7 +265,8 @@ static const luaL_Reg list_funcs[] = {
 };
 
 static const luaL_Reg metareg[] = {
-  {"__call", list_new}
+  {"__call", list_new},
+  {NULL, NULL}
 };
 
 /*
