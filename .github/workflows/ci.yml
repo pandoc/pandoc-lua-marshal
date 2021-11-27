@@ -4,41 +4,43 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
 
 jobs:
   build:
-    name: ghc ${{ matrix.ghc }}
+    name: GHC ${{ matrix.version.ghc }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        cabal: ["2.4"]
-        ghc:
-          - "8.6.5"
-          - "8.8.4"
-          - "8.10.7"
-          - "9.0.1"
+        version:
+          - ghc: '8.6.5'
+            cabal: '3.2'
+          - ghc: '8.8.4'
+            cabal: '3.2'
+          - ghc: '8.10.7'
+            cabal: '3.2'
+          - ghc: '9.0.1'
+            cabal: '3.4'
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Install recent cabal/ghc
-      uses: haskell/actions/setup@v1
-      with:
-        ghc-version: ${{ matrix.ghc }}
-        cabal-version: ${{ matrix.cabal }}
+      - name: Install recent cabal/ghc
+        uses: haskell/actions/setup@v1
+        with:
+          ghc-version: ${{ matrix.version.ghc }}
+          cabal-version: ${{ matrix.version.cabal }}
 
-    - uses: actions/cache@v1
-      name: Cache ~/.cabal/store
-      with:
-        path: ~/.cabal/store
-        key: ${{ runner.os }}-${{ matrix.ghc }}-cabal
+      - uses: actions/cache@v1
+        name: Cache ~/.cabal/store
+        with:
+          path: ~/.cabal/store
+          key: ${{ runner.os }}-${{ matrix.version.ghc }}-cabal
 
-    - name: Build
-      run: |
-        cabal v2-update
-        cabal v2-build --enable-tests --enable-benchmarks
+      - name: Build
+        run: |
+          cabal update
+          cabal build --enable-tests --enable-benchmarks
 
-    - name: Test
-      run: |
-        cabal v2-test --enable-tests
+      - name: Test
+        run: |
+          cabal test --enable-tests
