@@ -74,6 +74,17 @@ main = do
     forM_ blockConstructors register'
     translateResultsFromFile "test/test-block.lua"
 
+  simpleTableTests <- run @Lua.Exception $ do
+    openlibs
+    pushListModule *> setglobal "List"
+    register' mkAttr
+    register' mkListAttributes
+    register' mkSimpleTable
+    registerConstants (Proxy @Alignment)
+    forM_ inlineConstructors register'
+    forM_ blockConstructors register'
+    translateResultsFromFile "test/test-simpletable.lua"
+
   metavalueTests <- run @Lua.Exception $ do
     openlibs
     pushListModule *> setglobal "List"
@@ -97,6 +108,7 @@ main = do
     , citationTests
     , inlineTests
     , blockTests
+    , simpleTableTests
     , metavalueTests
     , pandocTests
     ]

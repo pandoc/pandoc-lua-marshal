@@ -87,6 +87,7 @@ library
                      , Text.Pandoc.Lua.Marshal.MetaValue
                      , Text.Pandoc.Lua.Marshal.Pandoc
                      , Text.Pandoc.Lua.Marshal.QuoteType
+                     , Text.Pandoc.Lua.Marshal.SimpleTable
                      , Text.Pandoc.Lua.Marshal.TableParts
 
 test-suite pandoc-lua-marshal-test

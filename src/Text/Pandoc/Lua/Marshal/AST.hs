@@ -22,6 +22,7 @@ module Text.Pandoc.Lua.Marshal.AST
   , module Text.Pandoc.Lua.Marshal.MetaValue
   , module Text.Pandoc.Lua.Marshal.Pandoc
   , module Text.Pandoc.Lua.Marshal.QuoteType
+  , module Text.Pandoc.Lua.Marshal.SimpleTable
   , module Text.Pandoc.Lua.Marshal.TableParts
   ) where
 
@@ -40,4 +41,5 @@ import Text.Pandoc.Lua.Marshal.MathType
 import Text.Pandoc.Lua.Marshal.MetaValue
 import Text.Pandoc.Lua.Marshal.Pandoc
 import Text.Pandoc.Lua.Marshal.QuoteType
+import Text.Pandoc.Lua.Marshal.SimpleTable
 import Text.Pandoc.Lua.Marshal.TableParts
