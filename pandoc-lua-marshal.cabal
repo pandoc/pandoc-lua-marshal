@@ -1,10 +1,10 @@
 cabal-version:       2.4
-name:                hslua-pandoc-types
+name:                pandoc-lua-marshal
 version:             0.0.0.0
 synopsis:            Use pandoc types in Lua
 description:         Use pandoc types in Lua
-homepage:            https://github.com/tarleb/hslua-pandoc-types
-bug-reports:         https://github.com/tarleb/hslua-pandoc-types/issues
+homepage:            https://github.com/tarleb/pandoc-lua-marshal
+bug-reports:         https://github.com/tarleb/pandoc-lua-marshal/issues
 license:             MIT
 license-file:        LICENSE
 author:              Albert Krewinkel, John MacFarlane
@@ -29,7 +29,7 @@ extra-source-files:  test/test-attr.lua
 
 source-repository head
   type:                git
-  location:            https://github.com/tarleb/hslua-pandoc-types.git
+  location:            https://github.com/tarleb/pandoc-lua-marshal.git
 
 common common-options
   build-depends:       base                  >= 4.12     && < 5
@@ -78,12 +78,12 @@ library
                      , Text.Pandoc.Lua.Marshal.QuoteType
                      , Text.Pandoc.Lua.Marshal.TableParts
 
-test-suite hslua-pandoc-types-test
+test-suite pandoc-lua-marshal-test
   import:              common-options
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             test-hslua-pandoc-types.hs
-  build-depends:       hslua-pandoc-types
+  main-is:             test-pandoc-lua-marshal.hs
+  build-depends:       pandoc-lua-marshal
                      , tasty                >= 0.11
                      , tasty-hunit          >= 0.9
                      , tasty-lua            >= 1.0

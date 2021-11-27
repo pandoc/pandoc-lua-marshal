@@ -1,4 +1,4 @@
-# hslua-pandoc-types
+# pandoc-lua-marshal
 
 [![GitHub CI][]][1]
 [![Hackage][]][2]
@@ -8,13 +8,13 @@
 
 Use pandoc types in Lua.
 
-[GitHub CI]: https://github.com/tarleb/hslua-pandoc-types/workflows/CI/badge.svg
-[1]: https://github.com/tarleb/hslua-pandoc-types/actions
-[Hackage]: https://img.shields.io/hackage/v/hslua-pandoc-types.svg?logo=haskell
-[2]: https://hackage.haskell.org/package/hslua-pandoc-types
-[Stackage Lts]: http://stackage.org/package/hslua-pandoc-types/badge/lts
-[3]: https://stackage.org/lts/package/hslua-pandoc-types
-[Stackage Nightly]: https://stackage.org/package/hslua-pandoc-types/badge/nightly
-[4]: https://stackage.org/nightly/package/hslua-pandoc-types
+[GitHub CI]: https://github.com/tarleb/pandoc-lua-marshal/workflows/CI/badge.svg
+[1]: https://github.com/tarleb/pandoc-lua-marshal/actions
+[Hackage]: https://img.shields.io/hackage/v/pandoc-lua-marshal.svg?logo=haskell
+[2]: https://hackage.haskell.org/package/pandoc-lua-marshal
+[Stackage Lts]: http://stackage.org/package/pandoc-lua-marshal/badge/lts
+[3]: https://stackage.org/lts/package/pandoc-lua-marshal
+[Stackage Nightly]: https://stackage.org/package/pandoc-lua-marshal/badge/nightly
+[4]: https://stackage.org/nightly/package/pandoc-lua-marshal
 [MIT license]: https://img.shields.io/badge/license-MIT-blue.svg
 [5]: LICENSE

@@ -1,1 +1,1 @@
-packages: hslua-pandoc-types.cabal
+packages: pandoc-lua-marshal.cabal

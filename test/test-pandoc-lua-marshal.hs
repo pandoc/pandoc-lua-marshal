@@ -89,7 +89,7 @@ main = do
     forM_ blockConstructors register'
     translateResultsFromFile "test/test-pandoc.lua"
 
-  defaultMain $ testGroup "hslua-pandoc-types"
+  defaultMain $ testGroup "pandoc-lua-marshal"
     [ tests
     , listTests
     , listAttributeTests
