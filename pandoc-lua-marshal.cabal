@@ -71,7 +71,7 @@ library
   import:              common-options
   hs-source-dirs:      src
   c-sources:           cbits/listmod.c
-  exposed-modules:     Text.Pandoc.Lua.Marshal
+  exposed-modules:     Text.Pandoc.Lua.Marshal.AST
                      , Text.Pandoc.Lua.Marshal.Alignment
                      , Text.Pandoc.Lua.Marshal.Attr
                      , Text.Pandoc.Lua.Marshal.Block

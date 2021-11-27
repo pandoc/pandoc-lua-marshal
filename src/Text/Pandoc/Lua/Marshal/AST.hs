@@ -6,7 +6,7 @@ Maintainer: Albert Krewinkel <albert@zeitkraut.de>
 Use pandoc types in Lua
 -}
 
-module Text.Pandoc.Lua.Marshal
+module Text.Pandoc.Lua.Marshal.AST
   ( module Text.Pandoc.Lua.Marshal.List
   , module Text.Pandoc.Lua.Marshal.Alignment
   , module Text.Pandoc.Lua.Marshal.Attr
