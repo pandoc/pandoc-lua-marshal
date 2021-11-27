@@ -26,9 +26,8 @@ main :: IO ()
 main = do
   listTests <- run @Lua.Exception $ do
     openlibs
-    pushListModule
-    setglobal "List"
-    translateResultsFromFile "test/test-list-module.lua"
+    pushListModule *> setglobal "List"
+    translateResultsFromFile "test/test-list.lua"
 
   listAttributeTests <- run @Lua.Exception $ do
     openlibs
@@ -39,8 +38,7 @@ main = do
 
   attrTests <- run @Lua.Exception $ do
     openlibs
-    pushListModule
-    setglobal "List"
+    pushListModule *> setglobal "List"
     register' mkAttr
     register' mkAttributeList
     translateResultsFromFile "test/test-attr.lua"

@@ -23,7 +23,7 @@ extra-source-files:  test/test-attr.lua
                    , test/test-citation.lua
                    , test/test-inline.lua
                    , test/test-listattributes.lua
-                   , test/test-list-module.lua
+                   , test/test-list.lua
                    , test/test-metavalue.lua
                    , test/test-pandoc.lua
 
