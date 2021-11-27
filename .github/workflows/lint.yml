@@ -1,0 +1,37 @@
+name: Lint
+
+# Trigger the workflow on push or pull request
+on:
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/ci.yml'
+      - '.github/FUNDING.md'
+      - '**/CHANGELOG.md'
+      - '**/LICENSE'
+      - '**/README.md'
+      - '**/stack.yaml'
+      - '**/*.cabal'
+  push:
+    paths-ignore:
+      - '.github/workflows/ci.yml'
+      - '.github/FUNDING.md'
+      - '**/CHANGELOG.md'
+      - '**/LICENSE'
+      - '**/README.md'
+      - '**/stack.yaml'
+      - '**/*.cabal'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    env:
+      hlint_script: https://raw.github.com/ndmitchell/hlint/master/misc/run.sh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download and run hlint
+        run: |
+          curl -sSL "${hlint_script}" | sh -s .
