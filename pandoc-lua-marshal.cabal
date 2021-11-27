@@ -2,7 +2,17 @@ cabal-version:       2.4
 name:                pandoc-lua-marshal
 version:             0.0.0.0
 synopsis:            Use pandoc types in Lua
-description:         Use pandoc types in Lua
+description:         This package provides functions to marshal and unmarshal
+                     pandoc document types to and from Lua.
+                     .
+                     The values of most types are pushed to pandoc as "userdata"
+                     objects that wrap a stable pointer to the Haskell value;
+                     these objects come with methods to access and modify their
+                     properties.
+                     .
+                     Sequences are pushed as normal Lua tables, but are
+                     augmented with convenience functions.
+
 homepage:            https://github.com/tarleb/pandoc-lua-marshal
 bug-reports:         https://github.com/tarleb/pandoc-lua-marshal/issues
 license:             MIT
