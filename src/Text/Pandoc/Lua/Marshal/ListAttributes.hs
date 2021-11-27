@@ -8,7 +8,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 Marshaling/unmarshaling functions and constructor for 'ListAttributes'
 values.
 -}
-module HsLua.Pandoc.Types.ListAttributes
+module Text.Pandoc.Lua.Marshal.ListAttributes
   ( typeListAttributes
   , peekListAttributes
   , pushListAttributes

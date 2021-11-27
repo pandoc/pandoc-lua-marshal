@@ -1,4 +1,4 @@
-module HsLua.Pandoc.Types.Block
+module Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy
   , pushBlocks
   ) where

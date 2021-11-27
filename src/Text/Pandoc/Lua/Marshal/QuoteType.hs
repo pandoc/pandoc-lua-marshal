@@ -5,7 +5,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'QuoteType' values.
 -}
-module HsLua.Pandoc.Types.QuoteType
+module Text.Pandoc.Lua.Marshal.QuoteType
   ( peekQuoteType
   , pushQuoteType
   ) where

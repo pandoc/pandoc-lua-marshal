@@ -6,16 +6,16 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of table 'Cell' values.
 -}
-module HsLua.Pandoc.Types.Cell
+module Text.Pandoc.Lua.Marshal.Cell
   ( peekCell
   , pushCell
   ) where
 
 import Control.Monad ((<$!>))
 import HsLua
-import HsLua.Pandoc.Types.Alignment (peekAlignment, pushAlignment)
-import HsLua.Pandoc.Types.Attr (peekAttr, pushAttr)
-import {-# SOURCE #-} HsLua.Pandoc.Types.Block
+import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
+import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy, pushBlocks )
 import Text.Pandoc.Definition (Cell (..), RowSpan (..), ColSpan (..))
 

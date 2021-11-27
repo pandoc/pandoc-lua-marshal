@@ -5,7 +5,7 @@
 {-# LANGUAGE TupleSections        #-}
 {-# LANGUAGE TypeApplications     #-}
 {- |
-Module      : HsLua.Pandoc.Types.Attr
+Module      : Text.Pandoc.Lua.Marshal.Attr
 Copyright   : © 2017-2021 Albert Krewinkel, John MacFarlane
 License     : MIT
 
@@ -14,7 +14,7 @@ Maintainer  : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 Helpers to make pandoc's Attr elements usable in Lua, and to get objects
 back into Haskell.
 -}
-module HsLua.Pandoc.Types.Attr
+module Text.Pandoc.Lua.Marshal.Attr
   ( typeAttr
   , peekAttr
   , pushAttr
@@ -28,7 +28,7 @@ import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import HsLua
 import HsLua.Marshalling.Peekers (peekIndexRaw)
-import HsLua.Pandoc.Types.List (pushPandocList)
+import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Safe (atMay)
 import Text.Pandoc.Definition (Attr, nullAttr)
 

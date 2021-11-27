@@ -5,7 +5,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'Alignment' values.
 -}
-module HsLua.Pandoc.Types.Alignment
+module Text.Pandoc.Lua.Marshal.Alignment
   ( peekAlignment
   , pushAlignment
   ) where

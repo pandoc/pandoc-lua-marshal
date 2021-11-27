@@ -8,7 +8,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'MetaValue' elements.
 -}
-module HsLua.Pandoc.Types.MetaValue
+module Text.Pandoc.Lua.Marshal.MetaValue
   ( peekMetaValue
   , pushMetaValue
   , metaValueConstructors
@@ -17,11 +17,11 @@ module HsLua.Pandoc.Types.MetaValue
 import Control.Applicative ((<|>), optional)
 import Control.Monad ((<$!>))
 import HsLua
-import HsLua.Pandoc.Types.Block
+import Text.Pandoc.Lua.Marshal.Block
   ( peekBlock, peekBlocks, peekBlocksFuzzy, pushBlocks )
-import HsLua.Pandoc.Types.Inline
+import Text.Pandoc.Lua.Marshal.Inline
   ( peekInline, peekInlines, peekInlinesFuzzy, pushInlines )
-import HsLua.Pandoc.Types.List (pushPandocList)
+import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Definition (MetaValue (..))
 
 -- | Push a 'MetaValue' element to the top of the Lua stack.

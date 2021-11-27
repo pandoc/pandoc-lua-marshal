@@ -5,7 +5,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'MathType' values.
 -}
-module HsLua.Pandoc.Types.MathType
+module Text.Pandoc.Lua.Marshal.MathType
   ( peekMathType
   , pushMathType
   ) where

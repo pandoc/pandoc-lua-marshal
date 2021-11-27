@@ -8,7 +8,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 Defines a helper type that can handle different types of 'Block' and
 'Inline' element contents.
 -}
-module HsLua.Pandoc.Types.Content
+module Text.Pandoc.Lua.Marshal.Content
   ( Content (..)
   , contentTypeDescription
   , peekContent
@@ -19,11 +19,11 @@ module HsLua.Pandoc.Types.Content
 import Control.Applicative ((<|>))
 import Control.Monad ((<$!>))
 import HsLua
-import {-# SOURCE #-} HsLua.Pandoc.Types.Block
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy, pushBlocks )
-import {-# SOURCE #-} HsLua.Pandoc.Types.Inline
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
-import HsLua.Pandoc.Types.List (pushPandocList)
+import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Definition (Inline, Block)
 
 --

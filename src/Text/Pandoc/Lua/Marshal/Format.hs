@@ -5,7 +5,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'Format' values.
 -}
-module HsLua.Pandoc.Types.Format
+module Text.Pandoc.Lua.Marshal.Format
   ( peekFormat
   , pushFormat
   ) where

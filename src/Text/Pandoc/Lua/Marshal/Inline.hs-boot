@@ -1,4 +1,4 @@
-module HsLua.Pandoc.Types.Inline
+module Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy
   , pushInlines
   )

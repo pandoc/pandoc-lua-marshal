@@ -6,7 +6,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions and constructor for 'Citation' values.
 -}
-module HsLua.Pandoc.Types.Citation
+module Text.Pandoc.Lua.Marshal.Citation
   ( -- * Citation
     peekCitation
   , pushCitation
@@ -17,8 +17,8 @@ module HsLua.Pandoc.Types.Citation
 import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import HsLua as Lua
-import HsLua.Pandoc.Types.CitationMode (peekCitationMode, pushCitationMode)
-import {-# SOURCE #-} HsLua.Pandoc.Types.Inline (peekInlinesFuzzy, pushInlines)
+import Text.Pandoc.Lua.Marshal.CitationMode (peekCitationMode, pushCitationMode)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline (peekInlinesFuzzy, pushInlines)
 import Text.Pandoc.Definition (Citation (..))
 
 -- | Pushes a Citation value as userdata object.

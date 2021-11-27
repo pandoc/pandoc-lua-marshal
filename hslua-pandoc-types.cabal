@@ -60,23 +60,23 @@ library
   import:              common-options
   hs-source-dirs:      src
   c-sources:           cbits/listmod.c
-  exposed-modules:     HsLua.Pandoc.Types
-                     , HsLua.Pandoc.Types.Alignment
-                     , HsLua.Pandoc.Types.Attr
-                     , HsLua.Pandoc.Types.Block
-                     , HsLua.Pandoc.Types.Cell
-                     , HsLua.Pandoc.Types.Citation
-                     , HsLua.Pandoc.Types.CitationMode
-                     , HsLua.Pandoc.Types.Content
-                     , HsLua.Pandoc.Types.Format
-                     , HsLua.Pandoc.Types.Inline
-                     , HsLua.Pandoc.Types.List
-                     , HsLua.Pandoc.Types.ListAttributes
-                     , HsLua.Pandoc.Types.MathType
-                     , HsLua.Pandoc.Types.MetaValue
-                     , HsLua.Pandoc.Types.Pandoc
-                     , HsLua.Pandoc.Types.QuoteType
-                     , HsLua.Pandoc.Types.TableParts
+  exposed-modules:     Text.Pandoc.Lua.Marshal
+                     , Text.Pandoc.Lua.Marshal.Alignment
+                     , Text.Pandoc.Lua.Marshal.Attr
+                     , Text.Pandoc.Lua.Marshal.Block
+                     , Text.Pandoc.Lua.Marshal.Cell
+                     , Text.Pandoc.Lua.Marshal.Citation
+                     , Text.Pandoc.Lua.Marshal.CitationMode
+                     , Text.Pandoc.Lua.Marshal.Content
+                     , Text.Pandoc.Lua.Marshal.Format
+                     , Text.Pandoc.Lua.Marshal.Inline
+                     , Text.Pandoc.Lua.Marshal.List
+                     , Text.Pandoc.Lua.Marshal.ListAttributes
+                     , Text.Pandoc.Lua.Marshal.MathType
+                     , Text.Pandoc.Lua.Marshal.MetaValue
+                     , Text.Pandoc.Lua.Marshal.Pandoc
+                     , Text.Pandoc.Lua.Marshal.QuoteType
+                     , Text.Pandoc.Lua.Marshal.TableParts
 
 test-suite hslua-pandoc-types-test
   import:              common-options

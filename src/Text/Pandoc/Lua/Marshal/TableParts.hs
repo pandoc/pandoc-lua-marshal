@@ -8,7 +8,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 Marshaling/unmarshaling functions of types that are used exclusively
 with tables.
 -}
-module HsLua.Pandoc.Types.TableParts
+module Text.Pandoc.Lua.Marshal.TableParts
   ( peekCaption
   , pushCaption
   , peekColSpec
@@ -26,14 +26,14 @@ module HsLua.Pandoc.Types.TableParts
 import Control.Applicative (optional)
 import Control.Monad ((<$!>))
 import HsLua
-import HsLua.Pandoc.Types.Alignment (peekAlignment, pushAlignment)
-import HsLua.Pandoc.Types.Attr (peekAttr, pushAttr)
-import {-# SOURCE #-} HsLua.Pandoc.Types.Block
+import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
+import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy, pushBlocks )
-import HsLua.Pandoc.Types.Cell (peekCell, pushCell)
-import {-# SOURCE #-} HsLua.Pandoc.Types.Inline
+import Text.Pandoc.Lua.Marshal.Cell (peekCell, pushCell)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
-import HsLua.Pandoc.Types.List (pushPandocList)
+import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Definition
 
 -- | Push Caption element

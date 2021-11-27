@@ -7,7 +7,7 @@
 
 Marshal values of types that make up 'Inline' elements.
 -}
-module HsLua.Pandoc.Types.Inline
+module Text.Pandoc.Lua.Marshal.Inline
   ( -- * Single Inline elements
     peekInline
   , peekInlineFuzzy
@@ -26,16 +26,16 @@ import Data.Data (showConstr, toConstr)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import HsLua
-import HsLua.Pandoc.Types.Attr (peekAttr, pushAttr)
-import {-# SOURCE #-} HsLua.Pandoc.Types.Block
+import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy )
-import HsLua.Pandoc.Types.Citation (peekCitation, pushCitation)
-import HsLua.Pandoc.Types.Content
+import Text.Pandoc.Lua.Marshal.Citation (peekCitation, pushCitation)
+import Text.Pandoc.Lua.Marshal.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent )
-import HsLua.Pandoc.Types.Format (peekFormat, pushFormat)
-import HsLua.Pandoc.Types.List (pushPandocList, newListMetatable)
-import HsLua.Pandoc.Types.MathType (peekMathType, pushMathType)
-import HsLua.Pandoc.Types.QuoteType (peekQuoteType, pushQuoteType)
+import Text.Pandoc.Lua.Marshal.Format (peekFormat, pushFormat)
+import Text.Pandoc.Lua.Marshal.List (pushPandocList, newListMetatable)
+import Text.Pandoc.Lua.Marshal.MathType (peekMathType, pushMathType)
+import Text.Pandoc.Lua.Marshal.QuoteType (peekQuoteType, pushQuoteType)
 import Text.Pandoc.Definition ( Inline (..), nullAttr )
 import qualified Text.Pandoc.Builder as B
 

@@ -6,7 +6,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'Pandoc' values.
 -}
-module HsLua.Pandoc.Types.Pandoc
+module Text.Pandoc.Lua.Marshal.Pandoc
   ( -- * Pandoc
     peekPandoc
   , pushPandoc
@@ -21,8 +21,8 @@ import Control.Applicative (optional)
 import Control.Monad ((<$!>))
 import Data.Maybe (fromMaybe)
 import HsLua
-import HsLua.Pandoc.Types.Block (peekBlocksFuzzy, pushBlocks)
-import HsLua.Pandoc.Types.MetaValue (peekMetaValue, pushMetaValue)
+import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
+import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Definition (Pandoc (..), Meta (..), nullMeta)
 
 -- | Pushes a 'Pandoc' value as userdata.

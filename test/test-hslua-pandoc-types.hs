@@ -16,7 +16,7 @@ import Data.Data (Data, dataTypeConstrs, dataTypeOf, showConstr)
 import Data.Proxy (Proxy (Proxy))
 import Data.String (fromString)
 import HsLua as Lua
-import HsLua.Pandoc.Types
+import Text.Pandoc.Lua.Marshal
 import Text.Pandoc.Definition
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit (testCase)

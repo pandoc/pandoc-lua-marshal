@@ -5,7 +5,7 @@ Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
 Marshaling/unmarshaling functions of 'CitationMode' values.
 -}
-module HsLua.Pandoc.Types.CitationMode
+module Text.Pandoc.Lua.Marshal.CitationMode
   ( peekCitationMode
   , pushCitationMode
   ) where

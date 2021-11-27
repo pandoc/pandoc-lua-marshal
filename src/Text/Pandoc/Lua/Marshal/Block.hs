@@ -7,7 +7,7 @@
 
 Marshal values of types that make up 'Block' elements.
 -}
-module HsLua.Pandoc.Types.Block
+module Text.Pandoc.Lua.Marshal.Block
   ( -- * Single Block elements
     peekBlock
   , peekBlockFuzzy
@@ -28,15 +28,15 @@ import Data.Maybe (fromMaybe)
 import Data.Proxy (Proxy (Proxy))
 import Data.Text (Text)
 import HsLua hiding (Div)
-import HsLua.Pandoc.Types.Attr (peekAttr, pushAttr)
-import HsLua.Pandoc.Types.Content
+import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
+import Text.Pandoc.Lua.Marshal.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent
   , peekDefinitionItem )
-import HsLua.Pandoc.Types.Format (peekFormat, pushFormat)
-import HsLua.Pandoc.Types.Inline (peekInlinesFuzzy)
-import HsLua.Pandoc.Types.List (newListMetatable, pushPandocList)
-import HsLua.Pandoc.Types.ListAttributes (peekListAttributes, pushListAttributes)
-import HsLua.Pandoc.Types.TableParts
+import Text.Pandoc.Lua.Marshal.Format (peekFormat, pushFormat)
+import Text.Pandoc.Lua.Marshal.Inline (peekInlinesFuzzy)
+import Text.Pandoc.Lua.Marshal.List (newListMetatable, pushPandocList)
+import Text.Pandoc.Lua.Marshal.ListAttributes (peekListAttributes, pushListAttributes)
+import Text.Pandoc.Lua.Marshal.TableParts
   ( peekCaption, pushCaption
   , peekColSpec, pushColSpec
   , peekTableBody, pushTableBody
