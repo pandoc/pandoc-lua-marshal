@@ -71,4 +71,4 @@ jobs:
       - name: Test
         shell: cmd
         run: |
-          stack test --fast --test-arguments="--hide-successes --ansi-tricks=false"
+          stack test --fast --test-arguments="--ansi-tricks=false"
