@@ -58,6 +58,31 @@ static int list_clone (lua_State *L) {
 }
 
 /*
+** Creates a new list that is the concatenation of its two arguments.
+** The result has the same metatable as the first operand.
+*/
+static int list_concat (lua_State *L) {
+  lua_settop(L, 2);
+  luaL_checktype(L, 1, LUA_TTABLE);
+  luaL_checktype(L, 2, LUA_TTABLE);
+  lua_Integer len1 = luaL_len(L, 1);
+  lua_Integer len2 = luaL_len(L, 2);
+  lua_createtable(L, len1 + len2, 0);  /* result table */
+  if (lua_getmetatable(L, 1)) {
+    lua_setmetatable(L, 3);
+  }
+  for (lua_Integer i = 1; i <= len1; i++) {
+    lua_geti(L, 1, i);
+    lua_seti(L, 3, i);
+  }
+  for (lua_Integer i = 1; i <= len2; i++) {
+    lua_geti(L, 2, i);
+    lua_seti(L, 3, len1 + i);
+  }
+  return 1;
+}
+
+/*
 ** Appends the second list to the first.
 */
 static int list_extend (lua_State *L) {
@@ -224,6 +249,7 @@ static void copyfromtablelib (lua_State *L, int idx) {
 }
 
 static const luaL_Reg list_funcs[] = {
+  {"__concat", list_concat},
   {"clone", list_clone},
   {"extend", list_extend},
   {"filter", list_filter},

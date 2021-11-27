@@ -191,5 +191,25 @@ return {
         assert.are_same({71, 42, 23, 5, 1, 0, -1}, numbers)
       end)
     },
-  }
+  },
+  group 'Operations' {
+    group 'concatenation' {
+    test('yields a concatenated list', function ()
+      assert.are_same(List {3, 4, 5, 6}, List{3, 4} .. List {5, 6})
+    end),
+    test('does not modify its operands', function ()
+      local a = List {54, 74}
+      local b = List {90, 2014}
+      local result = a .. b
+      assert.are_same(a, List{54, 74})
+      assert.are_same(b, List{90, 2014})
+    end),
+    test('sets metatable of first operand on result', function ()
+      local result = {1, 4} .. List{9, 16}
+      assert.are_equal(nil, getmetatable(result))
+      result = List{1, 4} .. {9, 16}
+      assert.are_equal(List, getmetatable(result))
+    end),
+    }
+  },
 }
