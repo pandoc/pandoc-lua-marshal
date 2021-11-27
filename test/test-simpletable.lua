@@ -4,43 +4,38 @@ local test = tasty.test_case
 local group = tasty.test_group
 local assert = tasty.assert
 
+local default_caption = {Str 'Languages', Space(), Str 'overview.'}
+local default_aligns = {AlignDefault, AlignDefault}
+local default_widths = {0, 0}
+local default_headers = {{Plain({Str "Language"})}, {Plain({Str "Typing"})}}
+local default_rows = {
+  {{Plain "Haskell"}, {Plain "static"}},
+  {{Plain "Lua"}, {Plain "Dynamic"}},
+}
+
 return {
   group 'SimpleTable' {
     test('can access properties', function ()
-      local spc = Space()
-      local caption = {Str 'Languages', spc, Str 'overview.'}
-      local aligns = {AlignDefault, AlignDefault}
-      local widths = {0, 0} -- let pandoc determine col widths
-      local headers = {{Plain({Str "Language"})},
-        {Plain({Str "Typing"})}}
-      local rows = {
-        {{Plain "Haskell"}, {Plain "static"}},
-        {{Plain "Lua"}, {Plain "Dynamic"}},
-      }
       local simple_table = SimpleTable(
-        caption,
-        aligns,
-        widths,
-        headers,
-        rows
+        default_caption,
+        default_aligns,
+        default_widths,
+        default_headers,
+        default_rows
       )
-      assert.are_same(simple_table.caption, caption)
-      assert.are_same(simple_table.aligns, aligns)
-      assert.are_same(simple_table.widths, widths)
-      assert.are_same(simple_table.headers, headers)
-      assert.are_same(simple_table.rows, rows)
+      assert.are_same(simple_table.caption, default_caption)
+      assert.are_same(simple_table.aligns, default_aligns)
+      assert.are_same(simple_table.widths, default_widths)
+      assert.are_same(simple_table.headers, default_headers)
+      assert.are_same(simple_table.rows, default_rows)
     end),
     test('can modify properties', function ()
       local new_table = SimpleTable(
-        {'Languages'},
-        {AlignDefault, AlignDefault},
+        default_caption,
+        default_aligns,
         {0.5, 0.5},
-        {{Plain({Str "Language"})},
-         {Plain({Str "Typing"})}},
-        {
-          {{Plain "Haskell"}, {Plain "static"}},
-          {{Plain "Lua"}, {Plain "Dynamic"}},
-        }
+        default_headers,
+        default_rows
       )
 
       new_table.caption = {Str 'Good', Space(),

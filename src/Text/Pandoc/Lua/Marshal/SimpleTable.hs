@@ -50,7 +50,7 @@ typeSimpleTable = deftype "SimpleTable"
       (peekInlinesFuzzy, \t capt -> t {simpleTableCaption = capt})
   , property "aligns" "column alignments"
       (pushPandocList pushAlignment, simpleTableAlignments)
-      (peekList peekRead, \t aligns -> t{simpleTableAlignments = aligns})
+      (peekList peekAlignment, \t aligns -> t{simpleTableAlignments = aligns})
   , property "widths" "relative column widths"
       (pushPandocList pushRealFloat, simpleTableColumnWidths)
       (peekList peekRealFloat, \t ws -> t{simpleTableColumnWidths = ws})
