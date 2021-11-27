@@ -76,7 +76,7 @@ pushRow (Row attr cells) =
 
 -- | Push a table row from a pair of attr and the list of cells.
 peekRow :: LuaError e => Peeker e Row
-peekRow = ((uncurry Row) <$!>)
+peekRow = (uncurry Row <$!>)
   . retrieving "Row"
   . peekPair peekAttr (peekList peekCell)
 
@@ -97,7 +97,7 @@ peekTableBody = fmap (retrieving "TableBody")
   . typeChecked "table" istable
   $ \idx -> TableBody
   <$!> peekFieldRaw peekAttr "attr" idx
-  <*>  peekFieldRaw ((fmap RowHeadColumns) . peekIntegral) "row_head_columns" idx
+  <*>  peekFieldRaw (fmap RowHeadColumns . peekIntegral) "row_head_columns" idx
   <*>  peekFieldRaw (peekList peekRow) "head" idx
   <*>  peekFieldRaw (peekList peekRow) "body" idx
 
@@ -108,7 +108,7 @@ pushTableHead (TableHead attr rows) =
 
 -- | Peek a table head value from a pair of Attr and rows.
 peekTableHead :: LuaError e => Peeker e TableHead
-peekTableHead = ((uncurry TableHead) <$!>)
+peekTableHead = (uncurry TableHead <$!>)
   . retrieving "TableHead"
   . peekPair peekAttr (peekList peekRow)
 
@@ -121,7 +121,7 @@ pushTableFoot (TableFoot attr rows) =
 -- | Retrieves a 'TableFoot' value from a pair containing an Attr value
 -- and a list of table rows.
 peekTableFoot :: LuaError e => Peeker e TableFoot
-peekTableFoot = ((uncurry TableFoot) <$!>)
+peekTableFoot = (uncurry TableFoot <$!>)
   . retrieving "TableFoot"
   . peekPair peekAttr (peekList peekRow)
 

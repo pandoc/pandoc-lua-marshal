@@ -2,7 +2,6 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
 {-# LANGUAGE TypeApplications     #-}
-{-# LANGUAGE TupleSections        #-}
 {- |
 
 Marshal values of types that make up 'Block' elements.
@@ -77,7 +76,7 @@ peekBlockFuzzy :: LuaError e
                => Peeker e Block
 peekBlockFuzzy = choice
   [ peekBlock
-  , (\idx -> Plain <$!> peekInlinesFuzzy idx)
+  , \idx -> Plain <$!> peekInlinesFuzzy idx
   ]
 {-# INLINABLE peekBlockFuzzy #-}
 
@@ -142,7 +141,7 @@ typeBlock = deftype "Block"
   , possibleProperty "foot" "table foot"
       (pushTableFoot, \case {Table _ _ _ _ _ f -> Actual f; _ -> Absent})
       (peekTableFoot, \case
-          Table attr c cs h bs _ -> Actual . (\f -> Table attr c cs h bs f)
+          Table attr c cs h bs _ -> Actual . Table attr c cs h bs
           _                      -> const Absent)
   , possibleProperty "format" "format of raw content"
       (pushFormat, \case {RawBlock f _ -> Actual f; _ -> Absent})
