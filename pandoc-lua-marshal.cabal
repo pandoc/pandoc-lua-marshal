@@ -96,9 +96,11 @@ test-suite pandoc-lua-marshal-test
   hs-source-dirs:      test
   main-is:             test-pandoc-lua-marshal.hs
   build-depends:       pandoc-lua-marshal
+                     , QuickCheck           >= 2.4     && < 2.15
                      , tasty                >= 0.11
                      , tasty-hunit          >= 0.9
                      , tasty-lua            >= 1.0
+                     , tasty-quickcheck     >= 0.8     && < 0.11
   ghc-options:         -threaded
                        -rtsopts
                        -with-rtsopts=-N

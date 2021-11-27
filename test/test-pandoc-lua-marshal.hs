@@ -11,16 +11,17 @@ Tests for the pandoc types handling in Lua.
 -}
 module Main (main) where
 
-import Control.Monad (forM_)
+import Control.Monad (forM_, when)
 import Data.Data (Data, dataTypeConstrs, dataTypeOf, showConstr)
 import Data.Proxy (Proxy (Proxy))
 import Data.String (fromString)
 import HsLua as Lua
+import Test.Tasty.QuickCheck (ioProperty, testProperty)
+import Test.Tasty (TestTree, defaultMain, testGroup)
+import Test.Tasty.Lua (translateResultsFromFile)
+import Text.Pandoc.Arbitrary ()
 import Text.Pandoc.Definition
 import Text.Pandoc.Lua.Marshal.AST
-import Test.Tasty (TestTree, defaultMain, testGroup)
-import Test.Tasty.HUnit (testCase)
-import Test.Tasty.Lua (translateResultsFromFile)
 
 main :: IO ()
 main = do
@@ -101,7 +102,7 @@ main = do
     translateResultsFromFile "test/test-pandoc.lua"
 
   defaultMain $ testGroup "pandoc-lua-marshal"
-    [ tests
+    [ roundtrips
     , listTests
     , listAttributeTests
     , attrTests
@@ -112,13 +113,6 @@ main = do
     , metavalueTests
     , pandocTests
     ]
-
--- | Basic tests
-tests :: TestTree
-tests = testGroup "Basic tests"
-  [ testCase "Sample test" $
-      pure ()
-  ]
 
 register' :: LuaError e => DocumentedFunction e -> LuaE e ()
 register' f = do
@@ -133,3 +127,45 @@ registerConstants proxy =
 
 constructors :: forall a. Data a => Proxy a -> [String]
 constructors _ = map showConstr . dataTypeConstrs . dataTypeOf @a $ undefined
+
+--
+-- Roundtrips
+--
+
+-- | Basic tests
+roundtrips :: TestTree
+roundtrips = testGroup "Roundtrip through Lua stack"
+  [ testProperty "Inline" $
+    ioProperty . roundtripEqual pushInline peekInlineFuzzy
+
+  , testProperty "[Inline]" $
+    ioProperty . roundtripEqual pushInlines peekInlinesFuzzy
+
+  , testProperty "Block" $
+    ioProperty . roundtripEqual pushBlock peekBlockFuzzy
+
+  , testProperty "[Block]" $
+    ioProperty . roundtripEqual pushBlocks peekBlocksFuzzy
+
+  , testProperty "Meta" $
+    ioProperty . roundtripEqual pushMeta peekMeta
+
+  , testProperty "Pandoc" $
+    ioProperty . roundtripEqual pushPandoc peekPandoc
+  ]
+
+roundtripEqual :: forall a. Eq a
+               => Pusher Lua.Exception a -> Peeker Lua.Exception a
+               -> a -> IO Bool
+roundtripEqual pushX peekX x = (x ==) <$> roundtripped
+ where
+  roundtripped :: IO a
+  roundtripped = run $ do
+    openlibs
+    pushListModule <* pop 1
+    oldSize <- gettop
+    pushX x
+    size <- gettop
+    when (size - oldSize /= 1) $
+      Prelude.error ("Only one value should have been pushed" ++ show size)
+    forcePeek $ peekX top
