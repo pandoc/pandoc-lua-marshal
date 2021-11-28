@@ -269,5 +269,32 @@ return {
         assert.are_equal(elem, Underline{'word'})
       end)
     },
-  }
+  },
+  group "Inlines" {
+    test('splits a string into words', function ()
+      assert.are_same(
+        Inlines 'Absolute Giganten',
+        {Str 'Absolute', Space(), Str 'Giganten'}
+      )
+    end),
+    test('converts single Inline into List', function ()
+      assert.are_same(
+        Inlines(Emph{Str'Important'}),
+        {Emph{Str'Important'}}
+      )
+    end),
+    test('converts elements in a list into Inlines', function ()
+      assert.are_same(
+        Inlines{'Molecular', Space(), 'Biology'},
+        {Str 'Molecular', Space(), Str 'Biology'}
+      )
+    end),
+    test('can be mapped over', function ()
+      local words = Inlines 'good idea'
+      assert.are_same(
+        words:map(function (x) return x.t end),
+        {'Str', 'Space', 'Str'}
+      )
+    end)
+  },
 }

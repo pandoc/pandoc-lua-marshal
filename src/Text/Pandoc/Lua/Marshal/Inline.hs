@@ -18,6 +18,7 @@ module Text.Pandoc.Lua.Marshal.Inline
   , pushInlines
     -- * Constructors
   , inlineConstructors
+  , mkInlines
   ) where
 
 import Control.Monad.Catch (throwM)
@@ -338,12 +339,15 @@ inlineConstructors =
   , mkInlinesConstr "Superscript" Superscript
   , mkInlinesConstr "Underline" Underline
   ]
+ where
+   mkInlinesConstr name constr = defun name
+     ### liftPure (\x -> x `seq` constr x)
+     <#> parameter peekInlinesFuzzy "Inlines" "content" ""
+     =#> functionResult pushInline "Inline" "new object"
 
--- | Creates an Inline constructor for a type constructor that contains
--- just a list of inlines.
-mkInlinesConstr :: LuaError e
-                => Name -> ([Inline] -> Inline) -> DocumentedFunction e
-mkInlinesConstr name constr = defun name
-  ### liftPure (\x -> x `seq` constr x)
-  <#> parameter peekInlinesFuzzy "content" "Inlines" ""
-  =#> functionResult pushInline "Inline" "new object"
+-- | Constructor for a list of `Inline` values.
+mkInlines :: LuaError e => DocumentedFunction e
+mkInlines = defun "Inlines"
+  ### liftPure id
+  <#> parameter peekInlinesFuzzy "Inlines" "inlines" "inline elements"
+  =#> functionResult pushInlines "Inlines" "list of inline elements"

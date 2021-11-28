@@ -57,6 +57,7 @@ main = do
     pushListModule *> setglobal "List"
     register' mkAttr
     register' mkCitation
+    register' mkInlines
     registerConstants (Proxy @CitationMode)
     registerConstants (Proxy @MathType)
     registerConstants (Proxy @QuoteType)
