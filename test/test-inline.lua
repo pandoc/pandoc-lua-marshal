@@ -289,6 +289,24 @@ return {
         {Str 'Molecular', Space(), Str 'Biology'}
       )
     end),
+    test('tabs are treated as space', function ()
+      local expected = {
+        Str 'Linkin', Space(), Str 'Park', Space(),
+        Str '-', Space(), Str 'Papercut'
+      }
+      assert.are_same(Inlines('Linkin Park\t-\tPapercut'), expected)
+    end),
+    test('newlines are treated as softbreaks', function ()
+      local expected = {
+        Str 'Porcupine', Space(), Str 'Tree',
+        SoftBreak(), Str '-', SoftBreak(),
+        Str 'Blackest',  Space(), Str 'Eyes'
+      }
+      assert.are_same(
+        Inlines('Porcupine Tree\n-\nBlackest Eyes'),
+        expected
+      )
+    end),
     test('can be mapped over', function ()
       local words = Inlines 'good idea'
       assert.are_same(
