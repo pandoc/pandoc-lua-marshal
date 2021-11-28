@@ -13,6 +13,10 @@ module Text.Pandoc.Lua.Marshal.ListAttributes
   , peekListAttributes
   , pushListAttributes
   , mkListAttributes
+  , peekListNumberDelim
+  , pushListNumberDelim
+  , peekListNumberStyle
+  , pushListNumberStyle
   ) where
 
 import Data.Maybe (fromMaybe)
@@ -33,11 +37,11 @@ typeListAttributes = deftype "ListAttributes"
       (pushIntegral, \(start,_,_) -> start)
       (peekIntegral, \(_,style,delim) -> (,style,delim))
   , property "style" "style used for list numbering"
-      (pushString . show, \(_,classes,_) -> classes)
-      (peekRead, \(start,_,delim) -> (start,,delim))
+      (pushListNumberStyle, \(_,style,_) -> style)
+      (peekListNumberStyle, \(start,_,delim) -> (start,,delim))
   , property "delimiter" "delimiter of list numbers"
-      (pushString . show, \(_,_,delim) -> delim)
-      (peekRead, \(start,style,_) -> (start,style,))
+      (pushListNumberDelim, \(_,_,delim) -> delim)
+      (peekListNumberDelim, \(start,style,_) -> (start,style,))
   , method $ defun "clone"
     ### return
     <#> udparam typeListAttributes "a" ""
@@ -70,3 +74,23 @@ mkListAttributes = defun "ListAttributes"
   <#> optionalParameter peekRead "string" "delimiter" "list number delimiter"
   =#> functionResult pushListAttributes "ListAttributes" "new ListAttributes"
   #? "Creates a new ListAttributes object."
+
+-- | Pushes a 'ListNumberDelim' value as string.
+pushListNumberDelim :: LuaError e => Pusher e ListNumberDelim
+pushListNumberDelim = pushString . show
+{-# INLINE pushListNumberDelim #-}
+
+-- | Retrieves a 'ListNumberDelim' value from a string.
+peekListNumberDelim :: LuaError e => Peeker e ListNumberDelim
+peekListNumberDelim = peekRead
+{-# INLINE peekListNumberDelim #-}
+
+-- | Pushes a 'ListNumberStyle' value as string.
+pushListNumberStyle :: LuaError e => Pusher e ListNumberStyle
+pushListNumberStyle = pushString . show
+{-# INLINE pushListNumberStyle #-}
+
+-- | Retrieves a 'ListNumberStyle' value from a string.
+peekListNumberStyle :: LuaError e => Peeker e ListNumberStyle
+peekListNumberStyle = peekRead
+{-# INLINE peekListNumberStyle #-}
