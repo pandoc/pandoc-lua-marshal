@@ -316,4 +316,31 @@ return {
       end)
     },
   },
+  group "Blocks" {
+    test('splits a string into words', function ()
+      assert.are_same(
+        Blocks 'Absolute Giganten',
+        {Plain {Str 'Absolute', Space(), Str 'Giganten'}}
+      )
+    end),
+    test('converts single Block into List', function ()
+      assert.are_same(
+        Blocks(CodeBlock('return true')),
+        {CodeBlock('return true')}
+      )
+    end),
+    test('converts elements in a list into Blocks', function ()
+      assert.are_same(
+        Blocks{'Berlin', 'Berkeley', Plain 'Zürich'},
+        {Plain{Str 'Berlin'}, Plain{Str 'Berkeley'}, Plain{Str 'Zürich'}}
+      )
+    end),
+    test('can be mapped over', function ()
+      local words = Blocks{Header(1, 'Program'), CodeBlock 'pandoc'}
+      assert.are_same(
+        words:map(function (x) return x.t end),
+        {'Header', 'CodeBlock'}
+      )
+    end),
+  },
 }

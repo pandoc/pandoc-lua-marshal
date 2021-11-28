@@ -17,6 +17,7 @@ module Text.Pandoc.Lua.Marshal.Block
   , pushBlocks
     -- * Constructors
   , blockConstructors
+  , mkBlocks
   ) where
 
 import Control.Applicative ((<|>))
@@ -370,8 +371,14 @@ blockConstructors =
   peekItemsFuzzy idx = peekList peekBlocksFuzzy idx
     <|> ((:[]) <$!> peekBlocksFuzzy idx)
 
-textParam :: Text -> Text -> Parameter e Text
-textParam = parameter peekText "string"
+  textParam = parameter peekText "string"
+  optAttrParam = optionalParameter peekAttr "attr" "Attr"
+    "additional attributes"
 
-optAttrParam :: LuaError e => Parameter e (Maybe Attr)
-optAttrParam = optionalParameter peekAttr "attr" "Attr" "additional attributes"
+
+-- | Constructor for a list of `Block` values.
+mkBlocks :: LuaError e => DocumentedFunction e
+mkBlocks = defun "Blocks"
+  ### liftPure id
+  <#> parameter peekBlocksFuzzy "Blocks" "blocks" "block elements"
+  =#> functionResult pushBlocks "Blocks" "list of block elements"

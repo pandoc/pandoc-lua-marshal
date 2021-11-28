@@ -68,6 +68,7 @@ main = do
     openlibs
     pushListModule *> setglobal "List"
     register' mkAttr
+    register' mkBlocks
     register' mkListAttributes
     registerConstants (Proxy @Alignment)
     registerConstants (Proxy @ListNumberStyle)
