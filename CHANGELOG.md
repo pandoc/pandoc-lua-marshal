@@ -5,7 +5,7 @@ The changelog is available [on GitHub][2].
 
 ## 0.1.0
 
-Release pending.
+Released 2021-11-28.
 
 * Released into the wild. May it live long and prosper.
 
