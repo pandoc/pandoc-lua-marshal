@@ -13,8 +13,8 @@ description:         This package provides functions to marshal and unmarshal
                      Sequences are pushed as normal Lua tables, but are
                      augmented with convenience functions.
 
-homepage:            https://github.com/tarleb/pandoc-lua-marshal
-bug-reports:         https://github.com/tarleb/pandoc-lua-marshal/issues
+homepage:            https://github.com/pandoc/pandoc-lua-marshal
+bug-reports:         https://github.com/pandoc/pandoc-lua-marshal/issues
 license:             MIT
 license-file:        LICENSE
 author:              Albert Krewinkel, John MacFarlane
@@ -40,7 +40,7 @@ extra-source-files:  test/test-attr.lua
 
 source-repository head
   type:                git
-  location:            https://github.com/tarleb/pandoc-lua-marshal.git
+  location:            https://github.com/pandoc/pandoc-lua-marshal.git
 
 common common-options
   build-depends:       base                  >= 4.12     && < 5

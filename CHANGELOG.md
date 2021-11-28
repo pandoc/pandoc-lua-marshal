@@ -10,4 +10,4 @@ Release pending.
 * Released into the wild. May it live long and prosper.
 
 [1]: https://pvp.haskell.org
-[2]: https://github.com/tarleb/hslua-pandoc-types/releases
+[2]: https://github.com/pandoc/pandoc-lua-marshal/releases
