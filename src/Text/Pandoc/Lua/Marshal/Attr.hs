@@ -34,6 +34,7 @@ import Text.Pandoc.Definition (Attr, nullAttr)
 
 import qualified Data.Text as T
 
+-- | Attr object type.
 typeAttr :: LuaError e => DocumentedType e Attr
 typeAttr = deftype "Attr"
   [ operation Eq $ lambda
@@ -65,9 +66,12 @@ typeAttr = deftype "Attr"
   , alias "t" "alias for `tag`" ["tag"]
   ]
 
+-- | Pushes an 'Attr' value as @Attr@ userdata object.
 pushAttr :: LuaError e => Pusher e Attr
 pushAttr = pushUD typeAttr
 
+-- | Retrieves an associated list of attributes from a table or an
+-- @AttributeList@ userdata object.
 peekAttribs :: LuaError e => Peeker e [(Text,Text)]
 peekAttribs idx = liftLua (ltype idx) >>= \case
   TypeUserdata -> peekUD typeAttributeList idx
@@ -76,9 +80,12 @@ peekAttribs idx = liftLua (ltype idx) >>= \case
     _ -> peekList (peekPair peekText peekText) idx
   _            -> failPeek "unsupported type"
 
+-- | Pushes an associated list of attributes as @AttributeList@ userdata
+-- object.
 pushAttribs :: LuaError e => Pusher e [(Text, Text)]
 pushAttribs = pushUD typeAttributeList
 
+-- | Constructor functions for 'AttributeList' elements.
 typeAttributeList :: LuaError e => DocumentedType e [(Text, Text)]
 typeAttributeList = deftype "AttributeList"
   [ operation Eq $ lambda
@@ -180,6 +187,10 @@ setKey kvs mbKey mbValue = case mbKey of
         True -> return ()
         False -> failLua "failed to modify attributes list"
 
+-- | Retrieves an 'Attr' value from a string, a table, or an @Attr@
+-- userdata object. A string is used as an identifier; a table is either
+-- an HTML-like set of attributes, or a triple containing the
+-- identifier, classes, and attributes.
 peekAttr :: LuaError e => Peeker e Attr
 peekAttr idx = retrieving "Attr" $ liftLua (ltype idx) >>= \case
   TypeString -> (,[],[]) <$!> peekText idx -- treat string as ID

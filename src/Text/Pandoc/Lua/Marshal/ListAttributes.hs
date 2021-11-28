@@ -76,21 +76,21 @@ mkListAttributes = defun "ListAttributes"
   #? "Creates a new ListAttributes object."
 
 -- | Pushes a 'ListNumberDelim' value as string.
-pushListNumberDelim :: LuaError e => Pusher e ListNumberDelim
+pushListNumberDelim :: Pusher e ListNumberDelim
 pushListNumberDelim = pushString . show
 {-# INLINE pushListNumberDelim #-}
 
 -- | Retrieves a 'ListNumberDelim' value from a string.
-peekListNumberDelim :: LuaError e => Peeker e ListNumberDelim
+peekListNumberDelim :: Peeker e ListNumberDelim
 peekListNumberDelim = peekRead
 {-# INLINE peekListNumberDelim #-}
 
 -- | Pushes a 'ListNumberStyle' value as string.
-pushListNumberStyle :: LuaError e => Pusher e ListNumberStyle
+pushListNumberStyle :: Pusher e ListNumberStyle
 pushListNumberStyle = pushString . show
 {-# INLINE pushListNumberStyle #-}
 
 -- | Retrieves a 'ListNumberStyle' value from a string.
-peekListNumberStyle :: LuaError e => Peeker e ListNumberStyle
+peekListNumberStyle :: Peeker e ListNumberStyle
 peekListNumberStyle = peekRead
 {-# INLINE peekListNumberStyle #-}

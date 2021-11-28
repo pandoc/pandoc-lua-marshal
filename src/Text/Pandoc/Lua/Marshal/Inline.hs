@@ -262,6 +262,7 @@ setInlineText = \case
   Str _           -> Actual . Str
   _               -> const Absent
 
+-- | Constructor functions for 'Inline' elements.
 inlineConstructors :: LuaError e =>  [DocumentedFunction e]
 inlineConstructors =
   [ defun "Cite"

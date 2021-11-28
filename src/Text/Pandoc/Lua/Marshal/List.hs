@@ -28,14 +28,18 @@ pushPandocList pushItem items = do
     TypeTable -> setmetatable (nth 2)
     _ -> failLua "List has not been initialized correctly."
 
+-- | Pointer to the function that opens the List module and pushes it to the
+-- stack.
 foreign import ccall unsafe "listmod.c &luaopen_list"
   luaopen_list_ptr :: CFunction
 
+-- | Opens the List module and pushes it to the stack.
 pushListModule :: LuaError e => LuaE e ()
 pushListModule = do
   pushcfunction luaopen_list_ptr
   call 0 1
 
+-- | Creates a new list metatable with the given name.
 foreign import ccall "listmod.c lualist_newmetatable"
   lualist_newmetatable :: State -> CString -> IO CInt
 
