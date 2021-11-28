@@ -135,11 +135,8 @@ constructors _ = map showConstr . dataTypeConstrs . dataTypeOf @a $ undefined
 -- | Basic tests
 roundtrips :: TestTree
 roundtrips = testGroup "Roundtrip through Lua stack"
-  [ testProperty "Inline" $
-    ioProperty . roundtripEqual pushInline peekInlineFuzzy
-
-  , testProperty "[Inline]" $
-    ioProperty . roundtripEqual pushInlines peekInlinesFuzzy
+  [ testProperty "Alignment" $
+    ioProperty . roundtripEqual pushAlignment peekAlignment
 
   , testProperty "Block" $
     ioProperty . roundtripEqual pushBlock peekBlockFuzzy
@@ -147,11 +144,50 @@ roundtrips = testGroup "Roundtrip through Lua stack"
   , testProperty "[Block]" $
     ioProperty . roundtripEqual pushBlocks peekBlocksFuzzy
 
+  , testProperty "Caption" $
+    ioProperty . roundtripEqual pushCaption peekCaption
+
+  , testProperty "Cell" $
+    ioProperty . roundtripEqual pushCell peekCell
+
+  , testProperty "Citation" $
+    ioProperty . roundtripEqual pushCitation peekCitation
+
+  , testProperty "CitationMode" $
+    ioProperty . roundtripEqual pushCitationMode peekCitationMode
+
+  , testProperty "Inline" $
+    ioProperty . roundtripEqual pushInline peekInlineFuzzy
+
+  , testProperty "[Inline]" $
+    ioProperty . roundtripEqual pushInlines peekInlinesFuzzy
+
+  , testProperty "ListNumberStyle" $
+    ioProperty . roundtripEqual pushListNumberStyle peekListNumberStyle
+
+  , testProperty "ListNumberDelim" $
+    ioProperty . roundtripEqual pushListNumberDelim peekListNumberDelim
+
+  , testProperty "MathType" $
+    ioProperty . roundtripEqual pushMathType peekMathType
+
   , testProperty "Meta" $
     ioProperty . roundtripEqual pushMeta peekMeta
 
   , testProperty "Pandoc" $
     ioProperty . roundtripEqual pushPandoc peekPandoc
+
+  , testProperty "Row" $
+    ioProperty . roundtripEqual pushRow peekRow
+
+  , testProperty "QuoteType" $
+    ioProperty . roundtripEqual pushQuoteType peekQuoteType
+
+  , testProperty "TableBody" $
+    ioProperty . roundtripEqual pushTableBody peekTableBody
+
+  , testProperty "TableHead" $
+    ioProperty . roundtripEqual pushTableHead peekTableHead
   ]
 
 roundtripEqual :: forall a. Eq a
