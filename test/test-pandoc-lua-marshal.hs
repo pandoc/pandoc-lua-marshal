@@ -62,6 +62,7 @@ main = do
     registerConstants (Proxy @MathType)
     registerConstants (Proxy @QuoteType)
     forM_ inlineConstructors register'
+    forM_ blockConstructors register'
     translateResultsFromFile "test/test-inline.lua"
 
   blockTests <- run @Lua.Exception $ do

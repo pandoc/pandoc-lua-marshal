@@ -343,4 +343,98 @@ return {
       )
     end),
   },
+  group 'walk' {
+    test('modifies Inline subelements', function ()
+      local para = Para 'Hello, World!'
+      local expected = Para 'Hello, John!'
+      assert.are_equal(
+        expected,
+        para:walk{
+          Str = function (str)
+            return str.text == 'World!' and Str('John!') or nil
+          end
+        }
+      )
+    end),
+    test('modifies blocks in notes', function ()
+      local div = Div{Note{Para 'The proof is trivial.'}}
+      assert.are_equal(
+        Div{Note{Plain 'The proof is trivial.'}},
+        div:walk{
+          Para = function (para)
+            return Plain(para.content)
+          end
+        }
+      )
+    end),
+    test('uses `Inlines` for lists of inlines', function ()
+      local para = Para{Emph 'Kid A'}
+      assert.are_equal(
+        Para{Emph 'Kid A+'},
+        para:walk{
+          Inlines = function (inlns)
+            if Span(inlns) == Span 'Kid A' then
+              return Span('Kid A+').content
+            end
+          end
+        }
+      )
+    end),
+    test('handles inline elements before inline lists', function ()
+      local para = Para{Emph 'Red door'}
+      assert.are_equal(
+        Para{Emph 'Paint it Black'},
+        para:walk{
+          Inlines = function (inlns)
+            if Span(inlns) == Span('Paint it') then
+              return inlns .. {Space(), 'Black'}
+            end
+          end,
+          Str = function (str)
+            if str == Str 'Red' then
+              return 'Paint'
+            elseif str == Str 'door' then
+              return 'it'
+            end
+          end
+        }
+      )
+    end),
+    test('uses `Blocks` for lists of Blocks', function ()
+      local bl = BulletList{{'Overture'}, {'The Grid'}, {'The Son of Flynn'}}
+      assert.are_equal(
+        BulletList{
+          {'Overture', 'by Daft Punk'},
+          {'The Grid', 'by Daft Punk'},
+          {'The Son of Flynn', 'by Daft Punk'},
+        },
+        bl:walk{
+          Blocks = function (blocks)
+            return blocks .. {Plain 'by Daft Punk'}
+          end
+        }
+      )
+    end),
+    test('uses order Inline -> Inlines -> Block -> Blocks', function ()
+      local names = List{}
+      local div = Div{Para 'Discovery', CodeBlock 'Homework'}:walk{
+        Blocks = function (_)
+          names:insert('Blocks')
+        end,
+        Block = function (b)
+          names:insert(b.t)
+        end,
+        Inline = function (i)
+          names:insert(i.t)
+        end,
+        Inlines = function (_)
+          names:insert('Inlines')
+        end,
+      }
+      assert.are_same(
+        {'Str', 'Inlines', 'Para', 'CodeBlock', 'Blocks'},
+        names
+      )
+    end),
+  }
 }

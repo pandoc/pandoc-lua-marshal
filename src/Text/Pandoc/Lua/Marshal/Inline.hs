@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE LambdaCase           #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
@@ -19,25 +20,34 @@ module Text.Pandoc.Lua.Marshal.Inline
     -- * Constructors
   , inlineConstructors
   , mkInlines
+    -- * Walking
+  , walkInlineSplicing
+  , walkInlines
   ) where
 
 import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
 import Data.Data (showConstr, toConstr)
 import Data.Maybe (fromMaybe)
+import Data.Proxy (Proxy (Proxy))
 import Data.Text (Text)
 import HsLua
+import Text.Pandoc.Definition ( Block, Inline (..), nullAttr )
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
-  ( peekBlocksFuzzy )
+  ( peekBlocksFuzzy, walkBlockSplicing, walkBlocks )
 import Text.Pandoc.Lua.Marshal.Citation (peekCitation, pushCitation)
 import Text.Pandoc.Lua.Marshal.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent )
+import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter')
 import Text.Pandoc.Lua.Marshal.Format (peekFormat, pushFormat)
 import Text.Pandoc.Lua.Marshal.List (pushPandocList, newListMetatable)
 import Text.Pandoc.Lua.Marshal.MathType (peekMathType, pushMathType)
 import Text.Pandoc.Lua.Marshal.QuoteType (peekQuoteType, pushQuoteType)
-import Text.Pandoc.Definition ( Inline (..), nullAttr )
+import Text.Pandoc.Lua.Walk
+  ( SpliceList, Walkable
+  , filterFunctionNames
+  , walkElement, walkSplice )
 import qualified Text.Pandoc.Builder as B
 
 -- | Pushes an Inline value as userdata object.
@@ -238,7 +248,24 @@ typeInline = deftype "Inline"
       ### return
       <#> parameter peekInline "inline" "Inline" "self"
       =#> functionResult pushInline "Inline" "cloned Inline"
+
+  , method $ defun "walk"
+    ### (\x f ->
+              walkInlineSplicing f x
+          >>= walkInlines f
+          >>= walkBlockSplicing f
+          >>= walkBlocks f)
+    <#> parameter peekInline "Inline" "self" ""
+    <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
+    =#> functionResult pushInline "Inline" "modified element"
   ]
+ where
+  peekFilter = peekFilter' $ mconcat
+    [ filterFunctionNames (Proxy @Inline)
+    , filterFunctionNames (Proxy @Block)
+    , ["Inlines", "Inline"]
+    , ["Blocks", "Block"]
+    ]
 
 --
 -- Text
@@ -352,3 +379,15 @@ mkInlines = defun "Inlines"
   ### liftPure id
   <#> parameter peekInlinesFuzzy "Inlines" "inlines" "inline elements"
   =#> functionResult pushInlines "Inlines" "list of inline elements"
+
+-- | Walks an element of type @a@ and applies the filter to all 'Inline'
+-- elements.  The filter result is spliced back into the list.
+walkInlineSplicing :: (LuaError e, Walkable (SpliceList Inline) a)
+                   => Filter -> a -> LuaE e a
+walkInlineSplicing = walkSplice pushInline peekInlinesFuzzy
+
+-- | Walks an element of type @a@ and applies the filter to all lists of
+-- 'Inline' elements.
+walkInlines :: (LuaError e, Walkable [Inline] a)
+            => Filter -> a -> LuaE e a
+walkInlines = walkElement "Inlines" pushInlines peekInlinesFuzzy

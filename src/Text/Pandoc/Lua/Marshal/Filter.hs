@@ -10,8 +10,10 @@ functions to be called on specific elements.
 -}
 module Text.Pandoc.Lua.Marshal.Filter
   ( -- * Filters
-    peekFilter'
+    Filter (..)
+  , peekFilter'
     -- * Individual filter functions
+  , FilterFunction (..)
   , peekFilterFunction
   , pushFilterFunction
   ) where

@@ -1,3 +1,5 @@
+{-# LANGUAGE AllowAmbiguousTypes  #-}
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE LambdaCase           #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
@@ -18,6 +20,9 @@ module Text.Pandoc.Lua.Marshal.Block
     -- * Constructors
   , blockConstructors
   , mkBlocks
+    -- * Walk
+  , walkBlockSplicing
+  , walkBlocks
   ) where
 
 import Control.Applicative ((<|>))
@@ -32,8 +37,10 @@ import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import Text.Pandoc.Lua.Marshal.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent
   , peekDefinitionItem )
+import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter')
 import Text.Pandoc.Lua.Marshal.Format (peekFormat, pushFormat)
-import Text.Pandoc.Lua.Marshal.Inline (peekInlinesFuzzy)
+import Text.Pandoc.Lua.Marshal.Inline
+  (peekInlinesFuzzy, walkInlineSplicing, walkInlines)
 import Text.Pandoc.Lua.Marshal.List (newListMetatable, pushPandocList)
 import Text.Pandoc.Lua.Marshal.ListAttributes (peekListAttributes, pushListAttributes)
 import Text.Pandoc.Lua.Marshal.TableParts
@@ -43,6 +50,10 @@ import Text.Pandoc.Lua.Marshal.TableParts
   , peekTableFoot, pushTableFoot
   , peekTableHead, pushTableHead
   )
+import Text.Pandoc.Lua.Walk
+  ( SpliceList, Walkable
+  , filterFunctionNames
+  , walkElement, walkSplice )
 import Text.Pandoc.Definition
 
 -- | Pushes an Block value as userdata object.
@@ -191,9 +202,25 @@ typeBlock = deftype "Block"
     ### liftPure show
     <#> parameter peekBlock "Block" "self" ""
     =#> functionResult pushString "string" "Haskell string representation"
+
+  , method $ defun "walk"
+    ### (\x f ->
+              walkInlineSplicing f x
+          >>= walkInlines f
+          >>= walkBlockSplicing f
+          >>= walkBlocks f)
+    <#> parameter peekBlock "Block" "self" ""
+    <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
+    =#> functionResult pushBlock "Block" "modified element"
   ]
  where
   boolResult = functionResult pushBool "boolean"
+  peekFilter = peekFilter' $ mconcat
+    [ filterFunctionNames (Proxy @Inline)
+    , filterFunctionNames (Proxy @Block)
+    , ["Inlines", "Inline"]
+    , ["Blocks", "Block"]
+    ]
 
 getBlockContent :: Block -> Possible Content
 getBlockContent = \case
@@ -382,3 +409,15 @@ mkBlocks = defun "Blocks"
   ### liftPure id
   <#> parameter peekBlocksFuzzy "Blocks" "blocks" "block elements"
   =#> functionResult pushBlocks "Blocks" "list of block elements"
+
+--
+-- walk
+--
+
+walkBlockSplicing :: (LuaError e, Walkable (SpliceList Block) a)
+                  => Filter -> a -> LuaE e a
+walkBlockSplicing = walkSplice pushBlock peekBlocksFuzzy
+
+walkBlocks :: (LuaError e, Walkable [Block] a)
+           => Filter -> a -> LuaE e a
+walkBlocks = walkElement "Blocks" pushBlocks peekBlocksFuzzy
