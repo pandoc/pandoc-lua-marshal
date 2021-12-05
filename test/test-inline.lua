@@ -141,16 +141,15 @@ return {
       end),
     },
     group 'Note' {
-      -- FIXME: waiting for Block support
-      -- test('has property `content`', function ()
-      --   local elem = Note{Para {'two', Space(), 'words'}}
-      --   assert.are_same(
-      --     elem.content,
-      --     {Para {Str 'two', Space(), Str 'words'}}
-      --   )
-      --   elem.content = Plain 'word'
-      --   assert.are_equal(elem, Note{'word'})
-      -- end)
+      test('has property `content`', function ()
+        local elem = Note{Para {'two', Space(), 'words'}}
+        assert.are_same(
+          elem.content,
+          {Para {Str 'two', Space(), Str 'words'}}
+        )
+        elem.content = Plain 'word'
+        assert.are_equal(elem, Note{'word'})
+      end)
     },
     group 'Quoted' {
       test('has property `content`', function ()
@@ -315,4 +314,95 @@ return {
       )
     end)
   },
+  group 'walk' {
+    test('modifies Inline subelements', function ()
+      local span = Span 'Hello, World!'
+      local expected = Span 'Hello, John!'
+      assert.are_equal(
+        expected,
+        span:walk{
+          Str = function (str)
+            return str.text == 'World!' and Str('John!') or nil
+          end
+        }
+      )
+    end),
+    test('applies filter only on subtree', function ()
+      local str = Str 'Hello'
+      assert.are_equal(
+        Str 'Hello',
+        str:walk{
+          Str = function (str)
+            return str.text == 'Hello' and Str('Goodbye') or nil
+          end
+        }
+      )
+    end),
+    test('modifies blocks in notes', function ()
+      local note = Note{Para 'The proof is trivial.'}
+      assert.are_equal(
+        Note{Plain 'The proof is trivial.'},
+        note:walk{
+          Para = function (para)
+            return Plain(para.content)
+          end
+        }
+      )
+    end),
+    test('uses `Inlines` for lists of inlines', function ()
+      local span = Span{Emph 'Kid A'}
+      assert.are_equal(
+        Span{Emph 'Kid A+'},
+        span:walk{
+          Inlines = function (inlns)
+            if Span(inlns) == Span 'Kid A' then
+              return Inlines 'Kid A+'
+            end
+          end
+        }
+      )
+    end),
+    test('handles inline elements before inline lists', function ()
+      local span = Span{Emph 'Red door'}
+      assert.are_equal(
+        Span{Emph 'Paint it Black'},
+        span:walk{
+          Inlines = function (inlns)
+            if Span(inlns) == Span('Paint it') then
+              return inlns .. {Space(), 'Black'}
+            end
+          end,
+          Str = function (str)
+            if str == Str 'Red' then
+              return 'Paint'
+            elseif str == Str 'door' then
+              return 'it'
+            end
+          end
+        }
+      )
+    end),
+    test('uses order Inline -> Inlines -> Block -> Blocks', function ()
+      local names = List{}
+      Note{Para 'Human After All', CodeBlock 'Alive 2007'}:walk{
+        Blocks = function (_)
+          names:insert('Blocks')
+        end,
+        Block = function (b)
+          names:insert(b.t)
+        end,
+        Inline = function (i)
+          names:insert(i.t)
+        end,
+        Inlines = function (_)
+          names:insert('Inlines')
+        end,
+      }
+      print(names)
+      assert.are_equal(
+        'Str, Space, Str, Space, Str, Inlines, Para, CodeBlock, Blocks',
+        table.concat(names, ', ')
+      )
+    end),
+  }
 }
