@@ -46,6 +46,7 @@ source-repository head
 common common-options
   build-depends:       base                  >= 4.12     && < 5
                      , bytestring            >= 0.10     && < 0.12
+                     , containers            >= 0.6      && < 0.7
                      , exceptions            >= 0.8      && < 0.11
                      , lua                   >= 2.0.2    && < 2.1
                      , hslua                 >= 2.0.1    && < 2.1
@@ -80,6 +81,7 @@ library
                      , Text.Pandoc.Lua.Marshal.Citation
                      , Text.Pandoc.Lua.Marshal.CitationMode
                      , Text.Pandoc.Lua.Marshal.Content
+                     , Text.Pandoc.Lua.Marshal.Filter
                      , Text.Pandoc.Lua.Marshal.Format
                      , Text.Pandoc.Lua.Marshal.Inline
                      , Text.Pandoc.Lua.Marshal.List
