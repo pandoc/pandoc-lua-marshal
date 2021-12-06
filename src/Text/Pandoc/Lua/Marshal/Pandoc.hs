@@ -15,14 +15,20 @@ module Text.Pandoc.Lua.Marshal.Pandoc
   , peekMeta
   , pushMeta
   , mkMeta
+    -- * Filtering
+  , applyFully
   ) where
 
 import Control.Applicative (optional)
-import Control.Monad ((<$!>))
+import Control.Monad ((<$!>), (>=>))
 import Data.Maybe (fromMaybe)
 import HsLua
-import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
+import Text.Pandoc.Lua.Marshal.Block
+  (peekBlocksFuzzy, pushBlocks, walkBlockSplicing, walkBlocksStraight)
+import Text.Pandoc.Lua.Marshal.Inline (walkInlineSplicing, walkInlinesStraight)
+import Text.Pandoc.Lua.Marshal.Filter (Filter)
 import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
+import Text.Pandoc.Lua.Walk (applyStraight)
 import Text.Pandoc.Definition (Pandoc (..), Meta (..), nullMeta)
 
 -- | Pushes a 'Pandoc' value as userdata.
@@ -80,3 +86,45 @@ mkMeta = defun "Meta"
   ### liftPure id
   <#> parameter peekMeta "table" "meta" "table containing meta information"
   =#> functionResult pushMeta "table" "new Meta table"
+
+-- | Applies a filter function to a Pandoc value.
+applyPandocFunction :: LuaError e
+                          => Filter
+                          -> Pandoc -> LuaE e Pandoc
+applyPandocFunction = applyStraight pushPandoc peekPandoc
+
+-- | Applies a filter function to a Meta value.
+applyMetaFunction :: LuaError e
+                        => Filter
+                        -> Pandoc -> LuaE e Pandoc
+applyMetaFunction filter' (Pandoc meta blocks) = do
+  meta' <- applyStraight pushMeta peekMeta filter' meta
+  pure (Pandoc meta' blocks)
+
+-- | Apply all components of a Lua filter.
+--
+-- These operations are run in order:
+--
+-- - Inline filter functions are applied to Inline elements, splicing
+--   the result back into the list of Inline elements
+--
+-- - The @Inlines@ function is applied to all lists of Inlines.
+--
+-- - Block filter functions are applied to Block elements, splicing the
+--   result back into the list of Block elements
+--
+-- - The @Blocks@ function is applied to all lists of Blocks.
+--
+-- - The @Meta@ function is applied to the 'Meta' part.
+--
+-- - The @Pandoc@ function is applied to the full 'Pandoc' element.
+applyFully :: LuaError e
+           => Filter
+           -> Pandoc -> LuaE e Pandoc
+applyFully filter' =
+      walkInlineSplicing filter'
+  >=> walkInlinesStraight filter'
+  >=> walkBlockSplicing filter'
+  >=> walkBlocksStraight filter'
+  >=> applyMetaFunction filter'
+  >=> applyPandocFunction filter'
