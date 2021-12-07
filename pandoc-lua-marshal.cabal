@@ -31,6 +31,7 @@ tested-with:         GHC == 8.6.5
                      GHC == 9.2.1
 extra-source-files:  test/test-attr.lua
                    , test/test-block.lua
+                   , test/test-cell.lua
                    , test/test-citation.lua
                    , test/test-inline.lua
                    , test/test-listattributes.lua
