@@ -270,49 +270,63 @@ return {
     },
   },
   group "Inlines" {
-    test('splits a string into words', function ()
-      assert.are_same(
-        Inlines 'Absolute Giganten',
-        {Str 'Absolute', Space(), Str 'Giganten'}
-      )
-    end),
-    test('converts single Inline into List', function ()
-      assert.are_same(
-        Inlines(Emph{Str'Important'}),
-        {Emph{Str'Important'}}
-      )
-    end),
-    test('converts elements in a list into Inlines', function ()
-      assert.are_same(
-        Inlines{'Molecular', Space(), 'Biology'},
-        {Str 'Molecular', Space(), Str 'Biology'}
-      )
-    end),
-    test('tabs are treated as space', function ()
-      local expected = {
-        Str 'Linkin', Space(), Str 'Park', Space(),
-        Str '-', Space(), Str 'Papercut'
-      }
-      assert.are_same(Inlines('Linkin Park\t-\tPapercut'), expected)
-    end),
-    test('newlines are treated as softbreaks', function ()
-      local expected = {
-        Str 'Porcupine', Space(), Str 'Tree',
-        SoftBreak(), Str '-', SoftBreak(),
-        Str 'Blackest',  Space(), Str 'Eyes'
-      }
-      assert.are_same(
-        Inlines('Porcupine Tree\n-\nBlackest Eyes'),
-        expected
-      )
-    end),
-    test('can be mapped over', function ()
-      local words = Inlines 'good idea'
-      assert.are_same(
-        words:map(function (x) return x.t end),
-        {'Str', 'Space', 'Str'}
-      )
-    end)
+    group 'Constructor' {
+      test('splits a string into words', function ()
+        assert.are_same(
+          Inlines 'Absolute Giganten',
+          {Str 'Absolute', Space(), Str 'Giganten'}
+        )
+      end),
+      test('converts single Inline into List', function ()
+        assert.are_same(
+          Inlines(Emph{Str'Important'}),
+          {Emph{Str'Important'}}
+        )
+      end),
+      test('converts elements in a list into Inlines', function ()
+        assert.are_same(
+          Inlines{'Molecular', Space(), 'Biology'},
+          {Str 'Molecular', Space(), Str 'Biology'}
+        )
+      end),
+      test('tabs are treated as space', function ()
+        local expected = {
+          Str 'Linkin', Space(), Str 'Park', Space(),
+          Str '-', Space(), Str 'Papercut'
+        }
+        assert.are_same(Inlines('Linkin Park\t-\tPapercut'), expected)
+      end),
+      test('newlines are treated as softbreaks', function ()
+        local expected = {
+          Str 'Porcupine', Space(), Str 'Tree',
+          SoftBreak(), Str '-', SoftBreak(),
+          Str 'Blackest',  Space(), Str 'Eyes'
+        }
+        assert.are_same(
+          Inlines('Porcupine Tree\n-\nBlackest Eyes'),
+          expected
+        )
+      end),
+      test('can be mapped over', function ()
+        local words = Inlines 'good idea'
+        assert.are_same(
+          words:map(function (x) return x.t end),
+          {'Str', 'Space', 'Str'}
+        )
+      end),
+    },
+    group 'walk' {
+      test('modifies Inline subelements', function ()
+        assert.are_same(
+          Inlines 'Hello, Jake!',
+          (Inlines 'Hello, World!'):walk{
+            Str = function (str)
+              return str.text == 'World!' and Str('Jake!') or nil
+            end
+          }
+        )
+      end),
+    }
   },
   group 'walk' {
     test('modifies Inline subelements', function ()

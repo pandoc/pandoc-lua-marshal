@@ -75,8 +75,18 @@ pushBlocks :: LuaError e
            => Pusher e [Block]
 pushBlocks xs = do
   pushList pushBlock xs
-  newListMetatable "Blocks" $
-    pure ()
+  newListMetatable "Blocks" $ do
+    pushName "walk"
+    pushDocumentedFunction $ lambda
+      ### (\x f ->
+                walkInlineSplicing f x
+            >>= walkInlinesStraight f
+            >>= walkBlockSplicing f
+            >>= walkBlocksStraight f)
+      <#> parameter peekBlocksFuzzy "Blocks" "self" ""
+      <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
+      =#> functionResult pushBlocks "Blocks" "modified list"
+    rawset (nth 3)
   setmetatable (nth 2)
 {-# INLINABLE pushBlocks #-}
 

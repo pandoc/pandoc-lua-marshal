@@ -317,31 +317,46 @@ return {
     },
   },
   group "Blocks" {
-    test('splits a string into words', function ()
-      assert.are_same(
-        Blocks 'Absolute Giganten',
-        {Plain {Str 'Absolute', Space(), Str 'Giganten'}}
-      )
-    end),
-    test('converts single Block into List', function ()
-      assert.are_same(
-        Blocks(CodeBlock('return true')),
-        {CodeBlock('return true')}
-      )
-    end),
-    test('converts elements in a list into Blocks', function ()
-      assert.are_same(
-        Blocks{'Berlin', 'Berkeley', Plain 'Zürich'},
-        {Plain{Str 'Berlin'}, Plain{Str 'Berkeley'}, Plain{Str 'Zürich'}}
-      )
-    end),
-    test('can be mapped over', function ()
-      local words = Blocks{Header(1, 'Program'), CodeBlock 'pandoc'}
-      assert.are_same(
-        words:map(function (x) return x.t end),
-        {'Header', 'CodeBlock'}
-      )
-    end),
+    group 'Constructor' {
+      test('splits a string into words', function ()
+        assert.are_same(
+          Blocks 'Absolute Giganten',
+          {Plain {Str 'Absolute', Space(), Str 'Giganten'}}
+        )
+      end),
+      test('converts single Block into List', function ()
+        assert.are_same(
+          Blocks(CodeBlock('return true')),
+          {CodeBlock('return true')}
+        )
+      end),
+      test('converts elements in a list into Blocks', function ()
+        assert.are_same(
+          Blocks{'Berlin', 'Berkeley', Plain 'Zürich'},
+          {Plain{Str 'Berlin'}, Plain{Str 'Berkeley'}, Plain{Str 'Zürich'}}
+        )
+      end),
+      test('can be mapped over', function ()
+        local words = Blocks{Header(1, 'Program'), CodeBlock 'pandoc'}
+        assert.are_same(
+          words:map(function (x) return x.t end),
+          {'Header', 'CodeBlock'}
+        )
+      end),
+    },
+    group 'walk' {
+      test('modifies Inline subelements', function ()
+        local blocks = Blocks{Para 'Hello, World!'}
+        assert.are_same(
+          Blocks{Para 'Hello, Jake!'},
+          blocks:walk{
+            Str = function (str)
+              return str.text == 'World!' and Str('Jake!') or nil
+            end
+          }
+        )
+      end),
+    }
   },
   group 'walk' {
     test('modifies Inline subelements', function ()
