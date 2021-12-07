@@ -26,7 +26,7 @@ import HsLua
 import Text.Pandoc.Lua.Marshal.Block
   (peekBlocksFuzzy, pushBlocks, walkBlockSplicing, walkBlocksStraight)
 import Text.Pandoc.Lua.Marshal.Inline (walkInlineSplicing, walkInlinesStraight)
-import Text.Pandoc.Lua.Marshal.Filter (Filter)
+import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter)
 import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Lua.Walk (applyStraight)
 import Text.Pandoc.Definition (Pandoc (..), Meta (..), nullMeta)
@@ -58,6 +58,17 @@ typePandoc = deftype "Pandoc"
   , property "meta" "document metadata"
       (pushMeta, \(Pandoc meta _) -> meta)
       (peekMeta, \(Pandoc _ blks) meta -> Pandoc meta blks)
+
+  , method $ defun "walk"
+    ### (\doc filter' ->
+               walkInlineSplicing filter' doc
+           >>= walkInlinesStraight filter'
+           >>= walkBlockSplicing filter'
+           >>= walkBlocksStraight filter'
+           >>= applyMetaFunction filter')
+    <#> parameter peekPandoc "Pandoc" "self" ""
+    <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
+    =#> functionResult pushPandoc "Pandoc" "modified element"
   ]
 
 -- | Pushes a 'Meta' value as a string-indexed table.
