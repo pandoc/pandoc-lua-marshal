@@ -39,11 +39,11 @@ import Text.Pandoc.Lua.Marshal.Content
   , peekDefinitionItem )
 import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter)
 import Text.Pandoc.Lua.Marshal.Format (peekFormat, pushFormat)
-import Text.Pandoc.Lua.Marshal.Inline
-  (peekInlinesFuzzy, walkInlineSplicing, walkInlinesStraight)
+import Text.Pandoc.Lua.Marshal.Inline (peekInlinesFuzzy)
 import Text.Pandoc.Lua.Marshal.List (newListMetatable, pushPandocList)
 import Text.Pandoc.Lua.Marshal.ListAttributes
   ( peekListAttributes, pushListAttributes )
+import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Marshal.TableParts
   ( peekCaption, pushCaption
   , peekColSpec, pushColSpec
@@ -78,11 +78,7 @@ pushBlocks xs = do
   newListMetatable "Blocks" $ do
     pushName "walk"
     pushDocumentedFunction $ lambda
-      ### (\x f ->
-                walkInlineSplicing f x
-            >>= walkInlinesStraight f
-            >>= walkBlockSplicing f
-            >>= walkBlocksStraight f)
+      ### flip walkBlocksAndInlines
       <#> parameter peekBlocksFuzzy "Blocks" "self" ""
       <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
       =#> functionResult pushBlocks "Blocks" "modified list"
@@ -212,11 +208,7 @@ typeBlock = deftype "Block"
     =#> functionResult pushString "string" "Haskell string representation"
 
   , method $ defun "walk"
-    ### (\x f ->
-              walkInlineSplicing f x
-          >>= walkInlinesStraight f
-          >>= walkBlockSplicing f
-          >>= walkBlocksStraight f)
+    ### flip walkBlocksAndInlines
     <#> parameter peekBlock "Block" "self" ""
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushBlock "Block" "modified element"

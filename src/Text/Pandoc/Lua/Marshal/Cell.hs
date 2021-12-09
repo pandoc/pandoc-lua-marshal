@@ -22,9 +22,9 @@ import HsLua
 import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
-  ( peekBlocksFuzzy, pushBlocks, walkBlockSplicing, walkBlocksStraight )
+  ( peekBlocksFuzzy, pushBlocks )
 import Text.Pandoc.Lua.Marshal.Filter (peekFilter)
-import Text.Pandoc.Lua.Marshal.Inline (walkInlineSplicing, walkInlinesStraight)
+import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Definition
 
 -- | Push a table cell as a table with fields @attr@, @alignment@,
@@ -91,11 +91,7 @@ typeCell = deftype "pandoc Cell"
   , alias "attributes" "cell attributes" ["attr", "attributes"]
 
   , method $ defun "walk"
-    ### (\doc filter' ->
-               walkInlineSplicing filter' doc
-           >>= walkInlinesStraight filter'
-           >>= walkBlockSplicing filter'
-           >>= walkBlocksStraight filter')
+    ### flip walkBlocksAndInlines
     <#> parameter peekCell "Cell" "self" ""
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushCell "Cell" "modified cell"

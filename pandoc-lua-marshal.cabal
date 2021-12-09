@@ -93,7 +93,8 @@ library
                      , Text.Pandoc.Lua.Marshal.QuoteType
                      , Text.Pandoc.Lua.Marshal.SimpleTable
                      , Text.Pandoc.Lua.Marshal.TableParts
-  other-modules:       Text.Pandoc.Lua.SpliceList
+  other-modules:       Text.Pandoc.Lua.Marshal.Shared
+                     , Text.Pandoc.Lua.SpliceList
                      , Text.Pandoc.Lua.Walk
 
 test-suite pandoc-lua-marshal-test
