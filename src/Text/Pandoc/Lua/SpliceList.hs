@@ -143,6 +143,60 @@ instance Walkable (SpliceList Block) Meta where
   walkM f (Meta metamap) = Meta <$> walkM f metamap
   query f (Meta metamap) = query f metamap
 
+--
+-- SpliceList Cell
+--
+instance {-# OVERLAPPING #-} Walkable (SpliceList Cell) [Cell] where
+  walkM = walkSpliceListM
+  query = querySpliceList
+
+instance Walkable (SpliceList Cell) Pandoc where
+  walkM = walkPandocM
+  query = queryPandoc
+
+instance Walkable (SpliceList Cell) Citation where
+  walkM = walkCitationM
+  query = queryCitation
+
+instance Walkable (SpliceList Cell) Inline where
+  walkM = walkInlineM
+  query = queryInline
+
+instance Walkable (SpliceList Cell) Block where
+  walkM = walkBlockM
+  query = queryBlock
+
+instance Walkable (SpliceList Cell) Row where
+  walkM f (Row attr bd) = Row attr <$> walkSpliceListM f bd
+  query = queryRow
+
+instance Walkable (SpliceList Cell) TableHead where
+  walkM = walkTableHeadM
+  query = queryTableHead
+
+instance Walkable (SpliceList Cell) TableBody where
+  walkM = walkTableBodyM
+  query = queryTableBody
+
+instance Walkable (SpliceList Cell) TableFoot where
+  walkM = walkTableFootM
+  query = queryTableFoot
+
+instance Walkable (SpliceList Cell) Caption where
+  walkM = walkCaptionM
+  query = queryCaption
+
+instance Walkable (SpliceList Cell) Cell where
+  walkM = walkCellM
+  query = queryCell
+
+instance Walkable (SpliceList Cell) MetaValue where
+  walkM = walkMetaValueM
+  query = queryMetaValue
+
+instance Walkable (SpliceList Cell) Meta where
+  walkM f (Meta metamap) = Meta <$> walkM f metamap
+  query f (Meta metamap) = query f metamap
 
 walkSpliceListM :: (Monad m, Walkable (SpliceList a) a)
                 => (SpliceList a -> m (SpliceList a))

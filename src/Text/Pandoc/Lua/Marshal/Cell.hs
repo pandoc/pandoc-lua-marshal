@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE LambdaCase           #-}
 {- |
@@ -13,6 +14,8 @@ module Text.Pandoc.Lua.Marshal.Cell
   , pushCell
   , typeCell
   , mkCell
+    -- * Walking
+  , walkCellSplicing
   ) where
 
 import Control.Applicative (optional)
@@ -23,8 +26,9 @@ import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy, pushBlocks )
-import Text.Pandoc.Lua.Marshal.Filter (peekFilter)
+import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
+import Text.Pandoc.Lua.Walk (SpliceList, Walkable, walkSplicing)
 import Text.Pandoc.Definition
 
 -- | Push a table cell as a table with fields @attr@, @alignment@,
@@ -112,3 +116,9 @@ mkCell = defun "Cell"
   <#> optionalParameter peekIntegral "integer" "col_span" "columns to span"
   <#> optionalParameter peekAttr "Attr" "attr" "cell attributes"
   =#> functionResult pushCell "Cell" "new Cell object"
+
+-- | Walks an element of type @a@ and applies the filter to all 'Cell'
+-- elements.  The filter result is spliced back into the list.
+walkCellSplicing :: (LuaError e, Walkable (SpliceList Cell) a)
+                   => Filter -> a -> LuaE e a
+walkCellSplicing = walkSplicing pushCell (peekList peekCellFuzzy)

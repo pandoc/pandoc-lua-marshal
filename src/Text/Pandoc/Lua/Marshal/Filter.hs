@@ -38,7 +38,7 @@ import Data.Map (Map)
 import Data.Proxy (Proxy (Proxy))
 import Data.String (IsString (fromString))
 import HsLua
-import Text.Pandoc.Definition (Pandoc, Meta, Block, Inline)
+import Text.Pandoc.Definition (Pandoc, Meta, Block, Inline, Cell)
 import qualified Data.Map.Strict as Map
 
 -- | Filter function stored in the registry
@@ -73,6 +73,7 @@ peekFilter = peekFilter' $
   : baseFunctionName (Proxy @Meta)
   : baseFunctionName (Proxy @Block)
   : baseFunctionName (Proxy @Inline)
+  : baseFunctionName (Proxy @Cell)
   : listFunctionName (Proxy @Block)
   : listFunctionName (Proxy @Inline)
   :  valueFunctionNames (Proxy @Inline)

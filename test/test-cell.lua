@@ -114,6 +114,38 @@ return {
           names
         )
       end),
+      test('Blocks are filtered before Cells', function ()
+        local names = List{}
+        local tbl = Table(
+          {long = {}},
+          {{AlignCenter, 1}},
+          {{}, {{{'foo'}, {Cell{'test'}}}}},
+          {},
+          {{}, {}}
+        )
+        tbl:walk{
+          Blocks = function (_)
+            names:insert('Blocks')
+          end,
+          Block = function (b)
+            names:insert(b.t)
+          end,
+          Cell = function (_)
+            names:insert('Cell')
+          end,
+          Inline = function (i)
+            names:insert(i.t)
+          end,
+          Inlines = function (_)
+            names:insert('Inlines')
+          end,
+        }
+        assert.are_same(
+          --                  Cell    Caption   Cell
+          {'Str', 'Inlines', 'Plain', 'Blocks', 'Blocks', 'Cell'},
+          names
+        )
+      end),
     }
   },
 }

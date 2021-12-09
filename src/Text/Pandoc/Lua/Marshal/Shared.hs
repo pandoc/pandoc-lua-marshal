@@ -15,6 +15,7 @@ import Control.Monad ((>=>))
 import HsLua (LuaE, LuaError)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( walkBlockSplicing, walkBlocksStraight )
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Cell (walkCellSplicing)
 import Text.Pandoc.Lua.Marshal.Filter (Filter)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( walkInlineSplicing, walkInlinesStraight )
@@ -24,6 +25,7 @@ import Text.Pandoc.Lua.Walk (SpliceList, Walkable)
 -- | Walk blocks and inlines.
 walkBlocksAndInlines :: (LuaError e,
                          Walkable (SpliceList Block) a,
+                         Walkable (SpliceList Cell) a,
                          Walkable (SpliceList Inline) a,
                          Walkable [Block] a,
                          Walkable [Inline] a)
@@ -34,3 +36,4 @@ walkBlocksAndInlines f =
   >=> walkInlinesStraight f
   >=> walkBlockSplicing f
   >=> walkBlocksStraight f
+  >=> walkCellSplicing f
