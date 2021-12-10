@@ -14,6 +14,7 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , peekColSpec
   , pushColSpec
   , peekRow
+  , peekRowFuzzy
   , pushRow
   , peekTableBody
   , pushTableBody
@@ -21,6 +22,8 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , pushTableFoot
   , peekTableHead
   , pushTableHead
+    -- * Constructors
+  , mkRow
   ) where
 
 import Control.Applicative (optional)
@@ -30,10 +33,10 @@ import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy, pushBlocks )
-import Text.Pandoc.Lua.Marshal.Cell (peekCellFuzzy, pushCell)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
+import Text.Pandoc.Lua.Marshal.Row (peekRow, peekRowFuzzy, pushRow)
 import Text.Pandoc.Definition
 
 -- | Push Caption element
@@ -69,17 +72,6 @@ pushColWidth = \case
   (ColWidth w)    -> push w
   ColWidthDefault -> pushnil
 
--- | Push a table row as a pair of attr and the list of cells.
-pushRow :: LuaError e => Pusher e Row
-pushRow (Row attr cells) =
-  pushPair pushAttr (pushPandocList pushCell) (attr, cells)
-
--- | Push a table row from a pair of attr and the list of cells.
-peekRow :: LuaError e => Peeker e Row
-peekRow = (uncurry Row <$!>)
-  . retrieving "Row"
-  . peekPair peekAttr (peekList peekCellFuzzy)
-
 -- | Pushes a 'TableBody' value as a Lua table with fields @attr@,
 -- @row_head_columns@, @head@, and @body@.
 pushTableBody :: LuaError e => Pusher e TableBody
@@ -98,8 +90,8 @@ peekTableBody = fmap (retrieving "TableBody")
   $ \idx -> TableBody
   <$!> peekFieldRaw peekAttr "attr" idx
   <*>  peekFieldRaw (fmap RowHeadColumns . peekIntegral) "row_head_columns" idx
-  <*>  peekFieldRaw (peekList peekRow) "head" idx
-  <*>  peekFieldRaw (peekList peekRow) "body" idx
+  <*>  peekFieldRaw (peekList peekRowFuzzy) "head" idx
+  <*>  peekFieldRaw (peekList peekRowFuzzy) "body" idx
 
 -- | Push a table head value as the pair of its Attr and rows.
 pushTableHead :: LuaError e => Pusher e TableHead
@@ -110,7 +102,7 @@ pushTableHead (TableHead attr rows) =
 peekTableHead :: LuaError e => Peeker e TableHead
 peekTableHead = (uncurry TableHead <$!>)
   . retrieving "TableHead"
-  . peekPair peekAttr (peekList peekRow)
+  . peekPair peekAttr (peekList peekRowFuzzy)
 
 -- | Pushes a 'TableFoot' value as a pair of the Attr value and the list
 -- of table rows.
@@ -123,7 +115,7 @@ pushTableFoot (TableFoot attr rows) =
 peekTableFoot :: LuaError e => Peeker e TableFoot
 peekTableFoot = (uncurry TableFoot <$!>)
   . retrieving "TableFoot"
-  . peekPair peekAttr (peekList peekRow)
+  . peekPair peekAttr (peekList peekRowFuzzy)
 
 -- | Add a value to the table at the top of the stack at a string-index.
 addField :: LuaError e => Name -> LuaE e () -> LuaE e ()
