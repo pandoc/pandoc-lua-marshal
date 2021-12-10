@@ -451,5 +451,95 @@ return {
         names
       )
     end),
+    test('topdown traversal works', function ()
+      local names = List{}
+      local tbl = Table(
+        {long = {}},
+        {{AlignCenter, 1}},
+        {{}, {{{'foo'}, {Cell{'test', Para{'foo', Emph{'bar'}}}}}}},
+        {},
+        {{}, {}}
+      )
+      tbl:walk{
+        traverse = 'topdown',
+        Blocks = function (_)
+          names:insert('Blocks')
+        end,
+        Block = function (b)
+          names:insert(b.t)
+        end,
+        Inline = function (i)
+          names:insert(i.t)
+        end,
+        Inlines = function (_)
+          names:insert('Inlines')
+        end,
+      }
+      assert.are_same(
+        -- Caption  Cell
+        {'Blocks', 'Blocks',
+         'Plain', 'Inlines', 'Str',
+         'Para', 'Inlines', 'Str',
+         'Emph', 'Inlines', 'Str'
+        },
+        names
+      )
+    end),
+    test('truncating topdown traversal works', function ()
+      local names = List{}
+      local div = Div{
+        Para{Emph 'a'},
+        Plain{'b'},
+        CodeBlock('c')
+      }
+      local filter
+      filter = {
+        traverse = 'topdown',
+        Block = function (b)
+          names:insert(b.t)
+          if b.t == 'Para' then
+            return b, false
+          end
+        end,
+        Inline = function (i)
+          names:insert(i.t)
+          return i:walk(filter), false  -- continue 'manually'
+        end,
+      }
+      div:walk(filter)
+      assert.are_same(
+        {'Para',  -- Emph is skipped!
+         'Plain', 'Str',
+         'CodeBlock',
+        },
+        names
+      )
+    end),
+    test('truncating topdown traversal works in inlines', function ()
+      local names = List{}
+      local div = Div{
+        Para{Emph 'a'},
+        Plain{'b'},
+      }
+      div:walk {
+        traverse = 'topdown',
+        Block = function (b)
+          names:insert(b.t)
+          if b.t == 'Plain' then
+            return nil, false
+          end
+        end,
+        Emph = function (i)
+          names:insert(i.t)
+          return nil, false
+        end,
+      }
+      assert.are_same(
+        {'Para', 'Emph', -- Str is skipped
+         'Plain',        -- Str is skipped here, too
+        },
+        names
+      )
+    end),
   }
 }

@@ -70,6 +70,7 @@ main = do
     pushListModule *> setglobal "List"
     register' mkAttr
     register' mkBlocks
+    register' mkCell
     register' mkListAttributes
     registerConstants (Proxy @Alignment)
     registerConstants (Proxy @ListNumberStyle)
@@ -110,6 +111,7 @@ main = do
   pandocTests <- run @Lua.Exception $ do
     openlibs
     pushListModule *> setglobal "List"
+    register' mkBlocks
     register' mkMeta
     register' mkPandoc
     forM_ inlineConstructors register'

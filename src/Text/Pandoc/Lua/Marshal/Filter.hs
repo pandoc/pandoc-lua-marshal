@@ -13,6 +13,7 @@ functions to be called on specific elements.
 module Text.Pandoc.Lua.Marshal.Filter
   ( -- * Filters
     Filter (..)
+  , WalkingOrder (..)
   , peekFilter
   , lookup
   , member
@@ -28,7 +29,7 @@ module Text.Pandoc.Lua.Marshal.Filter
   ) where
 
 import Prelude hiding (lookup)
-import Control.Applicative ((<|>))
+import Control.Applicative ((<|>), optional)
 import Control.Monad ((<$!>))
 import Data.Data
   ( Data, dataTypeConstrs, dataTypeName, dataTypeOf
@@ -63,7 +64,17 @@ peekFilterFunction = typeChecked "function" isfunction $ \idx -> liftLua $ do
 
 -- | Collection of filter functions (at most one function per element
 -- constructor)
-newtype Filter = Filter (Map Name FilterFunction)
+data Filter = Filter
+  { filterWalkingOrder :: WalkingOrder
+  , filterMap :: Map Name FilterFunction
+  }
+
+-- | Description of how an AST should be traversed.
+data WalkingOrder
+  = WalkForEachType  -- ^ Process each type separately, traversing the
+                     -- tree bottom-up (leaves to root) for each type.
+  | WalkTopdown      -- ^ Traverse the tree top-down, from root to
+                     -- leaves and depth first, in a single traversal.
 
 -- | Retrieves a default `Filter` object from the stack, suitable for
 -- filtering a full document.
@@ -87,15 +98,21 @@ peekFilter' fnNames idx = do
         runPeek (peekFilterFunction top `lastly` pop 1) >>= \case
           Success fn -> pure $ Map.insert constr fn acc
           Failure {} -> pure acc
-  Filter <$!> foldrM go Map.empty fnNames
+  walkingSequence <- do
+    _ <- liftLua $ getfield idx "traverse"
+    optional (peekText top) `lastly` pop 1 >>= \case
+      Just "typewise" -> pure WalkForEachType
+      Just "topdown"  -> pure WalkTopdown
+      _               -> pure WalkForEachType
+  Filter walkingSequence <$!> foldrM go Map.empty fnNames
 
 -- | Looks up a filter function in a Lua 'Filter'.
 lookup :: Name -> Filter -> Maybe FilterFunction
-lookup name (Filter filterMap) = name `Map.lookup` filterMap
+lookup name = (name `Map.lookup`) . filterMap
 
 -- | Checks whether the 'Filter' contains a function of the given name.
 member :: Name -> Filter -> Bool
-member name (Filter filterMap) = name `Map.member` filterMap
+member name = (name `Map.member`) . filterMap
 
 -- | Filter function names for a given type.
 valueFunctionNames :: forall a. Data a => Proxy a -> [Name]
@@ -115,6 +132,8 @@ listFunctionName _ =
   fromString . (++ "s") . tyconUQname . dataTypeName . dataTypeOf
   $ (undefined :: a)
 
+-- | Finds the best filter function for a given element; returns
+-- 'Nothing' if no such function exists.
 getFunctionFor :: forall a. Data a => Filter -> a -> Maybe FilterFunction
 getFunctionFor filter' x =
   let constrName = fromString . showConstr . toConstr $ x

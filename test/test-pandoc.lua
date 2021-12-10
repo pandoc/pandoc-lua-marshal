@@ -54,5 +54,88 @@ return {
         }
       )
     end),
+    test('default traversal is typewise, bottom-up', function ()
+      local names = List{}
+      local doc = Pandoc(
+        Blocks{
+          Div{
+            Plain{Emph 'a'},
+            Para{'b'},
+            CodeBlock('c')
+          }
+        },
+        { test = Blocks 'foo' }
+      )
+      doc:walk {
+        Block = function (b)
+          names:insert(b.t)
+        end,
+        Inline = function (i)
+          names:insert(i.t)
+        end,
+        Pandoc = function (_)
+          names:insert('Pandoc')
+        end,
+        Meta = function (_)
+          names:insert('Meta')
+        end
+      }
+      assert.are_same(
+        { 'Str',   -- in meta value
+          'Str',   -- in Emph
+          'Emph',
+          'Str',   -- in Para,
+          'Plain', -- in meta value
+          'Plain',
+          'Para',
+          'CodeBlock',
+          'Div',
+          'Meta',
+          'Pandoc'
+        },
+        names
+      )
+    end),
+    test('truncating topdown traversal works', function ()
+      local names = List{}
+      local doc = Pandoc(
+        Blocks{
+          Div{
+            Plain{Emph 'a'},
+            Para{'b'},
+            CodeBlock('c')
+          }
+        },
+        { test = Blocks 'foo' }
+      )
+      doc:walk {
+        traverse = 'topdown',
+        Block = function (b)
+          names:insert(b.t)
+          if b.t == 'Para' then
+            return b, false
+          end
+        end,
+        Inline = function (i)
+          names:insert(i.t)
+        end,
+        Pandoc = function (_)
+          names:insert('Pandoc')
+        end,
+        Meta = function (_)
+          names:insert('Meta')
+        end
+      }
+      assert.are_same(
+        { 'Pandoc',
+          'Meta', 'Plain', 'Str', -- Meta and meta value
+          'Div',
+          'Plain', 'Emph', 'Str',
+          'Para',                 -- Str is skipped!
+          'CodeBlock'
+        },
+        names
+      )
+    end),
   }
 }
