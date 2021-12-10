@@ -2,6 +2,13 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.2
+
+Released 2021-12-10.
+
+-   Restored backward compatible retrieval of Rows. Cells can be
+    either a userdata value or a table.
+
 ## 0.1.1
 
 Released 2021-12-10.
