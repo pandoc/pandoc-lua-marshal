@@ -30,7 +30,7 @@ import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
   ( peekBlocksFuzzy, pushBlocks )
-import Text.Pandoc.Lua.Marshal.Cell (peekCell, pushCell)
+import Text.Pandoc.Lua.Marshal.Cell (peekCellFuzzy, pushCell)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
@@ -78,7 +78,7 @@ pushRow (Row attr cells) =
 peekRow :: LuaError e => Peeker e Row
 peekRow = (uncurry Row <$!>)
   . retrieving "Row"
-  . peekPair peekAttr (peekList peekCell)
+  . peekPair peekAttr (peekList peekCellFuzzy)
 
 -- | Pushes a 'TableBody' value as a Lua table with fields @attr@,
 -- @row_head_columns@, @head@, and @body@.
