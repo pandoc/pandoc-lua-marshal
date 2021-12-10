@@ -15,10 +15,13 @@ Walking documents in a filter-suitable way.
 module Text.Pandoc.Lua.Walk
   ( SpliceList (..)
   , Walkable
+  , TraversalControl (..)
   , walkSplicing
   , walkStraight
   , applyStraight
   , applySplicing
+  , applyStraightFunction
+  , applySplicingFunction
   )
 where
 
@@ -51,7 +54,7 @@ walkStraight filterFnName pushElement peekElement filter' =
       pure
     Just fn ->
       -- Walk the element with the filter function.
-      walkM $ applyStraightFunction fn pushElement peekElement
+      walkM $ fmap fst . applyStraightFunction fn pushElement peekElement
 
 -- | Applies a filter on an element. The element is pushed to the stack
 -- via the given pusher and calls the filter function with that value,
@@ -64,7 +67,7 @@ applyStraight pushElement peekElement filter' x = do
     Nothing ->
       -- There is no filter function, do nothing.
       pure x
-    Just fn -> do
+    Just fn -> fst <$>
       -- Apply the function
       applyStraightFunction fn pushElement peekElement x
 
@@ -74,13 +77,15 @@ applyStraight pushElement peekElement filter' x = do
 -- on the stack.
 applyStraightFunction :: LuaError e
                       => FilterFunction -> Pusher e a -> Peeker e a
-                      -> a -> LuaE e a
+                      -> a -> LuaE e (a, TraversalControl)
 applyStraightFunction fn pushElement peekElement x = do
   pushFilterFunction fn
   pushElement x
-  callWithTraceback 1 1
-  forcePeek . (`lastly` pop 1) $
-    (x <$ peekNil top) <|> peekElement top
+  callWithTraceback 1 2
+  forcePeek . (`lastly` pop 2) $
+    (,)
+    <$> ((x <$ peekNil (nth 2)) <|> peekElement (nth 2))
+    <*> peekTraversalControl top
 
 --
 -- Splicing
@@ -118,7 +123,7 @@ applySplicing pushElement peekElements filter' x = do
     Nothing ->
       -- There is no filter function, do nothing.
       pure [x]
-    Just fn -> do
+    Just fn -> fst <$>
       -- Apply the function
       applySplicingFunction fn pushElement peekElements x
 
@@ -128,14 +133,17 @@ applySplicing pushElement peekElements filter' x = do
 -- on the stack.
 applySplicingFunction :: LuaError e
                       => FilterFunction -> Pusher e a -> Peeker e [a]
-                      -> a -> LuaE e [a]
+                      -> a -> LuaE e ([a], TraversalControl)
 applySplicingFunction fn pushElement peekElements x = do
   pushFilterFunction fn
   pushElement x
-  callWithTraceback 1 1
-  forcePeek . (`lastly` pop 1) $ liftLua (ltype top) >>= \case
-    TypeNil -> pure [x]  -- function returned `nil`, keep original value
-    _       -> peekElements top
+  callWithTraceback 1 2
+  forcePeek . (`lastly` pop 2) $
+    (,)
+    <$> (liftLua (ltype (nth 2)) >>= \case
+            TypeNil -> pure [x]  -- function returned `nil`, keep original value
+            _       -> peekElements (nth 2))
+    <*> peekTraversalControl top
 
 --
 -- Helper
@@ -158,3 +166,13 @@ callWithTraceback nargs nresults = do
   remove tracebackIdx
   when (result /= OK)
     throwErrorAsException
+
+data TraversalControl = Continue | Stop
+
+-- | Retrieves a Traversal control value: @nil@ or a truthy value
+-- translate to 'Continue', @false@ is treated to mean 'Stop'.
+peekTraversalControl :: Peeker e TraversalControl
+peekTraversalControl idx = (Continue <$ peekNil idx)
+  <|> (liftLua (toboolean top) >>= \case
+          True -> pure Continue
+          False -> pure Stop)

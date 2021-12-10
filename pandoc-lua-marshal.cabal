@@ -94,6 +94,7 @@ library
                      , Text.Pandoc.Lua.Marshal.SimpleTable
                      , Text.Pandoc.Lua.Marshal.TableParts
   other-modules:       Text.Pandoc.Lua.Marshal.Shared
+                     , Text.Pandoc.Lua.Topdown
                      , Text.Pandoc.Lua.SpliceList
                      , Text.Pandoc.Lua.Walk
 

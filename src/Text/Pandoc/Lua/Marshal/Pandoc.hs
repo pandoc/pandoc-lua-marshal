@@ -26,7 +26,7 @@ import HsLua
 import Text.Pandoc.Lua.Marshal.Block
   (peekBlocksFuzzy, pushBlocks, walkBlockSplicing, walkBlocksStraight)
 import Text.Pandoc.Lua.Marshal.Inline (walkInlineSplicing, walkInlinesStraight)
-import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter)
+import Text.Pandoc.Lua.Marshal.Filter
 import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Walk (applyStraight)
@@ -61,10 +61,13 @@ typePandoc = deftype "Pandoc"
       (peekMeta, \(Pandoc _ blks) meta -> Pandoc meta blks)
 
   , method $ defun "walk"
-    ### (\doc filter' ->
-               walkBlocksAndInlines filter' doc
-           >>= applyMetaFunction filter'
-           >>= applyPandocFunction filter')
+    ### (\doc filter' -> case filterWalkingOrder filter' of
+            WalkForEachType -> walkBlocksAndInlines filter' doc
+                           >>= applyMetaFunction filter'
+                           >>= applyPandocFunction filter'
+            WalkTopdown     -> applyPandocFunction filter' doc
+                           >>= applyMetaFunction filter'
+                           >>= walkBlocksAndInlines filter')
     <#> parameter peekPandoc "Pandoc" "self" ""
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushPandoc "Pandoc" "modified element"

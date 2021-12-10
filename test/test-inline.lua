@@ -412,7 +412,6 @@ return {
           names:insert('Inlines')
         end,
       }
-      print(names)
       assert.are_equal(
         'Str, Space, Str, Space, Str, Inlines, Para, CodeBlock, Blocks',
         table.concat(names, ', ')
