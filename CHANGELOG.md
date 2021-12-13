@@ -2,6 +2,26 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.3
+
+Release pending.
+
+### Lua changes
+
+-   The traversal order of filters can now be selected by setting
+    the key `traverse` to either `'topdown'` or `'typewise'`; the
+    default remains `'typewise'`.
+
+    Topdown traversals can be cut short by returning `false` as a
+    second value from the filter function. No child-element of
+    the returned element is processed in that case.
+
+### Haskell code
+
+-   Text.Pandoc.Lua.Marshal.Filter exports the new type
+    `WalkingOrder`. The type `Filter` now contains the the
+    traversal specifier as a field.
+
 ## 0.1.2
 
 Released 2021-12-10.
