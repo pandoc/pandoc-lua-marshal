@@ -18,6 +18,7 @@ jobs:
             cabal: '3.2'
           - ghc: '8.10.7'
             cabal: '3.2'
+            cabalopts: '--constraint="lua +pkg-config"'
           - ghc: '9.0.1'
             cabal: '3.4'
           - ghc: '9.2.1'
@@ -32,6 +33,11 @@ jobs:
           ghc-version: ${{ matrix.version.ghc }}
           cabal-version: ${{ matrix.version.cabal }}
 
+      - name: Install system Lua
+        run: |
+          sudo apt update
+          sudo apt install lua5.3 liblua5.3-dev
+
       - uses: actions/cache@v1
         name: Cache ~/.cabal/store
         with:
@@ -41,11 +47,14 @@ jobs:
       - name: Build
         run: |
           cabal update
-          cabal build --enable-tests --enable-benchmarks
+          cabal build \
+            --enable-tests \
+            ${{ matrix.version.cabalopts }}
 
       - name: Test
         run: |
-          cabal test --enable-tests
+          cabal test --enable-tests \
+            ${{ matrix.version.cabalopts }}
 
   windows:
     name: Windows (stack)
