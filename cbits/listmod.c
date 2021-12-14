@@ -5,6 +5,13 @@
 
 #define LIST_T "List"
 
+/* compatibility with older Lua versions, which did not define this in the
+ * header. */
+#ifndef LUA_LOADED_TABLE
+/* key, in the registry, for table of loaded modules */
+#define LUA_LOADED_TABLE	"_LOADED"
+#endif
+
 /*
 ** Placeholder function.
 */
