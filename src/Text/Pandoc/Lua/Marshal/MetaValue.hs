@@ -1,6 +1,7 @@
 {-# LANGUAGE LambdaCase           #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE TypeApplications     #-}
 {- |
 Copyright               : © 2021 Albert Krewinkel
 SPDX-License-Identifier : MIT
@@ -23,6 +24,7 @@ import Text.Pandoc.Lua.Marshal.Inline
   ( peekInline, peekInlines, peekInlinesFuzzy, pushInlines )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Definition (MetaValue (..))
+import qualified Data.Text as T
 
 -- | Push a 'MetaValue' element to the top of the Lua stack.
 pushMetaValue :: LuaError e => Pusher e MetaValue
@@ -43,6 +45,11 @@ peekMetaValue = retrieving "MetaValue" . \idx -> do
     TypeBoolean -> MetaBool <$!> peekBool idx
 
     TypeString  -> MetaString <$!> peekText idx
+
+    TypeNumber  -> MetaString . T.pack <$>
+      (liftLua (isinteger idx) >>= \case
+          False -> show <$!> peekRealFloat @Double idx
+          True  -> show <$!> peekIntegral @Prelude.Integer idx)
 
     TypeUserdata -> -- Allow singleton Inline or Block elements
       (MetaInlines . (:[]) <$!> peekInline idx) <|>

@@ -11,5 +11,9 @@ return {
       assert.are_equal(type(metalist.insert), 'function')
       assert.are_equal(type(metalist.remove), 'function')
     end),
+    test('Numbers are treated as strings', function ()
+      local metalist = MetaList{5, 23, 13.37}
+      assert.are_same(metalist, MetaList{'5', '23', '13.37'})
+    end)
   }
 }
