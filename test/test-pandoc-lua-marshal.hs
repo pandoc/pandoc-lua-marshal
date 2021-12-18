@@ -66,17 +66,7 @@ main = do
     translateResultsFromFile "test/test-inline.lua"
 
   blockTests <- run @Lua.Exception $ do
-    openlibs
-    pushListModule *> setglobal "List"
-    register' mkAttr
-    register' mkBlocks
-    register' mkCell
-    register' mkListAttributes
-    registerConstants (Proxy @Alignment)
-    registerConstants (Proxy @ListNumberStyle)
-    registerConstants (Proxy @ListNumberStyle)
-    forM_ inlineConstructors register'
-    forM_ blockConstructors register'
+    registerDefault
     translateResultsFromFile "test/test-block.lua"
 
   cellTests <- run @Lua.Exception $ do
@@ -131,6 +121,24 @@ main = do
     , metavalueTests
     , pandocTests
     ]
+
+-- | Registers all constructors and string constants in the global
+-- environment.
+registerDefault :: LuaError e => LuaE e ()
+registerDefault = do
+  openlibs
+  pushListModule *> setglobal "List"
+  register' mkAttr
+  register' mkBlocks
+  register' mkCell
+  register' mkListAttributes
+  register' mkRow
+  register' mkTableHead
+  registerConstants (Proxy @Alignment)
+  registerConstants (Proxy @ListNumberStyle)
+  registerConstants (Proxy @ListNumberStyle)
+  forM_ inlineConstructors register'
+  forM_ blockConstructors register'
 
 register' :: LuaError e => DocumentedFunction e -> LuaE e ()
 register' f = do
