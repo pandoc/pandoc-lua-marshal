@@ -246,20 +246,20 @@ return {
     group 'Table' {
       test('access Attr via property `attr`', function ()
         local caption = {long = {Plain 'cap'}}
-        local tbl = Table(caption, {}, TableHead(), {}, {{}, {}},
+        local tbl = Table(caption, {}, TableHead(), {}, TableFoot(),
                                  {'my-tbl', {'a'}})
         assert.are_equal(tbl.attr, Attr{'my-tbl', {'a'}})
 
         tbl.attr = Attr{'my-other-tbl', {'b'}}
         assert.are_equal(
-          Table(caption, {}, TableHead(), {}, {{}, {}},
+          Table(caption, {}, TableHead(), {}, TableFoot(),
                        {'my-other-tbl', {'b'}}),
           tbl
         )
       end),
       test('access caption via property `caption`', function ()
         local caption = {long = {Plain 'cap'}}
-        local tbl = Table(caption, {}, TableHead(), {}, {{}, {}})
+        local tbl = Table(caption, {}, TableHead(), {}, TableFoot())
         assert.are_same(tbl.caption, {long = {Plain 'cap'}})
 
         tbl.caption.short = 'brief'
@@ -270,13 +270,13 @@ return {
           long = {Plain 'extended'}
         }
         assert.are_equal(
-          Table(new_caption, {}, TableHead(), {}, {{}, {}}),
+          Table(new_caption, {}, TableHead(), {}, TableFoot()),
           tbl
         )
       end),
       test('access column specifiers via property `colspecs`', function ()
         local colspecs = {{AlignCenter, 1}}
-        local tbl = Table({long = {}}, colspecs, TableHead(), {}, {{}, {}})
+        local tbl = Table({long = {}}, colspecs, TableHead(), {}, TableFoot())
         assert.are_same(tbl.colspecs, colspecs)
 
         tbl.colspecs[1][1] = AlignRight
@@ -284,13 +284,13 @@ return {
 
         local new_colspecs = {{AlignRight}}
         assert.are_equal(
-          Table({long = {}}, new_colspecs, TableHead(), {}, {{}, {}}),
+          Table({long = {}}, new_colspecs, TableHead(), {}, TableFoot()),
           tbl
         )
       end),
       test('access table head via property `head`', function ()
         local head = TableHead({Row{Cell'a'}}, Attr('tbl-head'))
-        local tbl = Table({long = {}}, {}, head, {}, {{}, {}})
+        local tbl = Table({long = {}}, {}, head, {}, TableFoot())
         assert.are_same(tbl.head, head)
 
         local new_head = head:clone()
@@ -300,18 +300,21 @@ return {
         tbl.head = new_head
 
         assert.are_equal(
-          Table({long = {}}, {}, new_head, {}, {{}, {}}),
+          Table({long = {}}, {}, new_head, {}, TableFoot()),
           tbl
         )
       end),
       test('access table foot via property `foot`', function ()
-        local foot = {{id = 'tbl-foot'}, {}}
+        local foot = TableFoot({Row{Cell{'test'}}}, {id = 'tbl-foot'})
         local tbl = Table({long = {}}, {}, TableHead(), {}, foot)
-        assert.are_same(tbl.foot, {Attr('tbl-foot'), {}})
+        assert.are_same(tbl.foot, foot)
 
-        tbl.foot[1] = Attr{'table-foot'}
+        local new_foot = foot:clone()
+        new_foot.attr = Attr{'table-foot'}
+        new_foot.rows = {Row{Cell{'test'}}}
 
-        local new_foot = {'table-foot', {}}
+        tbl.foot = new_foot
+
         assert.are_equal(
           Table({long = {}}, {}, TableHead(), {}, new_foot),
           tbl
@@ -461,7 +464,7 @@ return {
         {{AlignCenter, 1}},
         TableHead{Row({Cell{'test', Para{'foo', Emph{'bar'}}}}, 'foo')},
         {},
-        {{}, {}}
+        TableFoot()
       )
       tbl:walk{
         traverse = 'topdown',

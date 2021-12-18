@@ -93,6 +93,7 @@ library
                      , Text.Pandoc.Lua.Marshal.QuoteType
                      , Text.Pandoc.Lua.Marshal.Row
                      , Text.Pandoc.Lua.Marshal.SimpleTable
+                     , Text.Pandoc.Lua.Marshal.TableFoot
                      , Text.Pandoc.Lua.Marshal.TableHead
                      , Text.Pandoc.Lua.Marshal.TableParts
   other-modules:       Text.Pandoc.Lua.Marshal.Shared
