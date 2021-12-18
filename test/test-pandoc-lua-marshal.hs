@@ -134,6 +134,7 @@ registerDefault = do
   register' mkListAttributes
   register' mkRow
   register' mkTableHead
+  register' mkTableFoot
   registerConstants (Proxy @Alignment)
   registerConstants (Proxy @ListNumberStyle)
   registerConstants (Proxy @ListNumberStyle)

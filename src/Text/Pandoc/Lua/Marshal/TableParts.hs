@@ -24,6 +24,7 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , pushTableHead
     -- * Constructors
   , mkRow
+  , mkTableFoot
   , mkTableHead
   ) where
 
@@ -38,6 +39,7 @@ import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Lua.Marshal.Row
+import Text.Pandoc.Lua.Marshal.TableFoot
 import Text.Pandoc.Lua.Marshal.TableHead
 import Text.Pandoc.Definition
 
@@ -94,19 +96,6 @@ peekTableBody = fmap (retrieving "TableBody")
   <*>  peekFieldRaw (fmap RowHeadColumns . peekIntegral) "row_head_columns" idx
   <*>  peekFieldRaw (peekList peekRowFuzzy) "head" idx
   <*>  peekFieldRaw (peekList peekRowFuzzy) "body" idx
-
--- | Pushes a 'TableFoot' value as a pair of the Attr value and the list
--- of table rows.
-pushTableFoot :: LuaError e => Pusher e TableFoot
-pushTableFoot (TableFoot attr rows) =
-  pushPair pushAttr (pushPandocList pushRow) (attr, rows)
-
--- | Retrieves a 'TableFoot' value from a pair containing an Attr value
--- and a list of table rows.
-peekTableFoot :: LuaError e => Peeker e TableFoot
-peekTableFoot = (uncurry TableFoot <$!>)
-  . retrieving "TableFoot"
-  . peekPair peekAttr (peekList peekRowFuzzy)
 
 -- | Add a value to the table at the top of the stack at a string-index.
 addField :: LuaError e => Name -> LuaE e () -> LuaE e ()
