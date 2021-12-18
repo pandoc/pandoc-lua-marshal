@@ -24,6 +24,7 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , pushTableHead
     -- * Constructors
   , mkRow
+  , mkTableHead
   ) where
 
 import Control.Applicative (optional)
@@ -36,7 +37,8 @@ import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
-import Text.Pandoc.Lua.Marshal.Row (peekRow, peekRowFuzzy, pushRow)
+import Text.Pandoc.Lua.Marshal.Row
+import Text.Pandoc.Lua.Marshal.TableHead
 import Text.Pandoc.Definition
 
 -- | Push Caption element
@@ -92,17 +94,6 @@ peekTableBody = fmap (retrieving "TableBody")
   <*>  peekFieldRaw (fmap RowHeadColumns . peekIntegral) "row_head_columns" idx
   <*>  peekFieldRaw (peekList peekRowFuzzy) "head" idx
   <*>  peekFieldRaw (peekList peekRowFuzzy) "body" idx
-
--- | Push a table head value as the pair of its Attr and rows.
-pushTableHead :: LuaError e => Pusher e TableHead
-pushTableHead (TableHead attr rows) =
-  pushPair pushAttr (pushPandocList pushRow) (attr, rows)
-
--- | Peek a table head value from a pair of Attr and rows.
-peekTableHead :: LuaError e => Peeker e TableHead
-peekTableHead = (uncurry TableHead <$!>)
-  . retrieving "TableHead"
-  . peekPair peekAttr (peekList peekRowFuzzy)
 
 -- | Pushes a 'TableFoot' value as a pair of the Attr value and the list
 -- of table rows.
