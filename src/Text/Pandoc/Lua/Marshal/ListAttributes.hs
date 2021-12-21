@@ -19,6 +19,7 @@ module Text.Pandoc.Lua.Marshal.ListAttributes
   , pushListNumberStyle
   ) where
 
+import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Definition
@@ -28,9 +29,9 @@ import Text.Pandoc.Definition
 typeListAttributes :: LuaError e => DocumentedType e ListAttributes
 typeListAttributes = deftype "ListAttributes"
   [ operation Eq $ lambda
-    ### liftPure2 (==)
-    <#> parameter peekListAttributes "a" "ListAttributes" ""
-    <#> parameter peekListAttributes "b" "ListAttributes" ""
+    ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
+    <#> parameter (optional . peekListAttributes) "a" "ListAttributes" ""
+    <#> parameter (optional . peekListAttributes) "b" "ListAttributes" ""
     =#> functionResult pushBool "boolean" "whether the two are equal"
   ]
   [ property "start" "number of the first list item"

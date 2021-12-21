@@ -17,6 +17,8 @@ module Text.Pandoc.Lua.Marshal.SimpleTable
   )
   where
 
+import Control.Applicative (optional)
+import Data.Maybe (fromMaybe)
 import HsLua as Lua
 import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
@@ -36,9 +38,9 @@ data SimpleTable = SimpleTable
 typeSimpleTable :: LuaError e => DocumentedType e SimpleTable
 typeSimpleTable = deftype "SimpleTable"
   [ operation Eq $ lambda
-    ### liftPure2 (==)
-    <#> udparam typeSimpleTable "a" ""
-    <#> udparam typeSimpleTable "b" ""
+    ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
+    <#> parameter (optional . peekSimpleTable) "value" "a" ""
+    <#> parameter (optional . peekSimpleTable) "value" "b" ""
     =#> functionResult pushBool "boolean" "whether the two objects are equal"
   , operation Tostring $ lambda
     ### liftPure show

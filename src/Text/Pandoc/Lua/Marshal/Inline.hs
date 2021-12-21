@@ -25,6 +25,7 @@ module Text.Pandoc.Lua.Marshal.Inline
   , walkInlinesStraight
   ) where
 
+import Control.Applicative (optional)
 import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
 import Data.Data (showConstr, toConstr)
@@ -106,9 +107,9 @@ typeInline = deftype "Inline"
     <#> parameter peekInline "inline" "Inline" "Object"
     =#> functionResult pushString "string" "stringified Inline"
   , operation Eq $ defun "__eq"
-      ### liftPure2 (==)
-      <#> parameter peekInline "a" "Inline" ""
-      <#> parameter peekInline "b" "Inline" ""
+      ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
+      <#> parameter (optional . peekInline) "a" "Inline" ""
+      <#> parameter (optional . peekInline) "b" "Inline" ""
       =#> functionResult pushBool "boolean" "whether the two are equal"
   ]
   [ possibleProperty "attr" "element attributes"

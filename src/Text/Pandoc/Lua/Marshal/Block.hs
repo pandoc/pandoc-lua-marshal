@@ -25,7 +25,7 @@ module Text.Pandoc.Lua.Marshal.Block
   , walkBlocksStraight
   ) where
 
-import Control.Applicative ((<|>))
+import Control.Applicative ((<|>), optional)
 import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
 import Data.Data (showConstr, toConstr)
@@ -110,9 +110,9 @@ peekBlocksFuzzy = choice
 typeBlock :: forall e. LuaError e => DocumentedType e Block
 typeBlock = deftype "Block"
   [ operation Eq $ lambda
-    ### liftPure2 (==)
-    <#> parameter peekBlockFuzzy "Block" "a" ""
-    <#> parameter peekBlockFuzzy "Block" "b" ""
+    ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
+    <#> parameter (optional . peekBlockFuzzy) "Block" "a" ""
+    <#> parameter (optional . peekBlockFuzzy) "Block" "b" ""
     =#> boolResult "whether the two values are equal"
   , operation Tostring $ lambda
     ### liftPure show

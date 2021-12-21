@@ -38,7 +38,7 @@ typeCitation :: LuaError e
              => DocumentedType e Citation
 typeCitation = deftype "Citation"
   [ operation Eq $ lambda
-    ### liftPure2 (==)
+    ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
     <#> parameter (optional . peekCitation) "Citation" "a" ""
     <#> parameter (optional . peekCitation) "Citation" "b" ""
     =#> functionResult pushBool "boolean" "true iff the citations are equal"

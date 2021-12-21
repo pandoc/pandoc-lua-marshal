@@ -38,9 +38,9 @@ import qualified Data.Text as T
 typeAttr :: LuaError e => DocumentedType e Attr
 typeAttr = deftype "Attr"
   [ operation Eq $ lambda
-    ### liftPure2 (==)
-    <#> parameter peekAttr "a1" "Attr" ""
-    <#> parameter peekAttr "a2" "Attr" ""
+    ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
+    <#> parameter (optional . peekAttr) "a" "Attr" ""
+    <#> parameter (optional . peekAttr) "b" "Attr" ""
     =#> functionResult pushBool "boolean" "whether the two are equal"
   , operation Tostring $ lambda
     ### liftPure show

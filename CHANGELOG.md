@@ -16,6 +16,9 @@ Release pending.
     second value from the filter function. No child-element of
     the returned element is processed in that case.
 
+-   All types can be compared. Previously, comparing values of
+    different types would lead to errors in a number of cases.
+
 ### Haskell code
 
 -   Text.Pandoc.Lua.Marshal.Filter exports the new type
