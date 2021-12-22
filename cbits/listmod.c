@@ -201,7 +201,7 @@ static int list_map(lua_State *L) {
   luaL_checktype(L, 2, LUA_TFUNCTION);
   lua_Integer len = luaL_len(L, 1);
   lua_createtable(L, len, 0);  /* create new table */
-  lua_getmetatable(L, 1);
+  luaL_getmetatable(L, LIST_T);  /* make result a generic list */
   lua_setmetatable(L, 3);
   for (lua_Integer i = 1; i <= len; i++) {
     lua_pushvalue(L, 2);  /* map function */

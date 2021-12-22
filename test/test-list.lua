@@ -142,6 +142,14 @@ return {
         local primes = List:new {2, 3, 5, 7}
         local indices = primes:map(function (x, i) return i end)
         assert.are_same(List{1, 2, 3, 4}, indices)
+      end),
+      test('map returns a generic list', function ()
+        local custom = CustomList{'α', 'β'}
+        assert.are_equal(debug.getmetatable(custom).__name, 'CustomList')
+        assert.are_same(
+          debug.getmetatable(custom:map(tostring)).__name,
+          'List'
+        )
       end)
     },
 

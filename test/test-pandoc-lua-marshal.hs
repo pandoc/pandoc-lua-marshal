@@ -28,6 +28,13 @@ main = do
   listTests <- run @Lua.Exception $ do
     openlibs
     pushListModule *> setglobal "List"
+    -- Create a custom List type with constructor "CustomList"
+    pushHaskellFunction $ do
+      settop 1
+      newListMetatable "CustomList" (pure ())
+      setmetatable (nthBottom 1)
+      return 1
+    setglobal "CustomList"
     translateResultsFromFile "test/test-list.lua"
 
   listAttributeTests <- run @Lua.Exception $ do
