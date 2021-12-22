@@ -60,16 +60,7 @@ main = do
     translateResultsFromFile "test/test-citation.lua"
 
   inlineTests <- run @Lua.Exception $ do
-    openlibs
-    pushListModule *> setglobal "List"
-    register' mkAttr
-    register' mkCitation
-    register' mkInlines
-    registerConstants (Proxy @CitationMode)
-    registerConstants (Proxy @MathType)
-    registerConstants (Proxy @QuoteType)
-    forM_ inlineConstructors register'
-    forM_ blockConstructors register'
+    registerDefault
     translateResultsFromFile "test/test-inline.lua"
 
   blockTests <- run @Lua.Exception $ do
@@ -77,26 +68,11 @@ main = do
     translateResultsFromFile "test/test-block.lua"
 
   cellTests <- run @Lua.Exception $ do
-    openlibs
-    pushListModule *> setglobal "List"
-    register' mkAttr
-    register' mkBlocks
-    register' mkCell
-    register' mkListAttributes
-    registerConstants (Proxy @Alignment)
-    forM_ inlineConstructors register'
-    forM_ blockConstructors register'
+    registerDefault
     translateResultsFromFile "test/test-cell.lua"
 
   simpleTableTests <- run @Lua.Exception $ do
-    openlibs
-    pushListModule *> setglobal "List"
-    register' mkAttr
-    register' mkListAttributes
-    register' mkSimpleTable
-    registerConstants (Proxy @Alignment)
-    forM_ inlineConstructors register'
-    forM_ blockConstructors register'
+    registerDefault
     translateResultsFromFile "test/test-simpletable.lua"
 
   metavalueTests <- run @Lua.Exception $ do
@@ -106,13 +82,7 @@ main = do
     translateResultsFromFile "test/test-metavalue.lua"
 
   pandocTests <- run @Lua.Exception $ do
-    openlibs
-    pushListModule *> setglobal "List"
-    register' mkBlocks
-    register' mkMeta
-    register' mkPandoc
-    forM_ inlineConstructors register'
-    forM_ blockConstructors register'
+    registerDefault
     translateResultsFromFile "test/test-pandoc.lua"
 
   defaultMain $ testGroup "pandoc-lua-marshal"
