@@ -19,6 +19,13 @@ Release pending.
 -   All types can be compared. Previously, comparing values of
     different types would lead to errors in a number of cases.
 
+-   Lists now have an `__eq` metamethod. List equality is checked
+    by comparing both lists element-wise. Two lists are equal if
+    they have the same type and have equal elements.
+
+-   If start indices in `List:find` and `List:find_if` are
+    negative the start index is relative to the list length.
+
 ### Haskell code
 
 -   Text.Pandoc.Lua.Marshal.Filter exports the new type

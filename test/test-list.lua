@@ -221,22 +221,54 @@ return {
   },
   group 'Operations' {
     group 'concatenation' {
-    test('yields a concatenated list', function ()
-      assert.are_same(List {3, 4, 5, 6}, List{3, 4} .. List {5, 6})
-    end),
-    test('does not modify its operands', function ()
-      local a = List {54, 74}
-      local b = List {90, 2014}
-      local result = a .. b
-      assert.are_same(a, List{54, 74})
-      assert.are_same(b, List{90, 2014})
-    end),
-    test('sets metatable of first operand on result', function ()
-      local result = {1, 4} .. List{9, 16}
-      assert.are_equal(nil, getmetatable(result))
-      result = List{1, 4} .. {9, 16}
-      assert.are_equal(List, getmetatable(result))
-    end),
+      test('yields a concatenated list', function ()
+        assert.are_same(List {3, 4, 5, 6}, List{3, 4} .. List {5, 6})
+      end),
+      test('does not modify its operands', function ()
+        local a = List {54, 74}
+        local b = List {90, 2014}
+        local result = a .. b
+        assert.are_same(a, List{54, 74})
+        assert.are_same(b, List{90, 2014})
+      end),
+      test('sets metatable of first operand on result', function ()
+        local result = {1, 4} .. List{9, 16}
+        assert.are_equal(nil, getmetatable(result))
+        result = List{1, 4} .. {9, 16}
+        assert.are_equal(List, getmetatable(result))
+      end),
+    },
+    group 'equality' {
+      test('lists are equal if all elements are equal', function ()
+        assert.are_equal(
+          List {5, 6, 7, 8},
+          List {5, 6, 7, 8}
+        )
+      end),
+      test('lists are not equal if their metatables are different', function ()
+        assert.is_truthy(
+          List {18, 20, 2, 0, 24} ~=
+          CustomList {18, 20, 2, 0, 24}
+        )
+      end),
+      test('lists are not equal if one is a plain table', function ()
+        assert.is_truthy(
+          List {18, 20, 2, 0, 24} ~=
+          {18, 20, 2, 0, 24}
+        )
+      end),
+      test('lists are not equal if an element differs', function ()
+        assert.is_truthy(
+          List {18, 20, 22, 23, 24} ~=
+          List {18, 20, 22, 0, 24}
+        )
+      end),
+      test('can compare to a string', function ()
+        assert.is_truthy(
+          List {'a', 'b', 'c'} ~=
+          "abc"
+        )
+      end),
     }
   },
 }

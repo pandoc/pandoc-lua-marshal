@@ -90,6 +90,42 @@ static int list_concat (lua_State *L) {
 }
 
 /*
+** Checks equality. Two lists are equal if and only if they have the same
+** metatable and if all items are equal.
+*/
+static int list_eq (lua_State *L) {
+  lua_settop(L, 2);
+  /* compare meta tables */
+  if (!(lua_getmetatable(L, 1) &&
+        lua_getmetatable(L, 2) &&
+        lua_rawequal(L, -1, -2))) {
+    lua_pushboolean(L, 0);
+    return 1;
+  };
+  lua_pop(L, 2);  /* remove metatables */
+
+  /* ensure both lists have the same length */
+  lua_Integer len1 = luaL_len(L, 1);
+  lua_Integer len2 = luaL_len(L, 2);
+  if (len1 != len2) {
+    lua_pushboolean(L, 0);
+    return 1;
+  }
+
+  /* check element-wise equality  */
+  for (lua_Integer i = 1; i <= len1; i++) {
+    lua_geti(L, 1, i);
+    lua_geti(L, 2, i);
+    if (!lua_compare(L, -1, -2, LUA_OPEQ)) {
+      lua_pushboolean(L, 0);
+      return 1;
+    }
+  }
+  lua_pushboolean(L, 1);
+  return 1;
+}
+
+/*
 ** Appends the second list to the first.
 */
 static int list_extend (lua_State *L) {
@@ -257,6 +293,7 @@ static void copyfromtablelib (lua_State *L, int idx) {
 
 static const luaL_Reg list_funcs[] = {
   {"__concat", list_concat},
+  {"__eq", list_eq},
   {"clone", list_clone},
   {"extend", list_extend},
   {"filter", list_filter},
