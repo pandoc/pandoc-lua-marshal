@@ -26,11 +26,18 @@ Release pending.
 -   If start indices in `List:find` and `List:find_if` are
     negative the start index is relative to the list length.
 
+-   TableFoot, TableHead, and Row values are marshaled as
+    userdata objects.
+
 ### Haskell code
 
 -   Text.Pandoc.Lua.Marshal.Filter exports the new type
     `WalkingOrder`. The type `Filter` now contains the the
     traversal specifier as a field.
+
+-   New modules for TableFoot, TableHead, and Row, defining the
+    usual marshaling methods and constructor functions for these
+    types.
 
 ## 0.1.2
 
