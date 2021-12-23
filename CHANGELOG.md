@@ -4,7 +4,7 @@
 
 ## 0.1.3
 
-Release pending.
+Released 2021-12-23.
 
 ### Lua changes
 
