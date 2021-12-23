@@ -108,13 +108,19 @@ registerDefault = do
   register' mkAttr
   register' mkBlocks
   register' mkCell
+  register' mkCitation
+  register' mkInlines
   register' mkListAttributes
+  register' mkPandoc
   register' mkRow
+  register' mkSimpleTable
   register' mkTableHead
   register' mkTableFoot
   registerConstants (Proxy @Alignment)
   registerConstants (Proxy @ListNumberStyle)
   registerConstants (Proxy @ListNumberStyle)
+  registerConstants (Proxy @MathType)
+  registerConstants (Proxy @QuoteType)
   forM_ inlineConstructors register'
   forM_ blockConstructors register'
 
