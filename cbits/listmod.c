@@ -21,7 +21,7 @@ static int missing (lua_State *L) {
   );
 }
 
-/* translate a relative table position: negative means back from end */
+/* Translate a relative table position: negative means back from end */
 static lua_Integer posrelat (lua_Integer pos, size_t len) {
   if (pos >= 0) return pos;
   else if (0u - (size_t)pos > len) return 0;
@@ -138,8 +138,8 @@ static int list_filter (lua_State *L) {
 static int list_find (lua_State *L) {
   lua_settop(L, 3);
   luaL_checktype(L, 1, LUA_TTABLE);
-  lua_Integer start = luaL_optinteger(L, 3, 1);
   lua_Integer len = luaL_len(L, 1);
+  lua_Integer start = posrelat(luaL_optinteger(L, 3, 1), len);
   for (lua_Integer i = start; i <= len; i++) {
     lua_geti(L, 1, i);
     if (lua_compare(L, 2, -1, LUA_OPEQ)) {
@@ -160,8 +160,8 @@ static int list_find_if (lua_State *L) {
   lua_settop(L, 3);
   luaL_checktype(L, 1, LUA_TTABLE);
   luaL_checktype(L, 2, LUA_TFUNCTION);
-  lua_Integer start = luaL_optinteger(L, 3, 1);
   lua_Integer len = luaL_len(L, 1);
+  lua_Integer start = posrelat(luaL_optinteger(L, 3, 1), len);
   for (lua_Integer i = start; i <= len; i++) {
     lua_pushvalue(L, 2);  /* predicate function */
     lua_geti(L, 1, i);

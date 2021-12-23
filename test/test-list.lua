@@ -73,11 +73,19 @@ return {
         local list = List:new {19, 23, 29, 71}
         assert.are_equal(23, list:find(23, 1))
         assert.are_equal(23, list:find(23, 2))
+        assert.are_equal(23, list:find(23, -4))
         assert.is_nil(list:find(23, 3))
+        assert.is_nil(list:find(23, -2))
       end),
       test('returns nil if element not found', function ()
         assert.is_nil((List:new {18, 20, 22, 0, 24}):find('0'))
       end),
+      test('fails if start index is not an integer', function ()
+        assert.error_matches(
+          function () List:new{}:find(0, 'NaN') end,
+          'number expected, got string'
+        )
+      end)
     },
 
     group 'find_if' {
@@ -99,6 +107,17 @@ return {
         local is_zero = function (n) return n == 0 end
         assert.is_nil((List:new {18, 20, 22, 24, 27}):find_if(is_zero))
       end),
+      test('respects start index', function ()
+        local list = List:new {9, 29, 3, 71}
+        assert.are_equal(71, list:find_if(function(n) return n > 10 end, 3))
+        assert.are_equal(29, list:find_if(function(n) return n > 10 end, -3))
+      end),
+      test('fails if start index is not an integer', function ()
+        assert.error_matches(
+          function () List:new{}:find(0, 'NaN') end,
+          'number expected, got string'
+        )
+      end)
     },
 
     group 'includes' {
