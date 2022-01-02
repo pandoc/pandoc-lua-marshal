@@ -49,9 +49,9 @@ common common-options
                      , bytestring            >= 0.10     && < 0.12
                      , containers            >= 0.6      && < 0.7
                      , exceptions            >= 0.8      && < 0.11
-                     , lua                   >= 2.0.2    && < 2.1
-                     , hslua                 >= 2.0.1    && < 2.1
-                     , hslua-marshalling     >= 2.0.1    && < 2.1
+                     , lua                   >= 2.1      && < 2.2
+                     , hslua                 >= 2.1      && < 2.2
+                     , hslua-marshalling     >= 2.1      && < 2.2
                      , pandoc-types          >= 1.22.1   && < 1.23
                      , safe                  >= 0.3      && < 0.4
                      , text                  >= 1.1.1.0  && < 1.3

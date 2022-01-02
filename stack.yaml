@@ -1,18 +1,21 @@
 resolver: lts-18.16
 extra-deps:
-  - hslua-2.0.1
-  - hslua-classes-2.0.0
-  - hslua-core-2.0.0.2
-  - hslua-marshalling-2.0.1
-  - hslua-module-path-1.0.0
-  - hslua-module-system-1.0.0
-  - hslua-module-text-1.0.0
-  - hslua-module-version-1.0.0
-  - hslua-objectorientation-2.0.1
-  - hslua-packaging-2.0.0
-  - lua-2.0.2
+  - github: hslua/hslua
+    commit: 3b5637dc28a60a42c6dea2bc0796a754a826691
+    subdirs:
+      - hslua
+      - hslua-classes
+      - hslua-core
+      - hslua-marshalling
+      - hslua-module-path
+      - hslua-module-system
+      - hslua-module-text
+      - hslua-module-version
+      - hslua-objectorientation
+      - hslua-packaging
+      - lua
+      - tasty-hslua
+      - tasty-lua
   - pandoc-types-1.22.1
-  - tasty-hslua-1.0.0
-  - tasty-lua-1.0.0
 ghc-options:
   "$locals": -fhide-source-paths
