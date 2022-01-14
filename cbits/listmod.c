@@ -172,6 +172,7 @@ static int list_filter (lua_State *L) {
 ** element's index, or `nil` if no such element exists.
 */
 static int list_find (lua_State *L) {
+  luaL_checkstack(L, 2, "List.find");
   lua_settop(L, 3);
   luaL_checktype(L, 1, LUA_TTABLE);
   lua_Integer len = luaL_len(L, 1);
@@ -182,6 +183,7 @@ static int list_find (lua_State *L) {
       lua_pushinteger(L, i);
       return 2;
     }
+    lua_pop(L, 1);  /* remove list element result */
   }
   lua_pushnil(L);
   return 1;
@@ -223,6 +225,7 @@ static int list_includes(lua_State *L) {
   lua_pushcfunction(L, list_find);
   lua_insert(L, 1);
   lua_call(L, 3, 1);
+  luaL_checkstack(L, 1, "List.includes");
   lua_pushboolean(L, lua_toboolean(L, -1));
   return 1;
 }

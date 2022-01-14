@@ -127,6 +127,13 @@ return {
         assert.is_truthy(lst:includes('two'))
         assert.is_truthy(lst:includes('three'))
         assert.is_falsy(lst:includes('four'))
+      end),
+      test('doesn\'t crash with long lists', function ()
+        local lst = List:new()
+        for i = 1, 1000 do
+          lst[#lst + 1] = tostring(i)
+        end
+        assert.is_truthy(lst:includes '999')
       end)
     },
 
