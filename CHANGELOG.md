@@ -2,6 +2,13 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.3.1
+
+Released 2022-01-14.
+
+-   Fixed a bug in `List.include` that was causing the Lua stack
+    to overflow when the function was applied to long lists.
+
 ## 0.1.3
 
 Released 2021-12-23.
