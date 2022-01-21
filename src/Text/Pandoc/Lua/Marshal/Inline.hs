@@ -291,8 +291,8 @@ inlineConstructors =
     =#> functionResult pushInline "Inline" "cite element"
   , defun "Code"
     ### liftPure2 (\text mattr -> Code (fromMaybe nullAttr mattr) text)
-    <#> parameter peekText "code" "string" "code string"
-    <#> optionalParameter peekAttr "attr" "Attr" "additional attributes"
+    <#> textParam "code" "code string"
+    <#> opt (parameter peekAttr "Attr" "attr" "additional attributes")
     =#> functionResult pushInline "Inline" "code element"
   , mkInlinesConstr "Emph" Emph
   , defun "Image"
@@ -301,9 +301,9 @@ inlineConstructors =
                          title = fromMaybe mempty mtitle
                      in Image attr caption (src, title))
     <#> parameter peekInlinesFuzzy "Inlines" "caption" "image caption / alt"
-    <#> parameter peekText "string" "src" "path/URL of the image file"
-    <#> optionalParameter peekText "string" "title" "brief image description"
-    <#> optionalParameter peekAttr "Attr" "attr" "image attributes"
+    <#> textParam "src" "path/URL of the image file"
+    <#> opt (textParam "title" "brief image description")
+    <#> opt (parameter peekAttr "Attr" "attr" "image attributes")
     =#> functionResult pushInline "Inline" "image element"
   , defun "LineBreak"
     ### return LineBreak
@@ -314,14 +314,14 @@ inlineConstructors =
                          title = fromMaybe mempty mtitle
                      in Link attr content (target, title))
     <#> parameter peekInlinesFuzzy "Inlines" "content" "text for this link"
-    <#> parameter peekText "string" "target" "the link target"
-    <#> optionalParameter peekText "string" "title" "brief link description"
-    <#> optionalParameter peekAttr "Attr" "attr" "link attributes"
+    <#> textParam "target" "the link target"
+    <#> opt (textParam "title" "brief link description")
+    <#> opt (parameter peekAttr "Attr" "attr" "link attributes")
     =#> functionResult pushInline "Inline" "link element"
   , defun "Math"
     ### liftPure2 Math
     <#> parameter peekMathType "quotetype" "Math" "rendering method"
-    <#> parameter peekText "text" "string" "math content"
+    <#> textParam "text" "math content"
     =#> functionResult pushInline "Inline" "math element"
   , defun "Note"
     ### liftPure Note
@@ -335,7 +335,7 @@ inlineConstructors =
   , defun "RawInline"
     ### liftPure2 RawInline
     <#> parameter peekFormat "format" "Format" "format of content"
-    <#> parameter peekText "text" "string" "string content"
+    <#> textParam "text" "string content"
     =#> functionResult pushInline "Inline" "raw inline element"
   , mkInlinesConstr "SmallCaps" SmallCaps
   , defun "SoftBreak"
@@ -347,11 +347,11 @@ inlineConstructors =
   , defun "Span"
     ### liftPure2 (\inlns mattr -> Span (fromMaybe nullAttr mattr) inlns)
     <#> parameter peekInlinesFuzzy "content" "Inlines" "inline content"
-    <#> optionalParameter peekAttr "attr" "Attr" "additional attributes"
+    <#> opt (parameter peekAttr "Attr" "attr" "additional attributes")
     =#> functionResult pushInline "Inline" "span element"
   , defun "Str"
     ### liftPure Str
-    <#> parameter peekText "text" "string" ""
+    <#> textParam "text" ""
     =#> functionResult pushInline "Inline" "new Str object"
   , mkInlinesConstr "Strong" Strong
   , mkInlinesConstr "Strikeout" Strikeout

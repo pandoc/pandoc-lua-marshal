@@ -67,7 +67,6 @@ mkTableFoot = defun "TableFoot"
   ### liftPure2 (\mCells mAttr -> TableFoot
                   (fromMaybe nullAttr mAttr)
                   (fromMaybe [] mCells))
-  <#> optionalParameter (peekList peekRowFuzzy) "{Row,...}" "rows"
-        "footer rows"
-  <#> optionalParameter peekAttr "Attr" "attr" "table foot attributes"
+  <#> opt (parameter (peekList peekRowFuzzy) "{Row,...}" "rows" "footer rows")
+  <#> opt (parameter peekAttr "Attr" "attr" "table foot attributes")
   =#> functionResult pushTableFoot "TableFoot" "new TableFoot object"
