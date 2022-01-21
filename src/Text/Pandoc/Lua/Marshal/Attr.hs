@@ -18,6 +18,9 @@ module Text.Pandoc.Lua.Marshal.Attr
   ( typeAttr
   , peekAttr
   , pushAttr
+  , typeAttributeList
+  , pushAttributeList
+  , peekAttributeList
   , mkAttr
   , mkAttributeList
   ) where
@@ -54,8 +57,8 @@ typeAttr = deftype "Attr"
       (pushPandocList pushText, \(_,classes,_) -> classes)
       (peekList peekText, \(ident,_,kv) -> (ident,,kv))
   , property "attributes" "various element attributes"
-      (pushAttribs, \(_,_,attribs) -> attribs)
-      (peekAttribs, \(ident,cls,_) -> (ident,cls,))
+      (pushAttributeList, \(_,_,attribs) -> attribs)
+      (peekAttributeList, \(ident,cls,_) -> (ident,cls,))
   , method $ defun "clone"
     ### return
     <#> parameter peekAttr "attr" "Attr" ""
@@ -72,8 +75,8 @@ pushAttr = pushUD typeAttr
 
 -- | Retrieves an associated list of attributes from a table or an
 -- @AttributeList@ userdata object.
-peekAttribs :: LuaError e => Peeker e [(Text,Text)]
-peekAttribs idx = liftLua (ltype idx) >>= \case
+peekAttributeList :: LuaError e => Peeker e [(Text,Text)]
+peekAttributeList idx = liftLua (ltype idx) >>= \case
   TypeUserdata -> peekUD typeAttributeList idx
   TypeTable    -> liftLua (rawlen idx) >>= \case
     0 -> peekKeyValuePairs peekText peekText idx
@@ -82,16 +85,16 @@ peekAttribs idx = liftLua (ltype idx) >>= \case
 
 -- | Pushes an associated list of attributes as @AttributeList@ userdata
 -- object.
-pushAttribs :: LuaError e => Pusher e [(Text, Text)]
-pushAttribs = pushUD typeAttributeList
+pushAttributeList :: LuaError e => Pusher e [(Text, Text)]
+pushAttributeList = pushUD typeAttributeList
 
 -- | Constructor functions for 'AttributeList' elements.
 typeAttributeList :: LuaError e => DocumentedType e [(Text, Text)]
 typeAttributeList = deftype "AttributeList"
   [ operation Eq $ lambda
-    ### liftPure2 (==)
-    <#> parameter peekAttribs "a1" "AttributeList" ""
-    <#> parameter peekAttribs "a2" "AttributeList" ""
+    ### liftPure2 (\a b -> Just True == ((==) <$> a <*> b))
+    <#> parameter (optional . peekAttributeList) "a" "any" ""
+    <#> parameter (optional . peekAttributeList) "b" "any" ""
     =#> functionResult pushBool "boolean" "whether the two are equal"
 
   , operation Index $ lambda
@@ -207,7 +210,7 @@ peekAttrTable idx = do
     then do
       ident <- peekIndexRaw 1 peekText idx
       classes <- fromMaybe [] <$!> optional (peekIndexRaw 2 peekClasses idx)
-      attribs <- fromMaybe [] <$!> optional (peekIndexRaw 3 peekAttribs idx)
+      attribs <- fromMaybe [] <$!> optional (peekIndexRaw 3 peekAttributeList idx)
       return $ ident `seq` classes `seq` attribs `seq`
         (ident, classes, attribs)
     else retrieving "HTML-like attributes" $ do
@@ -225,7 +228,7 @@ mkAttr = defun "Attr"
           TypeString -> forcePeek $ do
             mident <- optional (peekText (nthBottom 1))
             mclass <- optional (peekList peekText (nthBottom 2))
-            mattribs <- optional (peekAttribs (nthBottom 3))
+            mattribs <- optional (peekAttributeList (nthBottom 3))
             return ( fromMaybe "" mident
                    , fromMaybe [] mclass
                    , fromMaybe [] mattribs)
@@ -242,6 +245,7 @@ mkAttr = defun "Attr"
 mkAttributeList :: LuaError e => DocumentedFunction e
 mkAttributeList = defun "AttributeList"
   ### return
-  <#> parameter peekAttribs "table|AttributeList" "attribs" "an attribute list"
+  <#> parameter peekAttributeList "table|AttributeList" "attribs"
+        "an attribute list"
   =#> functionResult (pushUD typeAttributeList) "AttributeList"
         "new AttributeList object"

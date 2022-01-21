@@ -2,6 +2,14 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.4
+
+Release pending.
+
+-   Export AttributeList type and marshaling functions from
+    `Text.Pandoc.Marshal.Attr`, namely `typeAttributeList`,
+    `peekAttributeList`, and `pushAttributeList`.
+
 ## 0.1.3.1
 
 Released 2022-01-14.
