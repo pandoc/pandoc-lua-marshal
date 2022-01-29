@@ -27,7 +27,7 @@ where
 
 import Prelude hiding (lookup)
 import Control.Applicative ((<|>))
-import Control.Monad ((<$!>), when)
+import Control.Monad ((<$!>))
 import Data.Data (Data)
 import Data.Proxy (Proxy (..))
 import HsLua
@@ -81,7 +81,7 @@ applyStraightFunction :: LuaError e
 applyStraightFunction fn pushElement peekElement x = do
   pushFilterFunction fn
   pushElement x
-  callWithTraceback 1 2
+  callTrace 1 2
   forcePeek . (`lastly` pop 2) $
     (,)
     <$> ((x <$ peekNil (nth 2)) <|> peekElement (nth 2))
@@ -137,7 +137,7 @@ applySplicingFunction :: LuaError e
 applySplicingFunction fn pushElement peekElements x = do
   pushFilterFunction fn
   pushElement x
-  callWithTraceback 1 2
+  callTrace 1 2
   forcePeek . (`lastly` pop 2) $
     (,)
     <$> (liftLua (ltype (nth 2)) >>= \case
@@ -148,24 +148,6 @@ applySplicingFunction fn pushElement peekElements x = do
 --
 -- Helper
 --
-
--- | Like @'Lua.call'@, but adds a traceback to the error message (if any).
-callWithTraceback :: forall e. LuaError e
-                  => NumArgs -> NumResults -> LuaE e ()
-callWithTraceback nargs nresults = do
-  let traceback' :: LuaE e NumResults
-      traceback' = do
-        l <- state
-        msg <- tostring' (nthBottom 1)
-        traceback l (Just msg) 2
-        return 1
-  tracebackIdx <- absindex (nth (fromNumArgs nargs + 1))
-  pushHaskellFunction traceback'
-  insert tracebackIdx
-  result <- pcall nargs nresults (Just tracebackIdx)
-  remove tracebackIdx
-  when (result /= OK)
-    throwErrorAsException
 
 data TraversalControl = Continue | Stop
 
