@@ -4,7 +4,7 @@
 
 ## 0.1.4
 
-Release pending.
+Released 2022-01-29.
 
 -   Export AttributeList type and marshaling functions from
     `Text.Pandoc.Marshal.Attr`, namely `typeAttributeList`,
