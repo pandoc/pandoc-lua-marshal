@@ -10,6 +10,8 @@ Release pending.
     `Text.Pandoc.Marshal.Attr`, namely `typeAttributeList`,
     `peekAttributeList`, and `pushAttributeList`.
 
+-   Update to hslua 2.1.
+
 ## 0.1.3.1
 
 Released 2022-01-14.

@@ -30,7 +30,7 @@ module Text.Pandoc.Lua.Marshal.Filter
 
 import Prelude hiding (lookup)
 import Control.Applicative ((<|>), optional)
-import Control.Monad ((<$!>))
+import Control.Monad ((<$!>), void)
 import Data.Data
   ( Data, dataTypeConstrs, dataTypeName, dataTypeOf
   , showConstr, toConstr, tyconUQname )
@@ -50,7 +50,7 @@ newtype FilterFunction = FilterFunction Reference
 -- Filter functions are stored in the registry and retrieved from there.
 pushFilterFunction :: LuaError e => FilterFunction -> LuaE e ()
 pushFilterFunction (FilterFunction fnRef) =
-  getref registryindex fnRef
+  void $ getref registryindex fnRef
 
 -- | Retrieves a filter function from the stack.
 --
