@@ -213,8 +213,6 @@ typeBlock = deftype "Block"
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushBlock "Block" "modified element"
   ]
- where
-  boolResult = functionResult pushBool "boolean"
 
 getBlockContent :: Block -> Possible Content
 getBlockContent = \case
@@ -350,8 +348,8 @@ blockConstructors =
                      let defListAttrib = (1, DefaultStyle, DefaultDelim)
                      in OrderedList (fromMaybe defListAttrib mListAttrib) items)
     <#> blockItemsParam "ordered list items"
-    <#> optionalParameter peekListAttributes "ListAttributes" "listAttributes"
-                          "specifier for the list's numbering"
+    <#> opt (parameter peekListAttributes "ListAttributes" "listAttributes"
+                       "specifier for the list's numbering")
     =#> blockResult "OrderedList element"
 
   , defun "Para"
@@ -367,7 +365,7 @@ blockConstructors =
   , defun "RawBlock"
     ### liftPure2 RawBlock
     <#> parameter peekFormat "Format" "format" "format of content"
-    <#> parameter peekText "string" "text" "raw content"
+    <#> textParam "text" "raw content"
     =#> blockResult "RawBlock element"
 
   , defun "Table"
@@ -392,9 +390,7 @@ blockConstructors =
   peekItemsFuzzy idx = peekList peekBlocksFuzzy idx
     <|> ((:[]) <$!> peekBlocksFuzzy idx)
 
-  textParam = parameter peekText "string"
-  optAttrParam = optionalParameter peekAttr "attr" "Attr"
-    "additional attributes"
+  optAttrParam = opt (parameter peekAttr "Attr" "attr" "additional attributes")
 
 
 -- | Constructor for a list of `Block` values.

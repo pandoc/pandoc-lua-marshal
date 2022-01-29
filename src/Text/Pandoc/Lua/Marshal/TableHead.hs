@@ -67,7 +67,6 @@ mkTableHead = defun "TableHead"
   ### liftPure2 (\mRows mAttr -> TableHead
                   (fromMaybe nullAttr mAttr)
                   (fromMaybe [] mRows))
-  <#> optionalParameter (peekList peekRowFuzzy) "{Row,...}" "rows"
-        "header rows"
-  <#> optionalParameter peekAttr "Attr" "attr" "table head attributes"
+  <#> opt (parameter (peekList peekRowFuzzy) "{Row,...}" "rows" "header rows")
+  <#> opt (parameter peekAttr "Attr" "attr" "table head attributes")
   =#> functionResult pushTableHead "TableHead" "new TableHead object"

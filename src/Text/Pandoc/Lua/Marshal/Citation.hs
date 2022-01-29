@@ -86,11 +86,11 @@ mkCitation = defun "Citation"
            , citationNoteNum = fromMaybe 0 mnote_num
            , citationHash = fromMaybe 0 mhash
            })
-  <#> parameter peekText "string" "cid" "citation ID (e.g. bibtex key)"
+  <#> textParam "cid" "citation ID (e.g. bibtex key)"
   <#> parameter peekCitationMode "CitationMode" "mode" "citation rendering mode"
-  <#> optionalParameter peekInlinesFuzzy "prefix" "Inlines" ""
-  <#> optionalParameter peekInlinesFuzzy "suffix" "Inlines" ""
-  <#> optionalParameter peekIntegral "note_num" "integer" "note number"
-  <#> optionalParameter peekIntegral "hash" "integer" "hash number"
+  <#> opt (parameter peekInlinesFuzzy "prefix" "Inlines" "")
+  <#> opt (parameter peekInlinesFuzzy "suffix" "Inlines" "")
+  <#> opt (integralParam "note_num" "note number")
+  <#> opt (integralParam "hash"     "hash number")
   =#> functionResult pushCitation "Citation" "new citation object"
   #? "Creates a single citation."

@@ -90,7 +90,7 @@ mkPandoc :: LuaError e => DocumentedFunction e
 mkPandoc = defun "Pandoc"
   ### liftPure2 (\blocks mMeta -> Pandoc (fromMaybe nullMeta mMeta) blocks)
   <#> parameter peekBlocksFuzzy "Blocks" "blocks" "document contents"
-  <#> optionalParameter peekMeta "Meta" "meta" "document metadata"
+  <#> opt (parameter peekMeta "Meta" "meta" "document metadata")
   =#> functionResult pushPandoc "Pandoc" "new Pandoc document"
 
 -- | Constructor for 'Meta' values.

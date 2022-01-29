@@ -86,7 +86,7 @@ metaValueConstructors =
 
   , defun "MetaBool"
     ### liftPure MetaBool
-    <#> parameter peekBool "boolean" "bool" "true or false"
+    <#> boolParam "bool" "true or false"
     =#> functionResult pushMetaValue "boolean" "input, unchanged"
 
   , defun "MetaInlines"
@@ -108,6 +108,6 @@ metaValueConstructors =
 
   , defun "MetaString"
     ### liftPure MetaString
-    <#> parameter peekText "string" "s" "string value"
+    <#> textParam "s" "string value"
     =#> functionResult pushMetaValue "string" "unchanged input"
   ]

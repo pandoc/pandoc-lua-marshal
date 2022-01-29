@@ -107,8 +107,8 @@ mkCell = defun "Cell"
                   (maybe 1 ColSpan mColSpan)
                   blocks)
   <#> parameter peekBlocksFuzzy "Blocks" "blocks" "document contents"
-  <#> optionalParameter peekAlignment "integer" "align" "cell alignment"
-  <#> optionalParameter peekIntegral "integer" "row_span" "rows to span"
-  <#> optionalParameter peekIntegral "integer" "col_span" "columns to span"
-  <#> optionalParameter peekAttr "Attr" "attr" "cell attributes"
+  <#> opt (parameter peekAlignment "integer" "align" "cell alignment")
+  <#> opt (parameter peekIntegral "integer" "row_span" "rows to span")
+  <#> opt (parameter peekIntegral "integer" "col_span" "columns to span")
+  <#> opt (parameter peekAttr "Attr" "attr" "cell attributes")
   =#> functionResult pushCell "Cell" "new Cell object"

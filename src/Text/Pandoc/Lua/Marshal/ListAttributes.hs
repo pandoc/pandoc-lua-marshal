@@ -70,10 +70,10 @@ mkListAttributes = defun "ListAttributes"
                    , fromMaybe DefaultStyle mstyle
                    , fromMaybe DefaultDelim mdelim
                    ))
-  <#> optionalParameter peekIntegral "integer" "start" "number of first item"
-  <#> optionalParameter peekRead "string" "style" "list numbering style"
-  <#> optionalParameter peekRead "string" "delimiter" "list number delimiter"
-  =#> functionResult pushListAttributes "ListAttributes" "new ListAttributes"
+  <#> opt (integralParam "start" "number of first item")
+  <#> opt (parameter peekRead "string" "style" "list numbering style")
+  <#> opt (parameter peekRead "string" "delimiter" "list number delimiter")
+  =#> udresult typeListAttributes "new ListAttributes"
   #? "Creates a new ListAttributes object."
 
 -- | Pushes a 'ListNumberDelim' value as string.

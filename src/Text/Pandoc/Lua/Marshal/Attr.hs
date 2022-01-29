@@ -108,7 +108,7 @@ typeAttributeList = deftype "AttributeList"
     ### setKey
     <#> udparam typeAttributeList "t" "attributes list"
     <#> parameter peekKey "string|integer" "key" "lookup key"
-    <#> optionalParameter peekAttribute "string|nil" "value" "new value"
+    <#> opt (parameter peekAttribute "string|nil" "value" "new value")
     =#> []
 
   , operation Len $ lambda
