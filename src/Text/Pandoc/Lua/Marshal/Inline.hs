@@ -127,7 +127,7 @@ typeInline = deftype "Inline"
           _               -> const Absent)
 
   , possibleProperty "caption" "image caption"
-      (pushPandocList pushInline, \case
+      (pushInlines, \case
           Image _ capt _ -> Actual capt
           _              -> Absent)
       (peekInlinesFuzzy, \case

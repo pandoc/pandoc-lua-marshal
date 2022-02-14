@@ -60,12 +60,16 @@ return {
       end)
     },
     group 'Image' {
-      test('has property `caption`', function ()
+      test('has property `caption` of type Inlines', function ()
         local img = Image('example', 'a.png')
         assert.are_same(img.caption, {Str 'example'})
 
         img.caption = 'A'
         assert.are_equal(img, Image({'A'}, 'a.png'))
+        assert.are_equal(
+          Image('example', 'a.png').caption,
+          Inlines('example')
+        )
       end),
       test('has property `src`', function ()
         local img = Image('example', 'sample.png')
