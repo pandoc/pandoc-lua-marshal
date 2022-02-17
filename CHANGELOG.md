@@ -2,6 +2,18 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.5
+
+Released 2022-02-17.
+
+-   Allow any type of callable object as argument to List
+    functions `filter`, `map`, and `find_if`. These previously
+    required the argument to be of type `function`, which was too
+    restrictive.
+    
+-   Inline: the type of Image captions is now `Inlines` instead
+    of `List`.
+
 ## 0.1.4
 
 Released 2022-01-29.
