@@ -29,6 +29,18 @@ static lua_Integer posrelat (lua_Integer pos, size_t len) {
 }
 
 /*
+** Check that 'arg' is either a function or a different callable object.
+*/
+static void checkcallable (lua_State *L, int arg) {
+  if (lua_type(L, arg) != LUA_TFUNCTION) { /* is it not a function? */
+    if (luaL_getmetafield(L, arg, "__call"))
+      lua_pop(L, 1); /* pop metamethod */
+    else
+      luaL_checktype(L, arg, LUA_TFUNCTION); /* force an error */
+  }
+}
+
+/*
 ** Creates a List from a table; uses a fresh, empty table if none is
 ** given.
 */
@@ -147,7 +159,7 @@ static int list_extend (lua_State *L) {
 static int list_filter (lua_State *L) {
   lua_settop(L, 2);
   luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_checktype(L, 2, LUA_TFUNCTION);
+  checkcallable(L, 2);
   luaL_checkstack(L, 4, NULL);
   lua_Integer len = luaL_len(L, 1);
   lua_createtable(L, len, 0);  /* create new table */
@@ -197,7 +209,7 @@ static int list_find (lua_State *L) {
 static int list_find_if (lua_State *L) {
   lua_settop(L, 3);
   luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_checktype(L, 2, LUA_TFUNCTION);
+  checkcallable(L, 2);
   lua_Integer len = luaL_len(L, 1);
   lua_Integer start = posrelat(luaL_optinteger(L, 3, 1), len);
   for (lua_Integer i = start; i <= len; i++) {
@@ -237,7 +249,7 @@ static int list_includes(lua_State *L) {
 static int list_map(lua_State *L) {
   lua_settop(L, 2);
   luaL_checktype(L, 1, LUA_TTABLE);
-  luaL_checktype(L, 2, LUA_TFUNCTION);
+  checkcallable(L, 2);
   lua_Integer len = luaL_len(L, 1);
   lua_createtable(L, len, 0);  /* create new table */
   luaL_getmetatable(L, LIST_T);  /* make result a generic list */

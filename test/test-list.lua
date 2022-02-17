@@ -59,7 +59,21 @@ return {
           args,
           List{{0, 1}, {1, 2}, {1, 3}, {2, 4}, {3, 5}, {5, 6}, {8, 7}}
         )
-      end)
+      end),
+      test('accepts callable table as function', function ()
+        local always_true = function (t, x) return true end
+        local callable = setmetatable({}, {__call = always_true})
+        assert.are_same(
+          List{0},
+          List{0}:filter(callable)
+        )
+      end),
+      test('fails on non-callable table', function ()
+        assert.error_matches(
+          function () List{1}:filter({}) end,
+          'bad argument %#1 to \'filter\' %(function expected, got table%)'
+        )
+      end),
     },
 
     group 'find' {
@@ -85,7 +99,7 @@ return {
           function () List:new{}:find(0, 'NaN') end,
           'number expected, got string'
         )
-      end)
+      end),
     },
 
     group 'find_if' {
@@ -117,7 +131,18 @@ return {
           function () List:new{}:find(0, 'NaN') end,
           'number expected, got string'
         )
-      end)
+      end),
+      test('accepts callable table', function ()
+        local always_true = function (t, x) return true end
+        local callable = setmetatable({}, {__call = always_true})
+        assert.are_equal(List{1}:find_if(callable), 1)
+      end),
+      test('fails on non-callable table', function ()
+         assert.error_matches(
+           function () List():find_if({}) end,
+           'bad argument %#1 to \'find_if\' %(function expected, got table%)'
+         )
+      end),
     },
 
     group 'includes' {
@@ -176,7 +201,18 @@ return {
           debug.getmetatable(custom:map(tostring)).__name,
           'List'
         )
-      end)
+      end),
+      test('accepts callable table', function ()
+        local plus_length = function (t, x) return x + #t end
+        local callable = setmetatable({1, 2}, {__call = plus_length})
+        assert.are_equal(List{1, 3}:map(callable), List{3, 5})
+      end),
+      test('fails on non-callable table', function ()
+        assert.error_matches(
+          function () List{1}:map({}) end,
+          'bad argument %#1 to \'map\' %(function expected, got table%)'
+        )
+      end),
     },
 
     group 'new' {
