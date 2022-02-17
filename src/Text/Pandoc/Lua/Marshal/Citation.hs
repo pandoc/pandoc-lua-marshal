@@ -17,9 +17,10 @@ module Text.Pandoc.Lua.Marshal.Citation
 import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import HsLua as Lua
-import Text.Pandoc.Lua.Marshal.CitationMode (peekCitationMode, pushCitationMode)
-import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline (peekInlinesFuzzy, pushInlines)
 import Text.Pandoc.Definition (Citation (..))
+import Text.Pandoc.Lua.Marshal.CitationMode (peekCitationMode, pushCitationMode)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
+  ( peekInlinesFuzzy, pushInlines )
 
 -- | Pushes a Citation value as userdata object.
 pushCitation :: LuaError e
