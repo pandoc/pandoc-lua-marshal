@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase        #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
-Copyright               : © 2021 Albert Krewinkel
+Copyright               : © 2021-2022 Albert Krewinkel
 SPDX-License-Identifier : MIT
 Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 

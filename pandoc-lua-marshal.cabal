@@ -19,7 +19,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Albert Krewinkel, John MacFarlane
 maintainer:          Albert Krewinkel <albert@zeitkraut.de>
-copyright:           © 2017-2021 Albert Krewinkel, John MacFarlane
+copyright:           © 2017-2022 Albert Krewinkel, John MacFarlane
 category:            Foreign
 build-type:          Simple
 extra-doc-files:     README.md

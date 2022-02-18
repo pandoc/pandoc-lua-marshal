@@ -1,5 +1,5 @@
 {- |
-Copyright: (c) 2021 Albert Krewinkel
+Copyright: (c) 2021-2022 Albert Krewinkel
 SPDX-License-Identifier: MIT
 Maintainer: Albert Krewinkel <albert@zeitkraut.de>
 
