@@ -99,7 +99,7 @@ peekTableBody = fmap (retrieving "TableBody")
 
 -- | Add a value to the table at the top of the stack at a string-index.
 addField :: LuaError e => Name -> LuaE e () -> LuaE e ()
-addField key pushValue = do
+addField key pushFieldValue = do
   pushName key
-  pushValue
+  pushFieldValue
   rawset (nth 3)
