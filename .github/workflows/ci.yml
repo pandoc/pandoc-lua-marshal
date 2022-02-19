@@ -8,8 +8,8 @@ on:
 jobs:
   build:
     name: >-
-      ${{ matrix.version.ghc }}; ${{ matrix.version.cabal }};
-      ${{ matrix.version.lua }}
+      ghc ${{ matrix.version.ghc }}; cabal ${{ matrix.version.cabal }};
+      lua ${{ matrix.version.lua }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -22,7 +22,7 @@ jobs:
             lua: '+apicheck'
           - ghc: '8.10.7'
             cabal: '3.2'
-            lua: '+pkg-config +system-lua'
+            lua: '+pkg-config'
           - ghc: '9.0.1'
             cabal: '3.4'
             lua: '-export-dynamic'
