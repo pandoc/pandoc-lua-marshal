@@ -2,6 +2,12 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.5.1
+
+Release pending.
+
+-   Relax upper bound for lua and hslua.
+
 ## 0.1.5
 
 Released 2022-02-17.
