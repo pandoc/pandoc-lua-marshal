@@ -9,7 +9,7 @@ jobs:
   build:
     name: >-
       ghc ${{ matrix.version.ghc }}; cabal ${{ matrix.version.cabal }};
-      lua ${{ matrix.version.lua }}
+      lua ${{ matrix.version.lua }}; hslua ${{ matrix.version.hslua }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -17,18 +17,23 @@ jobs:
           - ghc: '8.6.5'
             cabal: '3.2'
             lua: '-allow-unsafe-gc'
+            hslua: '< 2.2'
           - ghc: '8.8.4'
             cabal: '3.2'
-            lua: '+apicheck'
+            lua: '+pkg-config'
+            hslua: '< 2.2'
           - ghc: '8.10.7'
             cabal: '3.2'
-            lua: '+pkg-config'
+            lua: '+apicheck'
+            hslua: '>= 2.2'
           - ghc: '9.0.1'
             cabal: '3.4'
             lua: '-export-dynamic'
+            hslua: '>= 2.2'
           - ghc: '9.2.1'
             cabal: '3.6'
             lua: '+apicheck'
+            hslua: '>= 2.2'
 
     steps:
       - uses: actions/checkout@v2
@@ -55,12 +60,14 @@ jobs:
           cabal update
           cabal build \
               --enable-tests \
-              --constraint 'lua ${{ matrix.version.lua }}'
+              --constraint 'lua ${{ matrix.version.lua }}' \
+              --constraint 'hslua ${{ matrix.version.hslua }}'
 
       - name: Test
         run: |
           cabal test --enable-tests \
-              --constraint 'lua ${{ matrix.version.lua }}'
+              --constraint 'lua ${{ matrix.version.lua }}' \
+              --constraint 'hslua ${{ matrix.version.hslua }}'
 
   windows:
     name: Windows (stack)
