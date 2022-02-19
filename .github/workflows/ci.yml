@@ -7,22 +7,28 @@ on:
 
 jobs:
   build:
-    name: GHC ${{ matrix.version.ghc }}
+    name: >-
+      ${{ matrix.version.ghc }}; ${{ matrix.version.cabal }};
+      ${{ matrix.version.lua }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
         version:
           - ghc: '8.6.5'
             cabal: '3.2'
+            lua: '+lua_32bits'
           - ghc: '8.8.4'
             cabal: '3.2'
+            lua: '+apicheck'
           - ghc: '8.10.7'
             cabal: '3.2'
-            cabalopts: '--constraint="lua +pkg-config"'
+            lua: '+pkg-config +system-lua'
           - ghc: '9.0.1'
             cabal: '3.4'
+            lua: '-export-dynamic'
           - ghc: '9.2.1'
             cabal: '3.6'
+            lua: '+apicheck'
 
     steps:
       - uses: actions/checkout@v2
@@ -48,13 +54,13 @@ jobs:
         run: |
           cabal update
           cabal build \
-            --enable-tests \
-            ${{ matrix.version.cabalopts }}
+              --enable-tests \
+              --constraint 'lua ${{ matrix.version.lua }}'
 
       - name: Test
         run: |
           cabal test --enable-tests \
-            ${{ matrix.version.cabalopts }}
+              --constraint 'lua ${{ matrix.version.lua }}'
 
   windows:
     name: Windows (stack)
