@@ -16,7 +16,7 @@ jobs:
         version:
           - ghc: '8.6.5'
             cabal: '3.2'
-            lua: '+lua_32bits'
+            lua: '-allow-unsafe-gc'
           - ghc: '8.8.4'
             cabal: '3.2'
             lua: '+apicheck'
