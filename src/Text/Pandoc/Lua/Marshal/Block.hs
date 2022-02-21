@@ -125,12 +125,14 @@ typeBlock = deftype "Block"
       (pushAttr, \case
           CodeBlock attr _     -> Actual attr
           Div attr _           -> Actual attr
+          Figure attr _ _      -> Actual attr
           Header _ attr _      -> Actual attr
           Table attr _ _ _ _ _ -> Actual attr
           _                    -> Absent)
       (peekAttr, \case
           CodeBlock _ code     -> Actual . flip CodeBlock code
           Div _ blks           -> Actual . flip Div blks
+          Figure _ capt blks   -> Actual . (\attr -> Figure attr capt blks)
           Header lvl _ blks    -> Actual . (\attr -> Header lvl attr blks)
           Table _ c cs h bs f  -> Actual . (\attr -> Table attr c cs h bs f)
           _                    -> const Absent)
@@ -142,8 +144,12 @@ typeBlock = deftype "Block"
           Table attr c cs h _ f -> Actual . (\bs -> Table attr c cs h bs f)
           _                     -> const Absent)
   , possibleProperty "caption" "element caption"
-      (pushCaption, \case {Table _ capt _ _ _ _ -> Actual capt; _ -> Absent})
+      (pushCaption, \case
+          Figure _ capt _      -> Actual capt
+          Table _ capt _ _ _ _ -> Actual capt
+          _ -> Absent)
       (peekCaptionFuzzy, \case
+          Figure attr _ blks     -> Actual . (\c -> Figure attr c blks)
           Table attr _ cs h bs f -> Actual . (\c -> Table attr c cs h bs f)
           _                      -> const Absent)
   , possibleProperty "colspecs" "column alignments and widths"
@@ -222,9 +228,10 @@ getBlockContent = \case
   Para inlns          -> Actual $ ContentInlines inlns
   Plain inlns         -> Actual $ ContentInlines inlns
   Header _ _ inlns    -> Actual $ ContentInlines inlns
-  -- inline content
+  -- block content
   BlockQuote blks     -> Actual $ ContentBlocks blks
   Div _ blks          -> Actual $ ContentBlocks blks
+  Figure _ _ blks     -> Actual $ ContentBlocks blks
   -- lines content
   LineBlock lns       -> Actual $ ContentLines lns
   -- list items content
@@ -244,6 +251,7 @@ setBlockContent _ = \case
   -- block content
   BlockQuote _     -> Actual . BlockQuote . blockContent
   Div attr _       -> Actual . Div attr . blockContent
+  Figure attr c _  -> Actual . Figure attr c . blockContent
   -- lines content
   LineBlock _      -> Actual . LineBlock . lineContent
   -- list items content
@@ -323,6 +331,16 @@ blockConstructors =
     <#> blocksParam
     <#> optAttrParam
     =#> blockResult "Div element"
+
+  , defun "Figure"
+    ### liftPure3 (\content mcapt mattr ->
+                     let attr = fromMaybe nullAttr mattr
+                         capt = fromMaybe (Caption mempty mempty) mcapt
+                     in Figure attr capt content)
+    <#> parameter peekBlocksFuzzy "Blocks" "content" "figure content"
+    <#> opt (parameter peekCaptionFuzzy "Caption" "caption" "figure caption")
+    <#> optAttrParam
+    =#> blockResult "Figure element"
 
   , defun "Header"
     ### liftPure3 (\lvl content mattr ->
