@@ -11,5 +11,7 @@ extra-deps:
   - pandoc-types-1.22.1
   - tasty-hslua-1.0.1
   - tasty-lua-1.0.1
+  - git: https://github.com/tarleb/pandoc-types
+    commit: b6217365df62716366ab7dac1a7f540486bfafa2
 ghc-options:
   "$locals": -fhide-source-paths

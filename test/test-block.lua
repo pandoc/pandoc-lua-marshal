@@ -122,6 +122,48 @@ return {
         )
       end)
     },
+    group 'Figure' {
+      test('access content via property `content`', function ()
+        local elem = Figure{BlockQuote{Plain 'word'}}
+        assert.are_same(elem.content, {BlockQuote{'word'}})
+        assert.are_equal(type(elem.content), 'table')
+
+        elem.content = {
+          Para{Str 'one'},
+          Para{Str 'two'}
+        }
+        assert.are_equal(
+          Figure{
+            Para 'one',
+            Para 'two'
+          },
+          elem
+        )
+      end),
+      test('access caption via property `caption`', function ()
+        local figure = Figure('word', {short='short', long='caption'})
+        assert.are_equal(figure.caption.long, Blocks 'caption')
+        assert.are_equal(figure.caption.short, Inlines 'short')
+        assert.are_equal(type(figure.caption), 'table')
+
+        figure.caption = {long = 'One day I was...', short = 'My day'}
+        assert.are_equal(
+          Figure('word', {long = 'One day I was...', short = 'My day'}),
+          figure
+        )
+      end),
+      test('access Attr via property `attr`', function ()
+        local figure = Figure('word', {long='caption'}, {'my-fig', {'sample'}})
+        assert.are_equal(figure.attr, Attr{'my-fig', {'sample'}})
+        assert.are_equal(type(figure.attr), 'userdata')
+
+        figure.attr = Attr{'my-other-figure', {'example'}}
+        assert.are_equal(
+          Figure('word', {long='caption'}, {'my-other-figure', {'example'}}),
+          figure
+        )
+      end)
+    },
     group 'Header' {
       test('access inlines via property `content`', function ()
         local header = Header(1, 'test')
