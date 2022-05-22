@@ -1,4 +1,6 @@
+{-# LANGUAGE ExplicitNamespaces   #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE PatternSynonyms      #-}
 {- |
 Copyright               : © 2021-2022 Albert Krewinkel
 SPDX-License-Identifier : MIT
@@ -17,7 +19,16 @@ module Text.Pandoc.Lua.Marshal.Citation
 import Control.Applicative (optional)
 import Data.Maybe (fromMaybe)
 import HsLua as Lua
-import Text.Pandoc.Definition (Citation (..))
+import Text.Pandoc.Definition
+  ( Citation
+  , pattern Citation
+  , citationId
+  , citationMode
+  , citationPrefix
+  , citationSuffix
+  , citationNoteNum
+  , citationHash
+  )
 import Text.Pandoc.Lua.Marshal.CitationMode (peekCitationMode, pushCitationMode)
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
   ( peekInlinesFuzzy, pushInlines )
