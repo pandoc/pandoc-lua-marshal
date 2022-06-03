@@ -41,7 +41,12 @@ peekPandoc = retrieving "Pandoc" . peekUD typePandoc
 -- | Pandoc object type.
 typePandoc :: LuaError e => DocumentedType e Pandoc
 typePandoc = deftype "Pandoc"
-  [ operation Eq $ defun "__eq"
+  [ operation Concat $ lambda
+     ### liftPure2 (<>)
+     <#> parameter peekPandoc "Pandoc" "a" ""
+     <#> parameter peekPandoc "Pandoc" "b" ""
+     =#> functionResult pushPandoc "Pandoc" "combined documents"
+  , operation Eq $ defun "__eq"
      ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
      <#> parameter (optional . peekPandoc) "doc1" "pandoc" ""
      <#> parameter (optional . peekPandoc) "doc2" "pandoc" ""

@@ -35,6 +35,16 @@ return {
       assert.are_same(meta.zahlen, {'eins', 'zwei', 'drei'})
     end),
   },
+  group 'operations' {
+    test('concatenation', function ()
+      local doc1 = Pandoc({Para 'Lovely'}, {title='first'})
+      local doc2 = Pandoc({Para 'Day'}, {title='second'})
+      assert.are_equal(
+        Pandoc({Para 'Lovely', Para 'Day'}, {title='second'}),
+        doc1 .. doc2
+      )
+    end)
+  },
   group 'walk' {
     test('uses `Meta` function', function ()
       local meta = {
