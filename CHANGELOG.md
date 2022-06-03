@@ -2,9 +2,21 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.6
+
+Released 2022-06-03.
+
+-   Fix `applyFully`: the function always traversed the document
+    type-wise, never topdown.
+
+-   Avoid shadowing of a function name that was added in
+    hslua-2.2.
+
+-   Support concatenating of Pandoc values with the `..` operator.
+
 ## 0.1.5.1
 
-Release pending.
+Released 2022-02-19.
 
 -   Relax upper bound for lua and hslua.
 
