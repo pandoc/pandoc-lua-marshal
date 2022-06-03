@@ -20,12 +20,10 @@ module Text.Pandoc.Lua.Marshal.Pandoc
   ) where
 
 import Control.Applicative (optional)
-import Control.Monad ((<$!>), (>=>))
+import Control.Monad ((<$!>))
 import Data.Maybe (fromMaybe)
 import HsLua
-import Text.Pandoc.Lua.Marshal.Block
-  (peekBlocksFuzzy, pushBlocks, walkBlockSplicing, walkBlocksStraight)
-import Text.Pandoc.Lua.Marshal.Inline (walkInlineSplicing, walkInlinesStraight)
+import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
 import Text.Pandoc.Lua.Marshal.Filter
 import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
@@ -61,13 +59,7 @@ typePandoc = deftype "Pandoc"
       (peekMeta, \(Pandoc _ blks) meta -> Pandoc meta blks)
 
   , method $ defun "walk"
-    ### (\doc filter' -> case filterWalkingOrder filter' of
-            WalkForEachType -> walkBlocksAndInlines filter' doc
-                           >>= applyMetaFunction filter'
-                           >>= applyPandocFunction filter'
-            WalkTopdown     -> applyPandocFunction filter' doc
-                           >>= applyMetaFunction filter'
-                           >>= walkBlocksAndInlines filter')
+    ### flip applyFully
     <#> parameter peekPandoc "Pandoc" "self" ""
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushPandoc "Pandoc" "modified element"
@@ -134,10 +126,10 @@ applyMetaFunction filter' (Pandoc meta blocks) = do
 applyFully :: LuaError e
            => Filter
            -> Pandoc -> LuaE e Pandoc
-applyFully filter' =
-      walkInlineSplicing filter'
-  >=> walkInlinesStraight filter'
-  >=> walkBlockSplicing filter'
-  >=> walkBlocksStraight filter'
-  >=> applyMetaFunction filter'
-  >=> applyPandocFunction filter'
+applyFully filter' doc = case filterWalkingOrder filter' of
+  WalkForEachType -> walkBlocksAndInlines filter' doc
+                 >>= applyMetaFunction filter'
+                 >>= applyPandocFunction filter'
+  WalkTopdown     -> applyPandocFunction filter' doc
+                 >>= applyMetaFunction filter'
+                 >>= walkBlocksAndInlines filter'
