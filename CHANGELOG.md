@@ -2,6 +2,15 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.6.1
+
+Released 2022-06-10.
+
+-   Provide better error messages when fuzzy retrieval of Inlines
+    or Blocks fails.
+
+-   Relax upper bound for text, allow text-2.0.
+
 ## 0.1.6
 
 Released 2022-06-03.

@@ -25,7 +25,7 @@ module Text.Pandoc.Lua.Marshal.Inline
   , walkInlinesStraight
   ) where
 
-import Control.Applicative (optional)
+import Control.Applicative ((<|>), optional)
 import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
 import Data.Data (showConstr, toConstr)
@@ -93,10 +93,10 @@ peekInlinesFuzzy :: LuaError e
                  => Peeker e [Inline]
 peekInlinesFuzzy idx = liftLua (ltype idx) >>= \case
   TypeString -> B.toList . B.text <$> peekText idx
-  _ -> choice
-       [ peekList peekInlineFuzzy
-       , fmap pure . peekInlineFuzzy
-       ] idx
+  _ ->  peekList peekInlineFuzzy idx
+    <|> (pure <$> peekInlineFuzzy idx)
+    <|> (failPeek =<<
+         typeMismatchMessage "Inline, list of Inlines, or string" idx)
 {-# INLINABLE peekInlinesFuzzy #-}
 
 -- | Inline object type.

@@ -318,6 +318,12 @@ return {
           {'Str', 'Space', 'Str'}
         )
       end),
+      test('gives sensible error message', function ()
+        assert.error_matches(
+          function() Inlines(nil) end,
+          "Inline, list of Inlines, or string"
+        )
+      end)
     },
     group 'walk' {
       test('modifies Inline subelements', function ()

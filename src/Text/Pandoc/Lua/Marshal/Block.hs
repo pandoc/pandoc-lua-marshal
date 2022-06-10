@@ -90,20 +90,22 @@ pushBlocks xs = do
 -- bare strings as @Str@ values.
 peekBlockFuzzy :: LuaError e
                => Peeker e Block
-peekBlockFuzzy = choice
-  [ peekBlock
-  , \idx -> Plain <$!> peekInlinesFuzzy idx
-  ]
+peekBlockFuzzy idx =
+       peekBlock idx
+  <|> (Plain <$!> peekInlinesFuzzy idx)
+  <|> (failPeek =<<
+       typeMismatchMessage "Block or list of Inlines" idx)
 {-# INLINABLE peekBlockFuzzy #-}
 
 -- | Try extra-hard to return the value at the given index as a list of
 -- inlines.
 peekBlocksFuzzy :: LuaError e
                 => Peeker e [Block]
-peekBlocksFuzzy = choice
-  [ peekList peekBlockFuzzy
-  , (<$!>) pure . peekBlockFuzzy
-  ]
+peekBlocksFuzzy idx =
+      peekList peekBlockFuzzy idx
+  <|> (pure <$!> peekBlockFuzzy idx)
+  <|> (failPeek =<<
+       typeMismatchMessage "Block, list of Blocks, or compatible element" idx)
 {-# INLINABLE peekBlocksFuzzy #-}
 
 -- | Block object type.

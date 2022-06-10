@@ -349,6 +349,12 @@ return {
           {'Header', 'CodeBlock'}
         )
       end),
+      test('gives sensible error message', function ()
+        assert.error_matches(
+          function() Blocks(nil) end,
+          'Block, list of Blocks, or compatible element expected'
+        )
+      end)
     },
     group 'walk' {
       test('modifies Inline subelements', function ()
