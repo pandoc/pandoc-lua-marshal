@@ -45,7 +45,7 @@ import Text.Pandoc.Lua.Marshal.ListAttributes
   ( peekListAttributes, pushListAttributes )
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Marshal.TableParts
-  ( peekCaption, pushCaption
+  ( peekCaptionFuzzy, pushCaption
   , peekColSpec, pushColSpec
   , peekTableBody, pushTableBody
   , peekTableFoot, pushTableFoot
@@ -143,7 +143,7 @@ typeBlock = deftype "Block"
           _                     -> const Absent)
   , possibleProperty "caption" "element caption"
       (pushCaption, \case {Table _ capt _ _ _ _ -> Actual capt; _ -> Absent})
-      (peekCaption, \case
+      (peekCaptionFuzzy, \case
           Table attr _ cs h bs f -> Actual . (\c -> Table attr c cs h bs f)
           _                      -> const Absent)
   , possibleProperty "colspecs" "column alignments and widths"
@@ -375,7 +375,7 @@ blockConstructors =
            let attr = fromMaybe nullAttr mattr
            in return $! attr `seq` capt `seq` colspecs `seq` thead `seq` tbodies
               `seq` tfoot `seq` Table attr capt colspecs thead tbodies tfoot)
-    <#> parameter peekCaption "Caption" "caption" "table caption"
+    <#> parameter peekCaptionFuzzy "Caption" "caption" "table caption"
     <#> parameter (peekList peekColSpec) "{ColSpec,...}" "colspecs"
                   "column alignments and widths"
     <#> parameter peekTableHead "TableHead" "head" "table head"

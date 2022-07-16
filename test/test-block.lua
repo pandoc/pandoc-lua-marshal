@@ -319,7 +319,23 @@ return {
           Table({long = {}}, {}, TableHead(), {}, new_foot),
           tbl
         )
-      end)
+      end),
+      test('caption field accepts list of blocks', function ()
+        local caption = {long = {Plain 'cap'}}
+        local tbl = Table(caption, {}, TableHead(), {}, TableFoot())
+        assert.are_same(tbl.caption, {long = {Plain 'cap'}})
+
+        tbl.caption = {Plain 'extended'}
+
+        local new_caption = {
+          short = nil,
+          long = {Plain 'extended'}
+        }
+        assert.are_equal(
+          Table(new_caption, {}, TableHead(), {}, TableFoot()),
+          tbl
+        )
+      end),
     },
   },
   group "Blocks" {

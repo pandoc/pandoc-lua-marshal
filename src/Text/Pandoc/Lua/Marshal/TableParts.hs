@@ -10,6 +10,7 @@ with tables.
 -}
 module Text.Pandoc.Lua.Marshal.TableParts
   ( peekCaption
+  , peekCaptionFuzzy
   , pushCaption
   , peekColSpec
   , pushColSpec
@@ -28,7 +29,7 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , mkTableHead
   ) where
 
-import Control.Applicative (optional)
+import Control.Applicative ((<|>), optional)
 import Control.Monad ((<$!>))
 import HsLua
 import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
@@ -52,10 +53,17 @@ pushCaption (Caption shortCaption longCaption) = do
 
 -- | Peek Caption element
 peekCaption :: LuaError e => Peeker e Caption
-peekCaption = retrieving "Caption" . \idx -> do
+peekCaption idx = do
   short <- optional $ peekFieldRaw peekInlinesFuzzy "short" idx
   long <- peekFieldRaw peekBlocksFuzzy "long" idx
   return $! Caption short long
+
+peekCaptionFuzzy :: LuaError e => Peeker e Caption
+peekCaptionFuzzy = retrieving "Caption" . \idx -> do
+      peekCaption idx
+  <|> (Caption Nothing <$!> peekBlocksFuzzy idx)
+  <|> (failPeek =<<
+       typeMismatchMessage "Caption, list of Blocks, or compatible element" idx)
 
 -- | Push a ColSpec value as a pair of Alignment and ColWidth.
 pushColSpec :: LuaError e => Pusher e ColSpec

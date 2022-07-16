@@ -2,6 +2,14 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.1.7
+
+Released 2022-07-16.
+
+-   Allow Blocks to be passed as Caption value. The resulting
+    caption has the Blocks as its long version and no short
+    version.
+
 ## 0.1.6.1
 
 Released 2022-06-10.
@@ -37,7 +45,7 @@ Released 2022-02-17.
     functions `filter`, `map`, and `find_if`. These previously
     required the argument to be of type `function`, which was too
     restrictive.
-    
+
 -   Inline: the type of Image captions is now `Inlines` instead
     of `List`.
 
