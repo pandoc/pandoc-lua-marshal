@@ -10,6 +10,8 @@ Released 2022-07-16.
     caption has the Blocks as its long version and no short
     version.
 
+-   Add `clone` method to Pandoc elements.
+
 ## 0.1.6.1
 
 Released 2022-06-10.

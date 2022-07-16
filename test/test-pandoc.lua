@@ -45,6 +45,21 @@ return {
       )
     end)
   },
+  group 'clone' {
+    test('cloned value is equal to original', function ()
+      local doc = Pandoc({'test'}, {foo = 'hi'})
+      assert.are_same(doc, doc:clone())
+    end),
+    test('changing the clone does not affect original', function ()
+      local orig = Pandoc({'test'}, {foo = 'hi'})
+      local copy = orig:clone()
+
+      copy.blocks[1] = Plain 'different'
+      assert.are_same(orig.meta, copy.meta)
+      assert.are_same(Blocks{'test'}, orig.blocks)
+      assert.are_same(Blocks{'different'}, copy.blocks)
+    end),
+  },
   group 'walk' {
     test('uses `Meta` function', function ()
       local meta = {

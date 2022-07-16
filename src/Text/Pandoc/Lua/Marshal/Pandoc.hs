@@ -63,6 +63,11 @@ typePandoc = deftype "Pandoc"
       (pushMeta, \(Pandoc meta _) -> meta)
       (peekMeta, \(Pandoc _ blks) meta -> Pandoc meta blks)
 
+  , method $ defun "clone"
+      ### return
+      <#> parameter peekPandoc "Pandoc" "doc" "self"
+      =#> functionResult pushPandoc "Pandoc" "cloned Pandoc document"
+
   , method $ defun "walk"
     ### flip applyFully
     <#> parameter peekPandoc "Pandoc" "self" ""
