@@ -1,6 +1,6 @@
 cabal-version:       2.4
 name:                pandoc-lua-marshal
-version:             0.1.6.1
+version:             0.1.7
 synopsis:            Use pandoc types in Lua
 description:         This package provides functions to marshal and unmarshal
                      pandoc document types to and from Lua.
@@ -28,7 +28,7 @@ tested-with:         GHC == 8.6.5
                      GHC == 8.8.4
                      GHC == 8.10.7
                      GHC == 9.0.2
-                     GHC == 9.2.2
+                     GHC == 9.2.3
 extra-source-files:  test/test-attr.lua
                    , test/test-block.lua
                    , test/test-cell.lua

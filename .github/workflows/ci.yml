@@ -30,7 +30,7 @@ jobs:
             cabal: '3.4'
             lua: '-export-dynamic'
             hslua: '>= 2.2'
-          - ghc: '9.2.2'
+          - ghc: '9.2.3'
             cabal: '3.6'
             lua: '+apicheck'
             hslua: '>= 2.2'
