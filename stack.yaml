@@ -1,6 +1,6 @@
 resolver: lts-20.6
 extra-deps:
-  - git: https://github.com/jgm/pandoc-types
-    commit: 6ac717718396bdca510cbdc6d211bbea408444cc
+  - git: https://github.com/tarleb/pandoc-types
+    commit: 2388552a49f6718f7f1f8a6ad45e20d88aa601f1
 ghc-options:
   "$locals": -fhide-source-paths
