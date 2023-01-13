@@ -1,7 +1,7 @@
 {- |
-Copyright: (c) 2021-2022 Albert Krewinkel
-SPDX-License-Identifier: MIT
-Maintainer: Albert Krewinkel <albert@zeitkraut.de>
+Copyright  : © 2021-2023 Albert Krewinkel
+License    : MIT
+Maintainer : Albert Krewinkel <albert@zeitkraut.de>
 
 Use pandoc types in Lua
 -}

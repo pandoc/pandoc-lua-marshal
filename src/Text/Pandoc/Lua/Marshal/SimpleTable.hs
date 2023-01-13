@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE ScopedTypeVariables  #-}
 {- |
-Copyright   : © 2021-2022 Albert Krewinkel
+Copyright   : © 2021-2023 Albert Krewinkel
 License     : MIT
 Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
 
