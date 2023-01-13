@@ -42,9 +42,13 @@ jobs:
             cabal: '3.4'
             lua: '-export-dynamic'
             hslua: '>= 2.2'
-          - ghc: '9.2.3'
+          - ghc: '9.2.5'
             cabal: '3.6'
             lua: '+apicheck'
+            hslua: '>= 2.2'
+          - ghc: '9.4.4'
+            cabal: '3.8'
+            lua: '-apicheck'
             hslua: '>= 2.2'
 
     steps:
