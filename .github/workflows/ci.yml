@@ -24,7 +24,7 @@ jobs:
   build:
     name: >-
       ghc ${{ matrix.version.ghc }}; cabal ${{ matrix.version.cabal }};
-      lua ${{ matrix.version.lua }}; hslua ${{ matrix.version.hslua }}
+      lua ${{ matrix.version.lua }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -32,27 +32,21 @@ jobs:
           - ghc: '8.6.5'
             cabal: '3.2'
             lua: '-allow-unsafe-gc'
-            hslua: '< 2.2'
           - ghc: '8.8.4'
             cabal: '3.2'
             lua: '+pkg-config'
-            hslua: '< 2.2'
           - ghc: '8.10.7'
             cabal: '3.2'
             lua: '+apicheck'
-            hslua: '>= 2.2'
           - ghc: '9.0.2'
             cabal: '3.4'
             lua: '-export-dynamic'
-            hslua: '>= 2.2'
           - ghc: '9.2.5'
             cabal: '3.6'
             lua: '+apicheck'
-            hslua: '>= 2.2'
           - ghc: '9.4.4'
             cabal: '3.8'
             lua: '-apicheck'
-            hslua: '>= 2.2'
 
     steps:
       - uses: actions/checkout@v3
@@ -66,7 +60,7 @@ jobs:
       - name: Install system Lua
         run: |
           sudo apt update
-          sudo apt install lua5.3 liblua5.3-dev
+          sudo apt install lua5.4 liblua5.4-dev
 
       - uses: actions/cache@v3
         name: Cache ~/.cabal/store
@@ -79,14 +73,12 @@ jobs:
           cabal update
           cabal build \
               --enable-tests \
-              --constraint 'lua ${{ matrix.version.lua }}' \
-              --constraint 'hslua ${{ matrix.version.hslua }}'
+              --constraint 'lua ${{ matrix.version.lua }}'
 
       - name: Test
         run: |
           cabal test --enable-tests \
-              --constraint 'lua ${{ matrix.version.lua }}' \
-              --constraint 'hslua ${{ matrix.version.hslua }}'
+              --constraint 'lua ${{ matrix.version.lua }}'
 
   windows:
     name: Windows (stack)
