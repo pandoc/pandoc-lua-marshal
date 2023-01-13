@@ -1,4 +1,4 @@
-name: CI
+name: CI tests
 
 # Trigger the workflow on push or pull request, but only for the master branch
 on:
@@ -17,12 +17,15 @@ on:
       - 'LICENSE'
       - 'README.md'
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: >-
       ghc ${{ matrix.version.ghc }}; cabal ${{ matrix.version.cabal }};
       lua ${{ matrix.version.lua }}; hslua ${{ matrix.version.hslua }}
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         version:
@@ -87,7 +90,7 @@ jobs:
 
   windows:
     name: Windows (stack)
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
 
