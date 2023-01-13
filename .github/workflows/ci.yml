@@ -55,10 +55,10 @@ jobs:
             hslua: '>= 2.2'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install recent cabal/ghc
-        uses: haskell/actions/setup@v1
+        uses: haskell/actions/setup@v2
         with:
           ghc-version: ${{ matrix.version.ghc }}
           cabal-version: ${{ matrix.version.cabal }}
@@ -68,7 +68,7 @@ jobs:
           sudo apt update
           sudo apt install lua5.3 liblua5.3-dev
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         name: Cache ~/.cabal/store
         with:
           path: ~/.cabal/store
@@ -92,11 +92,11 @@ jobs:
     name: Windows (stack)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Cache stack global package db
         id:   stack-global-package-db
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: 'C:\Users\runneradmin\AppData\Roaming\stack\'
           key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml') }}
