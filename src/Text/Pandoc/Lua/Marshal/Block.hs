@@ -359,10 +359,6 @@ blockConstructors =
     <#> parameter (peekList peekInlinesFuzzy) "{Inlines,...}" "content" "lines"
     =#> blockResult "LineBlock element"
 
-  , defun "Null"
-    ### return Null
-    =#> blockResult "Null element"
-
   , defun "OrderedList"
     ### liftPure2 (\items mListAttrib ->
                      let defListAttrib = (1, DefaultStyle, DefaultDelim)
