@@ -2,6 +2,19 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.0
+
+Release pending.
+
+-   Depend on pandoc-types 1.23: the `Null` Block constructor has
+    been removed, and a `Figure` constructor has been added.
+
+-   Support for Lua 5.3 has been dropped; the package now requires
+    hslua 2.2 or later.
+
+-   The implementation for `List` has been moved to the separate
+    `hslua-list` module. This module no longer contains C code.
+
 ## 0.1.7
 
 Released 2022-07-16.
