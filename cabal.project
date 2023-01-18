@@ -1,6 +1,1 @@
 packages: pandoc-lua-marshal.cabal
-
-source-repository-package
-  type: git
-  location: https://github.com/jgm/pandoc-types
-  tag: 8c7bc6c66d22538711171b8cfd0e5f3d48de39fd

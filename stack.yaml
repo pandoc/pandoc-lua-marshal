@@ -1,7 +1,6 @@
 resolver: lts-20.6
 extra-deps:
   - hslua-list-1.1.0
-  - git: https://github.com/jgm/pandoc-types
-    commit: 8c7bc6c66d22538711171b8cfd0e5f3d48de39fd
+  - pandoc-types-1.23
 ghc-options:
   "$locals": -fhide-source-paths
