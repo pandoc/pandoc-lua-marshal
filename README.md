@@ -8,7 +8,7 @@
 
 Use pandoc types in Lua.
 
-[GitHub CI]: https://github.com/tarleb/pandoc-lua-marshal/workflows/CI/badge.svg
+[GitHub CI]: https://img.shields.io/github/actions/workflow/status/pandoc/pandoc-lua-marshal/ci.yml?branch=main&logo=github
 [1]: https://github.com/tarleb/pandoc-lua-marshal/actions
 [Hackage]: https://img.shields.io/hackage/v/pandoc-lua-marshal.svg?logo=haskell
 [2]: https://hackage.haskell.org/package/pandoc-lua-marshal
