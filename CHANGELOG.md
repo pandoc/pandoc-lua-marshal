@@ -2,9 +2,17 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.1
+
+Released 2023-02-11.
+
+-   All userdata types have been given a `__tojson` metamethod.
+    The methods return the default JSON representations of AST
+    objects.
+
 ## 0.2.0
 
-Release pending.
+Released 2023-01-18.
 
 -   Depend on pandoc-types 1.23: the `Null` Block constructor has
     been removed, and a `Figure` constructor has been added.
