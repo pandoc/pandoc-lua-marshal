@@ -27,6 +27,7 @@ module Text.Pandoc.Lua.Marshal.Attr
 
 import Control.Applicative ((<|>), optional)
 import Control.Monad ((<$!>))
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import HsLua
@@ -49,6 +50,10 @@ typeAttr = deftype "Attr"
     ### liftPure show
     <#> parameter peekAttr "Attr" "attr" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeAttr "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "identifier" "element identifier"
       (pushText, \(ident,_,_) -> ident)

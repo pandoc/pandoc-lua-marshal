@@ -14,6 +14,7 @@ module Text.Pandoc.Lua.Marshal.TableHead
   ) where
 
 import Control.Applicative (optional)
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
@@ -41,6 +42,10 @@ typeTableHead = deftype "pandoc TableHead"
     ### liftPure show
     <#> parameter peekTableHead "TableHead" "self" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeTableHead "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "attr" "table head attributes"
       (pushAttr, \(TableHead attr _) -> attr)

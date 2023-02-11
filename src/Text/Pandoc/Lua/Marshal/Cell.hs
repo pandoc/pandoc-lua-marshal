@@ -17,6 +17,7 @@ module Text.Pandoc.Lua.Marshal.Cell
 
 import Control.Applicative (optional)
 import Control.Monad ((<$!>))
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
@@ -63,6 +64,10 @@ typeCell = deftype "pandoc Cell"
     ### liftPure show
     <#> parameter peekCell "Cell" "self" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeCell "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "attr" "cell attributes"
       (pushAttr, \(Cell attr _ _ _ _) -> attr)

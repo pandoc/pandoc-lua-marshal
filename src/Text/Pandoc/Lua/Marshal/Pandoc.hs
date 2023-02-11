@@ -21,6 +21,7 @@ module Text.Pandoc.Lua.Marshal.Pandoc
 
 import Control.Applicative (optional)
 import Control.Monad ((<$!>))
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
@@ -55,6 +56,10 @@ typePandoc = deftype "Pandoc"
     ### liftPure show
     <#> parameter peekPandoc "Pandoc" "doc" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typePandoc "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "blocks" "list of blocks"
       (pushBlocks, \(Pandoc _ blks) -> blks)

@@ -14,6 +14,7 @@ module Text.Pandoc.Lua.Marshal.TableFoot
   ) where
 
 import Control.Applicative (optional)
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
@@ -41,6 +42,10 @@ typeTableFoot = deftype "pandoc TableFoot"
     ### liftPure show
     <#> parameter peekTableFoot "TableFoot" "self" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeTableFoot "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "attr" "table foot attributes"
       (pushAttr, \(TableFoot attr _) -> attr)

@@ -28,6 +28,7 @@ module Text.Pandoc.Lua.Marshal.Inline
 import Control.Applicative ((<|>), optional)
 import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
+import Data.Aeson (encode)
 import Data.Data (showConstr, toConstr)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
@@ -76,6 +77,13 @@ pushInlines xs = do
       <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
       =#> functionResult pushInlines "Blocks" "modified list"
     rawset (nth 3)
+
+    pushName "__tojson"
+    pushDocumentedFunction $ lambda
+      ### liftPure encode
+      <#> parameter peekInlinesFuzzy "Inlines" "self" ""
+      =#> functionResult pushLazyByteString "string" "JSON representation"
+    rawset (nth 3)
   setmetatable (nth 2)
 {-# INLINABLE pushInlines #-}
 
@@ -111,6 +119,10 @@ typeInline = deftype "Inline"
       <#> parameter (optional . peekInline) "a" "Inline" ""
       <#> parameter (optional . peekInline) "b" "Inline" ""
       =#> functionResult pushBool "boolean" "whether the two are equal"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeInline "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ possibleProperty "attr" "element attributes"
       (pushAttr, \case

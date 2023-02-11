@@ -17,6 +17,7 @@ module Text.Pandoc.Lua.Marshal.Row
 
 import Control.Applicative (optional)
 import Control.Monad ((<$!>))
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
@@ -56,6 +57,10 @@ typeRow = deftype "pandoc Row"
     ### liftPure show
     <#> parameter peekRow "Row" "self" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeRow "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "attr" "row attributes"
       (pushAttr, \(Row attr _) -> attr)

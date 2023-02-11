@@ -15,6 +15,7 @@ module Text.Pandoc.Lua.Marshal.Citation
   ) where
 
 import Control.Applicative (optional)
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua as Lua
 import Text.Pandoc.Definition (Citation (..))
@@ -48,6 +49,10 @@ typeCitation = deftype "Citation"
     ### liftPure show
     <#> parameter peekCitation "Citation" "citation" ""
     =#> functionResult pushString "string" "native Haskell representation"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeCitation "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "id" "citation ID / key"
       (pushText, citationId)

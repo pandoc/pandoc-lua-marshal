@@ -20,6 +20,7 @@ module Text.Pandoc.Lua.Marshal.ListAttributes
   ) where
 
 import Control.Applicative (optional)
+import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
 import Text.Pandoc.Definition
@@ -33,6 +34,10 @@ typeListAttributes = deftype "ListAttributes"
     <#> parameter (optional . peekListAttributes) "a" "ListAttributes" ""
     <#> parameter (optional . peekListAttributes) "b" "ListAttributes" ""
     =#> functionResult pushBool "boolean" "whether the two are equal"
+  , operation (CustomOperation "__tojson") $ lambda
+    ### liftPure encode
+    <#> udparam typeListAttributes "self" ""
+    =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "start" "number of the first list item"
       (pushIntegral, \(start,_,_) -> start)
