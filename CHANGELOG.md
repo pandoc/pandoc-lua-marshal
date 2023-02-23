@@ -2,6 +2,13 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.1.1
+
+Release pending.
+
+-   The version constraints for hslua packages have been relaxed;
+    the changes in hslua 2.3.\* do not affect this package.
+
 ## 0.2.1
 
 Released 2023-02-11.
