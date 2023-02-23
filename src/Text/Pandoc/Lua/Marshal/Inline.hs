@@ -9,8 +9,9 @@
 Marshal values of types that make up 'Inline' elements.
 -}
 module Text.Pandoc.Lua.Marshal.Inline
-  ( -- * Single Inline elements
-    peekInline
+  ( typeInline
+    -- * Single Inline elements
+  , peekInline
   , peekInlineFuzzy
   , pushInline
     -- * List of Inlines

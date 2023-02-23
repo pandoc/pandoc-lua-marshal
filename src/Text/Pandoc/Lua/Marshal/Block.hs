@@ -10,7 +10,8 @@ Marshal values of types that make up 'Block' elements.
 -}
 module Text.Pandoc.Lua.Marshal.Block
   ( -- * Single Block elements
-    peekBlock
+    typeBlock
+  , peekBlock
   , peekBlockFuzzy
   , pushBlock
     -- * List of Blocks

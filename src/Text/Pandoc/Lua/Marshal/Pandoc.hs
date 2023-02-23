@@ -8,7 +8,8 @@ Marshaling/unmarshaling functions of 'Pandoc' values.
 -}
 module Text.Pandoc.Lua.Marshal.Pandoc
   ( -- * Pandoc
-    peekPandoc
+    typePandoc
+  , peekPandoc
   , pushPandoc
   , mkPandoc
     -- * Meta
