@@ -4,10 +4,10 @@
 
 ## 0.2.1.1
 
-Release pending.
+Released 2023-03-13.
 
 -   The version constraints for hslua packages have been relaxed;
-    the changes in hslua 2.3.\* do not affect this package.
+    other changes in hslua 2.3.\* do not affect this package.
 
 ## 0.2.1
 
