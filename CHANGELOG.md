@@ -2,6 +2,12 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.2
+
+Released 2023-03-15.
+
+-   Add `__tostring` metamethods to *Blocks* and *Inlines*.
+
 ## 0.2.1.1
 
 Released 2023-03-13.
