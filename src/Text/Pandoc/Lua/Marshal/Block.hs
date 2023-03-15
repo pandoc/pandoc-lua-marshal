@@ -86,6 +86,13 @@ pushBlocks xs = do
       =#> functionResult pushBlocks "Blocks" "modified list"
     rawset (nth 3)
 
+    pushName "__tostring"
+    pushDocumentedFunction $ lambda
+      ### liftPure show
+      <#> parameter peekBlocksFuzzy "Blocks" "self" ""
+      =#> functionResult pushString "string" "native Haskell representation"
+    rawset (nth 3)
+
     pushName "__tojson"
     pushDocumentedFunction $ lambda
       ### liftPure encode

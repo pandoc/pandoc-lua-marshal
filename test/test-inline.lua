@@ -325,6 +325,20 @@ return {
         )
       end)
     },
+    group 'tostring' {
+      test('works on an empty list', function ()
+        assert.are_equal(
+          tostring(Inlines{}),
+          '[]'
+        )
+      end),
+      test('simple inlines', function ()
+        assert.are_equal(
+          tostring(Inlines 'Bonjour, Monsieur !'),
+          '[Str "Bonjour,",Space,Str "Monsieur",Space,Str "!"]'
+        )
+      end),
+    },
     group 'walk' {
       test('modifies Inline subelements', function ()
         assert.are_same(

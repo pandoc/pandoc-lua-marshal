@@ -409,6 +409,17 @@ return {
         )
       end)
     },
+    group 'tostring' {
+      test('works on an empty list', function ()
+        assert.are_equal(tostring(Blocks{}), '[]')
+      end),
+      test('para singleton', function ()
+        assert.are_equal(
+          tostring(Blocks{Para 'Hallo'}),
+          '[Para [Str "Hallo"]]'
+        )
+      end),
+    },
     group 'walk' {
       test('modifies Inline subelements', function ()
         local blocks = Blocks{Para 'Hello, World!'}
