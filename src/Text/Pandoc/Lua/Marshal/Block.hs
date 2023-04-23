@@ -240,6 +240,11 @@ typeBlock = deftype "Block"
     <#> parameter peekBlock "Block" "self" ""
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushBlock "Block" "modified element"
+
+  , method $ defun "force"
+    ### forceProperties typeBlock
+    <#> parameter pure "Block" "self" ""
+    =#> []
   ]
 
 getBlockContent :: Block -> Possible Content
