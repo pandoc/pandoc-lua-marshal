@@ -93,8 +93,11 @@ peekFilter = peekFilter' $
 -- in the given list of names.
 peekFilter' :: LuaError e => [Name] -> Peeker e Filter
 peekFilter' fnNames idx = do
+  absidx <- liftLua $ absindex idx
   let go constr acc = liftLua $ do
-        _ <- getfield idx constr
+        -- _ <- getfield idx constr
+        pushName constr
+        rawget absidx
         runPeek (peekFilterFunction top `lastly` pop 1) >>= \case
           Success fn -> pure $ Map.insert constr fn acc
           Failure {} -> pure acc
