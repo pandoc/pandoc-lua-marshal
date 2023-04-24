@@ -64,7 +64,11 @@ pushBlock = pushUD typeBlock
 
 -- | Pushes an Block value as userdata object.
 pushBlock' :: LuaError e => Bool -> Pusher e Block
-pushBlock' lazy = pushUD (typeBlock' lazy)
+pushBlock' = \case
+  True -> pushBlock
+  False -> \blk -> do
+    pushUD (typeBlock' False) blk
+    forceProperties (typeBlock' False) top
 {-# INLINE pushBlock' #-}
 
 -- | Retrieves an Block value.

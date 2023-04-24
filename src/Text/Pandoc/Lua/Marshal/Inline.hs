@@ -29,7 +29,7 @@ module Text.Pandoc.Lua.Marshal.Inline
 
 import Control.Applicative ((<|>), optional)
 import Control.Monad.Catch (throwM)
-import Control.Monad ((<$!>))
+import Control.Monad ((<$!>), unless)
 import Data.Aeson (encode)
 import Data.Data (showConstr, toConstr)
 import Data.Maybe (fromMaybe)
@@ -57,7 +57,8 @@ pushInline = pushUD typeInline
 
 -- | Pushes an Inline value as userdata object.
 pushInline' :: LuaError e => Bool -> Pusher e Inline
-pushInline' lazy = pushUD (typeInline' lazy)
+pushInline' lazy inln = pushUD (typeInline' lazy) inln
+  <* unless lazy (forceProperties (typeInline' False) top)
 {-# INLINE pushInline' #-}
 
 -- | Retrieves an Inline value.
