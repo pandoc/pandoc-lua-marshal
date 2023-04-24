@@ -25,7 +25,7 @@ import Control.Monad ((<$!>))
 import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
-import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
+import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks')
 import Text.Pandoc.Lua.Marshal.Filter
 import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
@@ -42,7 +42,11 @@ peekPandoc = retrieving "Pandoc" . peekUD typePandoc
 
 -- | Pandoc object type.
 typePandoc :: LuaError e => DocumentedType e Pandoc
-typePandoc = deftype "Pandoc"
+typePandoc = typePandoc' True
+
+-- | Pandoc object type.
+typePandoc' :: LuaError e => Bool -> DocumentedType e Pandoc
+typePandoc' lazy = deftype "Pandoc"
   [ operation Concat $ lambda
      ### liftPure2 (<>)
      <#> parameter peekPandoc "Pandoc" "a" ""
@@ -63,7 +67,7 @@ typePandoc = deftype "Pandoc"
     =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
   [ property "blocks" "list of blocks"
-      (pushBlocks, \(Pandoc _ blks) -> blks)
+      (pushBlocks' lazy, \(Pandoc _ blks) -> blks)
       (peekBlocksFuzzy, \(Pandoc m _) blks -> Pandoc m blks)
   , property "meta" "document metadata"
       (pushMeta, \(Pandoc meta _) -> meta)
@@ -79,6 +83,11 @@ typePandoc = deftype "Pandoc"
     <#> parameter peekPandoc "Pandoc" "self" ""
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushPandoc "Pandoc" "modified element"
+
+  , method $ defun "force"
+    ### forceProperties (typePandoc' False)
+    <#> parameter pure "Pandoc" "self" ""
+    =#> []
   ]
 
 -- | Pushes a 'Meta' value as a string-indexed table.
