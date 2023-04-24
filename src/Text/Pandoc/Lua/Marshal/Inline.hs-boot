@@ -8,6 +8,7 @@ module Text.Pandoc.Lua.Marshal.Inline
   , peekInlines
   , peekInlinesFuzzy
   , pushInlines
+  , pushInlines'
     -- * Constructors
   , inlineConstructors
   , mkInlines
@@ -29,6 +30,7 @@ pushInline       :: LuaError e => Pusher e Inline
 peekInlines      :: LuaError e => Peeker e [Inline]
 peekInlinesFuzzy :: LuaError e => Peeker e [Inline]
 pushInlines      :: LuaError e => Pusher e [Inline]
+pushInlines'     :: LuaError e => Bool -> Pusher e [Inline]
 -- * Constructors
 inlineConstructors :: LuaError e => [DocumentedFunction e]
 mkInlines          :: LuaError e => DocumentedFunction e

@@ -20,9 +20,9 @@ import Control.Applicative ((<|>))
 import Control.Monad ((<$!>))
 import HsLua
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
-  ( peekBlocksFuzzy, pushBlocks )
+  ( peekBlocksFuzzy, pushBlocks' )
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
-  ( peekInlinesFuzzy, pushInlines )
+  ( peekInlinesFuzzy, pushInlines' )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Definition (Inline, Block)
 
@@ -49,13 +49,13 @@ contentTypeDescription = \case
   ContentListItems {} -> "list items (i.e., list of list of Block elements)"
 
 -- | Pushes the 'Content' to the stack.
-pushContent :: LuaError e => Pusher e Content
-pushContent = \case
-  ContentBlocks blks    -> pushBlocks blks
-  ContentInlines inlns  -> pushInlines inlns
-  ContentLines lns      -> pushPandocList pushInlines lns
-  ContentDefItems itms  -> pushPandocList pushDefinitionItem itms
-  ContentListItems itms -> pushPandocList pushBlocks itms
+pushContent :: LuaError e => Bool -> Pusher e Content
+pushContent lazy = \case
+  ContentBlocks blks    -> pushBlocks' lazy blks
+  ContentInlines inlns  -> pushInlines' lazy inlns
+  ContentLines lns      -> pushPandocList (pushInlines' lazy) lns
+  ContentDefItems itms  -> pushPandocList (pushDefinitionItem lazy) itms
+  ContentListItems itms -> pushPandocList (pushBlocks' lazy) itms
 
 -- | Gets a 'Content' element from the stack.
 peekContent :: LuaError e => Peeker e Content
@@ -77,6 +77,6 @@ peekDefinitionItem = peekPair peekInlinesFuzzy $ choice
   ]
 
 -- | Pushes a single definition items on the stack.
-pushDefinitionItem :: LuaError e => Pusher e ([Inline], [[Block]])
-pushDefinitionItem = pushPair pushInlines
-                              (pushPandocList pushBlocks)
+pushDefinitionItem :: LuaError e => Bool -> Pusher e ([Inline], [[Block]])
+pushDefinitionItem lazy = pushPair (pushInlines' lazy)
+                          (pushPandocList (pushBlocks' lazy))

@@ -18,6 +18,7 @@ module Text.Pandoc.Lua.Marshal.Inline
   , peekInlines
   , peekInlinesFuzzy
   , pushInlines
+  , pushInlines'
     -- * Constructors
   , inlineConstructors
   , mkInlines
@@ -54,6 +55,11 @@ pushInline :: LuaError e => Pusher e Inline
 pushInline = pushUD typeInline
 {-# INLINE pushInline #-}
 
+-- | Pushes an Inline value as userdata object.
+pushInline' :: LuaError e => Bool -> Pusher e Inline
+pushInline' lazy = pushUD (typeInline' lazy)
+{-# INLINE pushInline' #-}
+
 -- | Retrieves an Inline value.
 peekInline :: LuaError e => Peeker e Inline
 peekInline = peekUD typeInline
@@ -68,8 +74,13 @@ peekInlines = peekList peekInline
 -- | Pushes a list of Inline values.
 pushInlines :: LuaError e
             => Pusher e [Inline]
-pushInlines xs = do
-  pushList pushInline xs
+pushInlines = pushInlines' True
+
+-- | Pushes a list of Inline values.
+pushInlines' :: LuaError e
+            => Bool -> Pusher e [Inline]
+pushInlines' lazy xs = do
+  pushList (pushInline' lazy) xs
   newListMetatable "Inlines" $ do
     pushName "walk"
     pushDocumentedFunction $ lambda
@@ -117,7 +128,11 @@ peekInlinesFuzzy idx = liftLua (ltype idx) >>= \case
 
 -- | Inline object type.
 typeInline :: forall e. LuaError e => DocumentedType e Inline
-typeInline = deftype "Inline"
+typeInline = typeInline' True
+
+-- | Inline object type.
+typeInline' :: forall e. LuaError e => Bool -> DocumentedType e Inline
+typeInline' lazy = deftype "Inline"
   [ operation Tostring $ lambda
     ### liftPure (show @Inline)
     <#> parameter peekInline "inline" "Inline" "Object"
@@ -147,7 +162,7 @@ typeInline = deftype "Inline"
           _               -> const Absent)
 
   , possibleProperty "caption" "image caption"
-      (pushInlines, \case
+      (pushInlines' lazy, \case
           Image _ capt _ -> Actual capt
           _              -> Absent)
       (peekInlinesFuzzy, \case
@@ -163,7 +178,7 @@ typeInline = deftype "Inline"
           _            -> const Absent)
 
   , possibleProperty "content" "element contents"
-      (pushContent, \case
+      (pushContent lazy, \case
           Cite _ inlns      -> Actual $ ContentInlines inlns
           Emph inlns        -> Actual $ ContentInlines inlns
           Link _ inlns _    -> Actual $ ContentInlines inlns

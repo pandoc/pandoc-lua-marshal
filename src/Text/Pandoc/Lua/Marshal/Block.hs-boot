@@ -8,6 +8,7 @@ module Text.Pandoc.Lua.Marshal.Block
   , peekBlocks
   , peekBlocksFuzzy
   , pushBlocks
+  , pushBlocks'
     -- * Constructors
   , blockConstructors
   , mkBlocks
@@ -29,6 +30,7 @@ pushBlock      :: LuaError e => Pusher e Block
 peekBlocks      :: LuaError e => Peeker e [Block]
 peekBlocksFuzzy :: LuaError e => Peeker e [Block]
 pushBlocks      :: LuaError e => Pusher e [Block]
+pushBlocks'     :: LuaError e => Bool -> Pusher e [Block]
 -- * Constructors
 blockConstructors :: LuaError e => [DocumentedFunction e]
 mkBlocks          :: LuaError e => DocumentedFunction e

@@ -18,6 +18,7 @@ module Text.Pandoc.Lua.Marshal.Block
   , peekBlocks
   , peekBlocksFuzzy
   , pushBlocks
+  , pushBlocks'
     -- * Constructors
   , blockConstructors
   , mkBlocks
@@ -61,6 +62,11 @@ pushBlock :: LuaError e => Pusher e Block
 pushBlock = pushUD typeBlock
 {-# INLINE pushBlock #-}
 
+-- | Pushes an Block value as userdata object.
+pushBlock' :: LuaError e => Bool -> Pusher e Block
+pushBlock' lazy = pushUD (typeBlock' lazy)
+{-# INLINE pushBlock' #-}
+
 -- | Retrieves an Block value.
 peekBlock :: LuaError e => Peeker e Block
 peekBlock = peekUD typeBlock
@@ -75,8 +81,12 @@ peekBlocks = peekList peekBlock
 -- | Pushes a list of Block values.
 pushBlocks :: LuaError e
            => Pusher e [Block]
-pushBlocks xs = do
-  pushList pushBlock xs
+pushBlocks = pushBlocks' True
+
+-- | Pushes a list of Block values.
+pushBlocks' :: LuaError e => Bool -> Pusher e [Block]
+pushBlocks' lazy xs = do
+  pushList (pushBlock' lazy) xs
   newListMetatable "Blocks" $ do
     pushName "walk"
     pushDocumentedFunction $ lambda
@@ -126,7 +136,11 @@ peekBlocksFuzzy idx =
 
 -- | Block object type.
 typeBlock :: forall e. LuaError e => DocumentedType e Block
-typeBlock = deftype "Block"
+typeBlock = typeBlock' True
+
+-- | Block object type.
+typeBlock' :: forall e. LuaError e => Bool -> DocumentedType e Block
+typeBlock' lazy = deftype "Block"
   [ operation Eq $ lambda
     ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
     <#> parameter (optional . peekBlockFuzzy) "Block" "a" ""
@@ -180,7 +194,7 @@ typeBlock = deftype "Block"
           Table attr c _ h bs f  -> Actual . (\cs -> Table attr c cs h bs f)
           _                      -> const Absent)
   , possibleProperty "content" "element content"
-      (pushContent, getBlockContent)
+      (pushContent lazy, getBlockContent)
       (peekContent, setBlockContent (Proxy @e))
   , possibleProperty "foot" "table foot"
       (pushTableFoot, \case {Table _ _ _ _ _ f -> Actual f; _ -> Absent})
@@ -242,7 +256,7 @@ typeBlock = deftype "Block"
     =#> functionResult pushBlock "Block" "modified element"
 
   , method $ defun "force"
-    ### forceProperties typeBlock
+    ### forceProperties (typeBlock' False)
     <#> parameter pure "Block" "self" ""
     =#> []
   ]
