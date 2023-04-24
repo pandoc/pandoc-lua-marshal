@@ -68,7 +68,7 @@ pushBlock' = \case
   True -> pushBlock
   False -> \blk -> do
     pushUD (typeBlock' False) blk
-    forceProperties (typeBlock' False) top
+    forceProperties' (typeBlock' False) blk top
 {-# INLINE pushBlock' #-}
 
 -- | Retrieves an Block value.

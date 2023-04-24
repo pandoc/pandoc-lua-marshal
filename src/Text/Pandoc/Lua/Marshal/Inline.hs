@@ -58,7 +58,7 @@ pushInline = pushUD typeInline
 -- | Pushes an Inline value as userdata object.
 pushInline' :: LuaError e => Bool -> Pusher e Inline
 pushInline' lazy inln = pushUD (typeInline' lazy) inln
-  <* unless lazy (forceProperties (typeInline' False) top)
+  <* unless lazy (forceProperties' (typeInline' lazy) inln top)
 {-# INLINE pushInline' #-}
 
 -- | Retrieves an Inline value.
