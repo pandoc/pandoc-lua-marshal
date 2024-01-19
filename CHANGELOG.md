@@ -6,6 +6,12 @@
 
 Released 2024-01-19.
 
+-   Relaxed upper bound for aeson, allowing aeson-2.2.\*.
+
+## 0.2.3
+
+Released 2024-01-19.
+
 -   Relaxed upper bound for text, containers, and bytestring,
     allowing text-2.1, containers-0.7, and bytestring-0.12.
 
