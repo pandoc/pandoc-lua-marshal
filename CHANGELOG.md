@@ -2,6 +2,13 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.3
+
+Released 2024-01-19.
+
+-   Relaxed upper bound for text, containers, and bytestring,
+    allowing text-2.1, containers-0.7, and bytestring-0.12.
+
 ## 0.2.2
 
 Released 2023-03-15.
