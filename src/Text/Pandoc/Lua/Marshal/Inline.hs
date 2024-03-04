@@ -79,6 +79,13 @@ pushInlines xs = do
       =#> functionResult pushInlines "Blocks" "modified list"
     rawset (nth 3)
 
+    pushName "clone"
+    pushDocumentedFunction $ lambda
+      ### return
+      <#> parameter peekInlinesFuzzy "Inlines" "self" ""
+      =#> functionResult pushInlines "Inlines" "deep copy"
+    rawset (nth 3)
+
     pushName "__tostring"
     pushDocumentedFunction $ lambda
       ### liftPure show

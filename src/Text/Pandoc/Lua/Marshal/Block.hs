@@ -86,6 +86,13 @@ pushBlocks xs = do
       =#> functionResult pushBlocks "Blocks" "modified list"
     rawset (nth 3)
 
+    pushName "clone"
+    pushDocumentedFunction $ lambda
+      ### return
+      <#> parameter peekBlocksFuzzy "Blocks" "self" ""
+      =#> functionResult pushBlocks "Blocks" "deep copy"
+    rawset (nth 3)
+
     pushName "__tostring"
     pushDocumentedFunction $ lambda
       ### liftPure show

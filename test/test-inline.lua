@@ -325,6 +325,22 @@ return {
         )
       end)
     },
+    group 'clone' {
+      test('function exists', function ()
+        assert.are_equal(type(Inlines({}).clone), 'function')
+      end),
+      test('clones the list', function ()
+        local inlns = Inlines{'Hello,', Space(), 'World!'}
+        assert.are_same(inlns, inlns:clone())
+      end),
+      test('deep-clones the list', function ()
+        local inlns = Inlines{Str 'Hello,', Space(), Str 'World!'}
+        local copy = inlns:clone()
+        copy[1].text = 'Bonjour,'
+        assert.are_same(Inlines{Str 'Bonjour,', Space(), Str 'World!'}, copy)
+        assert.are_same(Inlines{Str 'Hello,', Space(), Str 'World!'}, inlns)
+      end)
+    },
     group 'tostring' {
       test('works on an empty list', function ()
         assert.are_equal(

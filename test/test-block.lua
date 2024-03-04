@@ -409,6 +409,22 @@ return {
         )
       end)
     },
+    group 'clone' {
+      test('function exists', function ()
+        assert.are_equal(type(Blocks({}).clone), 'function')
+      end),
+      test('clones the list', function ()
+        local blks = Blocks{Para('One'), CodeBlock 'two'}
+        assert.are_same(blks, blks:clone())
+      end),
+      test('deep-clones the list', function ()
+        local blks = Blocks{Para('one'), CodeBlock 'two'}
+        local copy = blks:clone()
+        copy[1].content[1].text = 'heh'
+        assert.are_same(Blocks{Para('heh'), CodeBlock 'two'}, copy)
+        assert.are_same(Blocks{Para('one'), CodeBlock 'two'}, blks)
+      end)
+    },
     group 'tostring' {
       test('works on an empty list', function ()
         assert.are_equal(tostring(Blocks{}), '[]')
