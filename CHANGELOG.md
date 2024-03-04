@@ -2,7 +2,14 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
-## 0.2.3
+## 0.2.5
+
+Released 2024-03-04.
+
+-   The `clone` method on *Blocks* and *Inlines* elements now
+    creates deep copies of the lists.
+
+## 0.2.4
 
 Released 2024-01-19.
 
