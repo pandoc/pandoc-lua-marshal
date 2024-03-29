@@ -120,6 +120,12 @@ return {
           Div('word', {'my-other-div', {'example'}}),
           div
         )
+      end),
+      test('accessing the content does not change the value', function ()
+        local div = Div {}
+        assert.are_equal(div, Div{})
+        x = div.content
+        assert.are_equal(div, Div{})
       end)
     },
     group 'Figure' {

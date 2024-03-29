@@ -294,6 +294,7 @@ setBlockContent _ = \case
            "expected Inlines, got " <> contentTypeDescription c
     blockContent = \case
       ContentBlocks blks   -> blks
+      ContentInlines []    -> []
       ContentInlines inlns -> [Plain inlns]
       c -> throwM . luaException @e $
            "expected Blocks, got " <> contentTypeDescription c
