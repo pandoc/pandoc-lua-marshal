@@ -2,6 +2,14 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.6
+
+Released 2024-03-29.
+
+-   Fixed a bug that caused problems with empty Block lists in
+    the `content` attributes of *Div*, *Figure*, and *BlockQuote*
+    elements.
+
 ## 0.2.5
 
 Released 2024-03-04.
