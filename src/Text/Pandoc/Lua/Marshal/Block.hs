@@ -307,7 +307,7 @@ setBlockContent _ = \case
       c -> throwM . luaException @e $
            "expected definition items, got " <> contentTypeDescription c
     listItemContent = \case
-      ContentBlocks blks    -> [blks]
+      ContentBlocks blks    -> map (:[]) blks
       ContentLines lns      -> map ((:[]) . Plain) lns
       ContentListItems itms -> itms
       c -> throwM . luaException @e $

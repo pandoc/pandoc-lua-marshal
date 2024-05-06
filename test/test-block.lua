@@ -9,7 +9,7 @@ return {
     group 'BlockQuote' {
       test('access content via property `content`', function ()
         local elem = BlockQuote{'word'}
-        assert.are_same(elem.content, {Plain 'word'})
+        assert.are_equal(elem.content, Blocks{Plain 'word'})
         assert.are_equal(type(elem.content), 'table')
 
         elem.content = {
@@ -29,16 +29,40 @@ return {
       test('access items via property `content`', function ()
         local para = Para 'one'
         local blist = BulletList{{para}}
-        assert.are_same({{para}}, blist.content)
+        assert.are_equal(List{Blocks{para}}, blist.content)
+      end),
+      test('property `content` is a list of Block lists', function ()
+        local items = List{Blocks{Plain 'item 1'}, Blocks{Plain 'item 2'}}
+        local blist = BulletList{}
+        blist.content = items
+        assert.are_equal(items, blist:clone().content)
       end),
       test('property `content` uses fuzzy marshalling', function ()
-        local old = Plain 'old'
         local new = Plain 'new'
-        local blist = BulletList{{old}}
+        local blist = BulletList{{Plain 'old'}}
         blist.content = {{new}}
-        assert.are_same({{new}}, blist:clone().content)
+        assert.are_equal(List{Blocks{new}}, blist:clone().content)
         blist.content = new
-        assert.are_same({{new}}, blist:clone().content)
+        assert.are_equal(List{Blocks{new}}, blist:clone().content)
+      end),
+      test('property `content` prioritizes lists', function ()
+        local blist = BulletList{}
+        local one, two = Para 'one', Plain 'two'
+        blist.content = {one, two}
+        assert.are_equal(
+          List{Blocks{one}, Blocks{two}},
+          blist:clone().content
+        )
+      end),
+      test('mixing types works', function ()
+             local one = Plain 'one'
+        local two = 'two'
+        local blist = BulletList{}
+        blist.content = {one, two}
+        assert.are_same(
+          List{Blocks{one}, Blocks{Plain(two)}},
+          blist:clone().content
+        )
       end),
     },
     group 'CodeBlock' {

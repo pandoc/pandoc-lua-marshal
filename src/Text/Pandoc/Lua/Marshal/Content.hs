@@ -39,7 +39,7 @@ data Content
   | ContentDefItems [([Inline], [[Block]])]
   | ContentListItems [[Block]]
 
--- | Gets the text property of an Inline, if present.
+-- | Returns a human-readable type description; used for error messages.
 contentTypeDescription :: Content -> String
 contentTypeDescription = \case
   ContentBlocks {}    -> "list of Block items"
