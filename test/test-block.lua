@@ -54,6 +54,13 @@ return {
           blist:clone().content
         )
       end),
+      test('behavior is consistent with constructor', function ()
+        local content = {Para 'one', CodeBlock 'print "Hello"'}
+        local bl1 = BulletList(content)
+        local bl2 = BulletList{}
+        bl2.content = content
+        assert.are_equal(bl1, bl2)
+      end),
       test('mixing types works', function ()
              local one = Plain 'one'
         local two = 'two'

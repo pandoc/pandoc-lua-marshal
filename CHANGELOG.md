@@ -2,6 +2,22 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.7
+
+Released 2024-05-06.
+
+-   Let the behavior of `content` attributes on BulletList and
+    OrderedList elements match that of the constructor by treating
+    a list of Block elements as a list of single-block items. The
+    following assertion now holds true:
+
+    ``` lua
+    local content = {pandoc.Plain "one", pandoc.Plain "two"}
+    local bl = pandoc.BulletList{}
+    bl.content = content
+    assert(bl == pandoc.BulletList(content))
+    ```
+
 ## 0.2.6
 
 Released 2024-03-29.
