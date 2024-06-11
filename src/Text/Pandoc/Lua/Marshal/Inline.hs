@@ -47,6 +47,7 @@ import Text.Pandoc.Lua.Marshal.MathType (peekMathType, pushMathType)
 import Text.Pandoc.Lua.Marshal.QuoteType (peekQuoteType, pushQuoteType)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Walk (SpliceList, Walkable, walkSplicing, walkStraight)
+import qualified Data.Text as T
 import qualified Text.Pandoc.Builder as B
 
 -- | Pushes an Inline value as userdata object.
@@ -313,28 +314,35 @@ inlineConstructors :: LuaError e =>  [DocumentedFunction e]
 inlineConstructors =
   [ defun "Cite"
     ### liftPure2 (flip Cite)
-    <#> parameter peekInlinesFuzzy "content" "Inline" "placeholder content"
-    <#> parameter (peekList peekCitation) "citations" "list of Citations" ""
+    <#> parameter peekInlinesFuzzy "content" "Inlines" "placeholder content"
+    <#> parameter (peekList peekCitation) "{Citation,...}" "citations"
+        "List of Citations"
     =#> functionResult pushInline "Inline" "cite element"
+    #? "Creates a Cite inline element"
   , defun "Code"
     ### liftPure2 (\text mattr -> Code (fromMaybe nullAttr mattr) text)
     <#> textParam "code" "code string"
     <#> opt (parameter peekAttr "Attr" "attr" "additional attributes")
     =#> functionResult pushInline "Inline" "code element"
+    #? "Creates a Code inline element"
   , mkInlinesConstr "Emph" Emph
+    #? "Creates an inline element representing emphasized text."
   , defun "Image"
     ### liftPure4 (\caption src mtitle mattr ->
                      let attr = fromMaybe nullAttr mattr
                          title = fromMaybe mempty mtitle
                      in Image attr caption (src, title))
-    <#> parameter peekInlinesFuzzy "Inlines" "caption" "image caption / alt"
-    <#> textParam "src" "path/URL of the image file"
+    <#> parameter peekInlinesFuzzy "Inlines" "caption"
+        "text used to describe the image"
+    <#> textParam "src" "path to the image file"
     <#> opt (textParam "title" "brief image description")
     <#> opt (parameter peekAttr "Attr" "attr" "image attributes")
-    =#> functionResult pushInline "Inline" "image element"
+    =#> functionResult pushInline "Inline" "Image element"
+    #? "Creates an Image element"
   , defun "LineBreak"
     ### return LineBreak
     =#> functionResult pushInline "Inline" "line break"
+    #? "Create a LineBreak inline element"
   , defun "Link"
     ### liftPure4 (\content target mtitle mattr ->
                      let attr = fromMaybe nullAttr mattr
@@ -345,59 +353,87 @@ inlineConstructors =
     <#> opt (textParam "title" "brief link description")
     <#> opt (parameter peekAttr "Attr" "attr" "link attributes")
     =#> functionResult pushInline "Inline" "link element"
+    #? "Creates a link inline element, usually a hyperlink."
   , defun "Math"
     ### liftPure2 Math
-    <#> parameter peekMathType "quotetype" "Math" "rendering method"
+    <#> parameter peekMathType "MathType" "mathtype" "rendering specifier"
     <#> textParam "text" "math content"
     =#> functionResult pushInline "Inline" "math element"
+    #? "Creates a Math element, either inline or displayed."
   , defun "Note"
     ### liftPure Note
-    <#> parameter peekBlocksFuzzy "content" "Blocks" "note content"
+    <#> parameter peekBlocksFuzzy "Blocks" "content" "footnote block content"
     =#> functionResult pushInline "Inline" "note"
+    #? "Creates a Note inline element"
   , defun "Quoted"
     ### liftPure2 Quoted
-    <#> parameter peekQuoteType "quotetype" "QuoteType" "type of quotes"
-    <#> parameter peekInlinesFuzzy "content" "Inlines" "inlines in quotes"
+    <#> parameter peekQuoteType "QuoteType" "quotetype" "type of quotes"
+    <#> parameter peekInlinesFuzzy "Inlines" "content" "inlines in quotes"
     =#> functionResult pushInline "Inline" "quoted element"
+    #? ("Creates a Quoted inline element given the quote type and " <>
+        "quoted content.")
   , defun "RawInline"
     ### liftPure2 RawInline
-    <#> parameter peekFormat "format" "Format" "format of content"
+    <#> parameter peekFormat "string" "format" "format of content"
     <#> textParam "text" "string content"
     =#> functionResult pushInline "Inline" "raw inline element"
+    #? "Creates a raw inline element"
   , mkInlinesConstr "SmallCaps" SmallCaps
+    #? "Creates text rendered in small caps"
   , defun "SoftBreak"
     ### return SoftBreak
     =#> functionResult pushInline "Inline" "soft break"
+    #? "Creates a SoftBreak inline element."
   , defun "Space"
     ### return Space
     =#> functionResult pushInline "Inline" "new space"
+    #? "Create a Space inline element"
   , defun "Span"
     ### liftPure2 (\inlns mattr -> Span (fromMaybe nullAttr mattr) inlns)
-    <#> parameter peekInlinesFuzzy "content" "Inlines" "inline content"
+    <#> parameter peekInlinesFuzzy "Inlines" "content" "inline content"
     <#> opt (parameter peekAttr "Attr" "attr" "additional attributes")
-    =#> functionResult pushInline "Inline" "span element"
+    =#> functionResult pushInline "Inline" "[[Span]] object"
+    #? "Creates a Span inline element"
   , defun "Str"
     ### liftPure Str
     <#> textParam "text" ""
-    =#> functionResult pushInline "Inline" "new Str object"
-  , mkInlinesConstr "Strong" Strong
+    =#> functionResult pushInline "Inline" "[[Str]] object"
+    #? "Creates a Str inline element"
   , mkInlinesConstr "Strikeout" Strikeout
+    #? "Creates text which is struck out."
+  , mkInlinesConstr "Strong" Strong
+    #? ("Creates a Strong element, whose text is usually displayed in " <>
+        "a bold font.")
   , mkInlinesConstr "Subscript" Subscript
+    #? "Creates a Subscript inline element"
   , mkInlinesConstr "Superscript" Superscript
+    #? "Creates a Superscript inline element"
   , mkInlinesConstr "Underline" Underline
+    #? "Creates an Underline inline element"
   ]
  where
    mkInlinesConstr name constr = defun name
      ### liftPure (\x -> x `seq` constr x)
-     <#> parameter peekInlinesFuzzy "Inlines" "content" ""
+     <#> parameter peekInlinesFuzzy "Inlines" "content" "inline content"
      =#> functionResult pushInline "Inline" "new object"
 
 -- | Constructor for a list of `Inline` values.
 mkInlines :: LuaError e => DocumentedFunction e
 mkInlines = defun "Inlines"
   ### liftPure id
-  <#> parameter peekInlinesFuzzy "Inlines" "inlines" "inline elements"
+  <#> parameter peekInlinesFuzzy "Inlines" "inline_like_elements"
+      ("List where each element can be treated as an [[Inline]] " <>
+       "value, or just a single such value.")
   =#> functionResult pushInlines "Inlines" "list of inline elements"
+  #? T.unlines
+  [ "Converts its argument into an [[Inlines]] list:"
+  , ""
+  , "-   copies a list of [[Inline]] elements into a fresh list; any"
+  , "    string `s` within the list is treated as `pandoc.Str(s)`;"
+  , "-   turns a single [[Inline]] into a singleton list;"
+  , "-   splits a string into `Str`-wrapped words, treating"
+  , "    interword spaces as `Space`s or `SoftBreak`s."
+  ]
 
 -- | Walks an element of type @a@ and applies the filter to all 'Inline'
 -- elements.  The filter result is spliced back into the list.

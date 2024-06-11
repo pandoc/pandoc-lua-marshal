@@ -332,17 +332,20 @@ blockConstructors =
     ### liftPure BlockQuote
     <#> blocksParam
     =#> blockResult "BlockQuote element"
+    #? "Creates a block quote element"
 
   , defun "BulletList"
     ### liftPure BulletList
     <#> blockItemsParam "list items"
     =#> blockResult "BulletList element"
+    #? "Creates a bullet list."
 
   , defun "CodeBlock"
     ### liftPure2 (\code mattr -> CodeBlock (fromMaybe nullAttr mattr) code)
-    <#> textParam "text" "code block content"
+    <#> textParam "text" "code string"
     <#> optAttrParam
     =#> blockResult "CodeBlock element"
+    #? "Creates a code block element."
 
   , defun "DefinitionList"
     ### liftPure DefinitionList
@@ -353,22 +356,25 @@ blockConstructors =
                   "{{Inlines, {Blocks,...}},...}"
                   "content" "definition items"
     =#> blockResult "DefinitionList element"
+    #? "Creates a definition list, containing terms and their explanation."
 
   , defun "Div"
     ### liftPure2 (\content mattr -> Div (fromMaybe nullAttr mattr) content)
     <#> blocksParam
     <#> optAttrParam
     =#> blockResult "Div element"
+    #? "Creates a div element"
 
   , defun "Figure"
     ### liftPure3 (\content mcapt mattr ->
                      let attr = fromMaybe nullAttr mattr
                          capt = fromMaybe (Caption mempty mempty) mcapt
                      in Figure attr capt content)
-    <#> parameter peekBlocksFuzzy "Blocks" "content" "figure content"
+    <#> parameter peekBlocksFuzzy "Blocks" "content" "figure block content"
     <#> opt (parameter peekCaptionFuzzy "Caption" "caption" "figure caption")
     <#> optAttrParam
-    =#> blockResult "Figure element"
+    =#> blockResult "Figure object"
+    #? "Creates a [[Figure]] element."
 
   , defun "Header"
     ### liftPure3 (\lvl content mattr ->
@@ -377,40 +383,47 @@ blockConstructors =
     <#> parameter peekInlinesFuzzy "Inlines" "content" "inline content"
     <#> optAttrParam
     =#> blockResult "Header element"
+    #? "Creates a header element."
 
   , defun "HorizontalRule"
     ### return HorizontalRule
     =#> blockResult "HorizontalRule element"
+    #? "Creates a horizontal rule."
 
   , defun "LineBlock"
     ### liftPure LineBlock
     <#> parameter (peekList peekInlinesFuzzy) "{Inlines,...}" "content" "lines"
     =#> blockResult "LineBlock element"
+    #? "Creates a line block element."
 
   , defun "OrderedList"
     ### liftPure2 (\items mListAttrib ->
                      let defListAttrib = (1, DefaultStyle, DefaultDelim)
                      in OrderedList (fromMaybe defListAttrib mListAttrib) items)
-    <#> blockItemsParam "ordered list items"
+    <#> blockItemsParam "list items"
     <#> opt (parameter peekListAttributes "ListAttributes" "listAttributes"
-                       "specifier for the list's numbering")
+                       "list parameters")
     =#> blockResult "OrderedList element"
+    #? "Creates an ordered list."
 
   , defun "Para"
     ### liftPure Para
-    <#> parameter peekInlinesFuzzy "Inlines" "content" "paragraph content"
+    <#> parameter peekInlinesFuzzy "Inlines" "content" "inline content"
     =#> blockResult "Para element"
+    #? "Creates a para element."
 
   , defun "Plain"
     ### liftPure Plain
-    <#> parameter peekInlinesFuzzy "Inlines" "content" "paragraph content"
+    <#> parameter peekInlinesFuzzy "Inlines" "content" "inline content"
     =#> blockResult "Plain element"
+    #? "Creates a plain element."
 
   , defun "RawBlock"
     ### liftPure2 RawBlock
-    <#> parameter peekFormat "Format" "format" "format of content"
+    <#> parameter peekFormat "string" "format" "format of content"
     <#> textParam "text" "raw content"
     =#> blockResult "RawBlock element"
+    #? "Creates a raw content block of the specified format."
 
   , defun "Table"
     ### (\capt colspecs thead tbodies tfoot mattr ->
@@ -426,23 +439,27 @@ blockConstructors =
     <#> parameter peekTableFoot "TableFoot" "foot" "table foot"
     <#> optAttrParam
     =#> blockResult "Table element"
+    #? "Creates a table element."
   ]
  where
   blockResult = functionResult pushBlock "Block"
   blocksParam = parameter peekBlocksFuzzy "Blocks" "content" "block content"
-  blockItemsParam = parameter peekItemsFuzzy "List of Blocks" "content"
+  blockItemsParam = parameter peekItemsFuzzy "{Blocks,...}" "items"
   peekItemsFuzzy idx = peekList peekBlocksFuzzy idx
     <|> ((:[]) <$!> peekBlocksFuzzy idx)
 
-  optAttrParam = opt (parameter peekAttr "Attr" "attr" "additional attributes")
+  optAttrParam = opt (parameter peekAttr "Attr" "attr" "element attributes")
 
 
 -- | Constructor for a list of `Block` values.
 mkBlocks :: LuaError e => DocumentedFunction e
 mkBlocks = defun "Blocks"
   ### liftPure id
-  <#> parameter peekBlocksFuzzy "Blocks" "blocks" "block elements"
+  <#> parameter peekBlocksFuzzy "Blocks" "block_like_elements"
+      ("List where each element can be treated as a [[Block]] value, " <>
+       "or a single such value.")
   =#> functionResult pushBlocks "Blocks" "list of block elements"
+  #? "Creates a [[Blocks]] list."
 
 --
 -- walk

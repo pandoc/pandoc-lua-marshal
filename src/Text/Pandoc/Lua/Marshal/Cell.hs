@@ -111,9 +111,13 @@ mkCell = defun "Cell"
                   (maybe 1 RowSpan mRowSpan)
                   (maybe 1 ColSpan mColSpan)
                   blocks)
-  <#> parameter peekBlocksFuzzy "Blocks" "blocks" "document contents"
-  <#> opt (parameter peekAlignment "integer" "align" "cell alignment")
-  <#> opt (parameter peekIntegral "integer" "row_span" "rows to span")
-  <#> opt (parameter peekIntegral "integer" "col_span" "columns to span")
+  <#> parameter peekBlocksFuzzy "Blocks" "blocks" "cell contents"
+  <#> opt (parameter peekAlignment "Alignment" "align"
+           "text alignment; defaults to `AlignDefault`")
+  <#> opt (parameter peekIntegral "integer" "rowspan"
+           "number of rows occupied by the cell; defaults to `1`")
+  <#> opt (parameter peekIntegral "integer" "colspan"
+           "number of columns occupied by the cell; defaults to `1`")
   <#> opt (parameter peekAttr "Attr" "attr" "cell attributes")
   =#> functionResult pushCell "Cell" "new Cell object"
+  #? "Create a new table cell."

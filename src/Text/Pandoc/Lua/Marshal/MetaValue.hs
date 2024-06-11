@@ -83,6 +83,11 @@ metaValueConstructors =
     ### liftPure MetaBlocks
     <#> parameter peekBlocksFuzzy "Blocks" "content" "block content"
     =#> functionResult pushMetaValue "Blocks" "list of Block elements"
+    #? T.unlines
+    [ "Creates a value to be used as a MetaBlocks value in meta"
+    , "data; creates a copy of the input list via `pandoc.Blocks`,"
+    , "discarding all non-list keys."
+    ]
 
   , defun "MetaBool"
     ### liftPure MetaBool
@@ -93,21 +98,41 @@ metaValueConstructors =
     ### liftPure MetaInlines
     <#> parameter peekInlinesFuzzy "Inlines" "inlines" "inline elements"
     =#> functionResult pushMetaValue "Inlines" "list of Inline elements"
+    #? T.unlines
+    [ "Creates a value to be used as a MetaInlines value in meta"
+    , "data; creates a copy of the input list via `pandoc.Inlines`,"
+    , "discarding all non-list keys."
+    ]
 
   , defun "MetaList"
     ### liftPure MetaList
     <#> parameter (peekList peekMetaValue) "MetaValue|{MetaValue,...}"
           "values" "value, or list of values"
     =#> functionResult pushMetaValue "List" "list of meta values"
+    #? T.unlines
+    [ "Creates a value to be used as a MetaList in meta data;"
+    , "creates a copy of the input list via `pandoc.List`,"
+    , "discarding all non-list keys."
+    ]
 
   , defun "MetaMap"
     ### liftPure MetaMap
-    <#> parameter (peekMap peekText peekMetaValue) "table" "map"
-          "string-indexed table"
+    <#> parameter (peekMap peekText peekMetaValue) "table" "key_value_map"
+          "a string-indexed map of meta values"
     =#> functionResult pushMetaValue "table" "map of meta values"
+    #? T.unlines
+    [ "Creates a value to be used as a MetaMap in meta data; creates"
+    , "a copy of the input table, keeping only pairs with string"
+    , "keys and discards all other keys."
+    ]
 
   , defun "MetaString"
     ### liftPure MetaString
     <#> textParam "s" "string value"
     =#> functionResult pushMetaValue "string" "unchanged input"
+    #? T.unlines
+    [ "Creates a value to be used as a MetaString in meta data; this"
+    , "is the identity function for boolean values and exists only"
+    , "for completeness."
+    ]
   ]

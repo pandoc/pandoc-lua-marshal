@@ -93,6 +93,8 @@ mkRow = defun "Row"
   ### liftPure2 (\mCells mAttr -> Row
                   (fromMaybe nullAttr mAttr)
                   (fromMaybe [] mCells))
-  <#> opt (parameter (peekList peekCellFuzzy) "{Cell,...}" "cells" "row cells")
-  <#> opt (parameter peekAttr "Attr" "attr" "cell attributes")
+  <#> opt (parameter (peekList peekCellFuzzy) "{Cell,...}" "cells"
+           "list of table cells in this row")
+  <#> opt (parameter peekAttr "Attr" "attr" "row attributes")
   =#> functionResult pushRow "Row" "new Row object"
+  #? "Creates a table row."

@@ -229,7 +229,8 @@ peekAttrTable idx = do
 -- | Constructor for 'Attr'.
 mkAttr :: LuaError e => DocumentedFunction e
 mkAttr = defun "Attr"
-  ### (ltype (nthBottom 1) >>= \case
+  ### (\_ _ _ ->
+        ltype (nthBottom 1) >>= \case
           TypeString -> forcePeek $ do
             mident <- optional (peekText (nthBottom 1))
             mclass <- optional (peekList peekText (nthBottom 2))
@@ -244,7 +245,12 @@ mkAttr = defun "Attr"
           TypeNil    -> pure nullAttr
           TypeNone   -> pure nullAttr
           x          -> failLua $ "Cannot create Attr from " ++ show x)
+  <#> opt (parameter pure "string|table|Attr" "identifier" "element identifier")
+  <#> opt (parameter pure "{string,...}" "classes" "element classes")
+  <#> opt (parameter pure "table|AttributeList" "attributes"
+           "table containing string keys and values")
   =#> functionResult pushAttr "Attr" "new Attr object"
+  #? "Create a new set of attributes"
 
 -- | Constructor for 'AttributeList'.
 mkAttributeList :: LuaError e => DocumentedFunction e

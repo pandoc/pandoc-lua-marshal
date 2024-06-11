@@ -25,6 +25,7 @@ import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
 import Text.Pandoc.Lua.Marshal.Inline (peekInlinesFuzzy, pushInlines)
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Definition
+import qualified Data.Text as T
 
 -- | A simple (legacy-style) table.
 data SimpleTable = SimpleTable
@@ -95,6 +96,26 @@ mkSimpleTable = defun "SimpleTable"
         "relative column widths"
   <#> parameter peekRow "{Blocks,...}" "header"
         "table header row"
-  <#> parameter (peekList peekRow) "{{Blocks,...},...}" "body"
-        "table body rows"
+  <#> parameter (peekList peekRow) "{{Blocks,...},...}" "rows"
+        "table rows"
   =#> functionResult pushSimpleTable "SimpleTable" "new SimpleTable object"
+  #? T.unlines
+  [ "Usage:"
+  , " "
+  , "    local caption = \"Overview\""
+  , "    local aligns = {pandoc.AlignDefault, pandoc.AlignDefault}"
+  , "    local widths = {0, 0} -- let pandoc determine col widths"
+  , "    local headers = {{pandoc.Plain({pandoc.Str \"Language\"})},"
+  , "                     {pandoc.Plain({pandoc.Str \"Typing\"})}}"
+  , "    local rows = {"
+  , "      {{pandoc.Plain \"Haskell\"}, {pandoc.Plain \"static\"}},"
+  , "      {{pandoc.Plain \"Lua\"}, {pandoc.Plain \"Dynamic\"}},"
+  , "    }"
+  , "    simple_table = pandoc.SimpleTable("
+  , "      caption,"
+  , "      aligns,"
+  , "      widths,"
+  , "      headers,"
+  , "      rows"
+  , "    )"
+  ]
