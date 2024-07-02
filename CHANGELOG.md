@@ -2,6 +2,16 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.7.1
+
+Released 2024-07-02.
+
+-   Relaxed the upper bound of tasty-quickcheck, used in tests.
+    Now allows version 0.11.
+
+-   Update documentation on constructors; the descriptions now
+    match those in the pandoc docs.
+
 ## 0.2.7
 
 Released 2024-05-06.
