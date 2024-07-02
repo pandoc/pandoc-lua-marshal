@@ -30,6 +30,8 @@ data TraversalNode
   | TBlocks [Block]
   | TInline Inline
   | TInlines [Inline]
+  -- | TRow Row
+  | TCell Cell
 
 -- | Type used to traverse a 'Pandoc' AST from top to bottom, i.e.,
 -- processing the root element first and then continue towards the
@@ -56,6 +58,8 @@ nodeBlocks = \case
   TBlock x    -> [x]
   TInlines xs -> [Plain xs]
   TInline x   -> [Plain [x]]
+  TCell c     -> let Cell _attr _align _rowspan _colspan blks = c
+                 in blks
 
 -- | Creates a topdown-walking function for a list of elements.
 walkTopdownM :: (Monad m, Walkable Topdown a)

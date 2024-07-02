@@ -16,6 +16,7 @@ import Prelude hiding (lookup)
 import Control.Monad ((>=>))
 import HsLua
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Cell
 import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
 import Text.Pandoc.Lua.Marshal.Filter
 import Text.Pandoc.Definition
@@ -82,3 +83,11 @@ applyFilterTopdown filter' topdown@(Topdown _ node) =
           (inlines, ctrl) <-
             applyStraightFunction fn pushInlines peekInlinesFuzzy xs
           pure $ Topdown ctrl $ TInlines inlines
+    TCell c ->
+      case "Cell" `lookup` filter' of
+        Nothing ->
+          pure topdown
+        Just fn -> do
+          (cell, ctrl) <-
+            applyStraightFunction fn pushCell peekCellFuzzy c
+          pure $ Topdown ctrl $ TCell cell
