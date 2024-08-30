@@ -266,8 +266,31 @@ typeInline = deftype "Inline"
       (pushText, getInlineText)
       (peekText, setInlineText)
 
+  , readonly "xtag" "type of Inline"
+      (pushText, \case
+          Cite{}        -> "Cite"
+          Code{}        -> "Code"
+          Emph{}        -> "Emph"
+          Image{}       -> "Image"
+          LineBreak{}   -> "LineBreak"
+          Link{}        -> "Link"
+          Math{}        -> "Math"
+          Note{}        -> "Note"
+          Quoted{}      -> "Quoted"
+          RawInline{}   -> "RawInline"
+          SmallCaps{}   -> "SmallCaps"
+          SoftBreak{}   -> "SoftBreak"
+          Space{}       -> "Space"
+          Span{}        -> "Span"
+          Strikeout{}   -> "Strikeout"
+          Strong{}      -> "Strong"
+          Str{}         -> "Str"
+          Subscript{}   -> "Subscript"
+          Superscript{} -> "Superscript"
+          Underline{}   -> "Underline")
+
   , readonly "tag" "type of Inline"
-      (pushString, showConstr . toConstr )
+      (pushString, showConstr . toConstr)
 
   , alias "t" "tag" ["tag"]
   , alias "c" "content" ["content"]
