@@ -1,6 +1,6 @@
 resolver: lts-20.6
 extra-deps:
-  - hslua-list-1.1.0
+  - hslua-list-1.1.2
   - pandoc-types-1.23
 ghc-options:
   "$locals": -fhide-source-paths
