@@ -2,6 +2,13 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.8
+
+Released 2024-09-21.
+
+-   Update list module, thereby introducing a new method `at` and
+    an extended constructor for List types.
+
 ## 0.2.7.1
 
 Released 2024-07-02.
