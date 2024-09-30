@@ -103,11 +103,31 @@ pushInlines xs = do
   setmetatable (nth 2)
 {-# INLINABLE pushInlines #-}
 
+-- | Unmarshal a value as Inline object by first calling the @__toinline@
+-- metamethod on that object.
+peekInlineMetamethod :: LuaError e
+                    => Peeker e Inline
+peekInlineMetamethod idx = do
+  absidx <- liftLua $ absindex idx
+  liftLua (getmetafield absidx "__toinline") >>= \case
+    TypeNil      -> failPeek "object has no __toinline metamethod"
+    TypeFunction -> do
+      liftLua (pushvalue absidx)
+      liftLua (pcall 1 1 Nothing) >>= \case
+        OK   -> peekInline top `lastly` pop 1
+        _err -> do
+          msg <- peekByteString top `lastly` pop 1
+          failPeek $ "failure in __toinline: " <> msg
+    _otherType   -> do
+      liftLua (pop 1)   -- drop "__toinline" field
+      failPeek "__toinline metafield does not contain a function"
+
 -- | Try extra hard to retrieve an Inline value from the stack. Treats
 -- bare strings as @Str@ values.
 peekInlineFuzzy :: LuaError e => Peeker e Inline
 peekInlineFuzzy idx = retrieving "Inline" $ liftLua (ltype idx) >>= \case
   TypeString   -> Str <$!> peekText idx
+  TypeTable    -> peekInlineMetamethod idx <|> peekInline idx
   _            -> peekInline idx
 {-# INLINABLE peekInlineFuzzy #-}
 

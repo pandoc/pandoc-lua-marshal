@@ -457,5 +457,46 @@ return {
         table.concat(names, ', ')
       )
     end),
+  },
+
+  group 'marshalling' {
+    test('bare strings become Str values', function ()
+      assert.are_equal(Inlines{'a'}, Inlines{Str 'a'})
+    end),
+
+    group '__toinline metamethod' {
+      test('metamethod __toinline is called when available', function ()
+        local function toinline (t)
+          return Code(t.code, {id = t.id, class = t.class})
+        end
+        local my_code = setmetatable(
+          {code = 'open access', id='opn'},
+          {__toinline = toinline}
+        )
+        assert.are_equal(
+          Inlines{Code('open access', {'opn'})},
+          Inlines{my_code}
+        )
+      end),
+
+      test("metafield is ignored if it's not a function", function ()
+        local bad_inline = setmetatable({'a'}, {__toinline = true})
+        assert.are_equal(
+          Inlines({'a'}),
+          Inlines(bad_inline)
+        )
+      end),
+
+      test("non-Inline return values are ignored", function ()
+        local function toinline ()
+          return "not an inline"
+        end
+        local bad_inline = setmetatable({'a'}, {__toinline = toinline})
+        assert.are_equal(
+          Inlines({'a'}),
+          Inlines(bad_inline)
+        )
+      end),
+    }
   }
 }
