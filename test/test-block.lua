@@ -670,5 +670,46 @@ return {
         names
       )
     end),
+  },
+
+  group 'Block marshalling' {
+    test('Inlines are unmarshalled as Plain', function ()
+      assert.are_equal(Blocks{Plain{'a'}}, Blocks{Inlines{Str 'a'}})
+    end),
+
+    group '__toblock metamethod' {
+      test('metamethod __toblock is called when available', function ()
+        local function toblock (t)
+          return CodeBlock(t.code, {id = t.id, class = t.class})
+        end
+        local my_code = setmetatable(
+          {code = 'open access', id='opn'},
+          {__toblock = toblock}
+        )
+        assert.are_equal(
+          Div{CodeBlock('open access', {'opn'})},
+          Div{my_code}
+        )
+      end),
+
+      test("metafield is ignored if it's not a function", function ()
+        local bad_block = setmetatable({'a'}, {__toblock = true})
+        assert.are_equal(
+          Blocks{Plain{'a'}, Plain{'b'}},
+          Blocks{bad_block, {'b'}}
+        )
+      end),
+
+      test("non-Block return values are ignored", function ()
+        local function toblock ()
+          return "not a block"
+        end
+        local bad_block = setmetatable({'a'}, {__toblock = toblock})
+        assert.are_equal(
+          Blocks{Plain{'b'}, Plain{'a'}},
+          Blocks{Plain{'b'}, bad_block}
+        )
+      end),
+    }
   }
 }

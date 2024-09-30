@@ -109,12 +109,32 @@ pushBlocks xs = do
   setmetatable (nth 2)
 {-# INLINABLE pushBlocks #-}
 
+-- | Unmarshal a table as Block value by calling the @__toblock@ metamethod
+-- first.
+peekBlockMetamethod :: LuaError e
+                    => Peeker e Block
+peekBlockMetamethod idx = do
+  absidx <- liftLua $ absindex idx
+  liftLua (getmetafield absidx "__toblock") >>= \case
+    TypeNil      -> failPeek "object has no __toblock metamethod"
+    TypeFunction -> do
+      liftLua (pushvalue absidx)
+      liftLua (pcall 1 1 Nothing) >>= \case
+        OK   -> peekBlock top `lastly` pop 1
+        _err -> do
+          msg <- peekByteString top `lastly` pop 1
+          failPeek $ "failure in __toblock: " <> msg
+    _otherType   -> do
+      liftLua (pop 1)   -- drop "__toblock" field
+      failPeek "__toblock metafield does not contain a function"
+
 -- | Try extra hard to retrieve an Block value from the stack. Treats
 -- bare strings as @Str@ values.
 peekBlockFuzzy :: LuaError e
                => Peeker e Block
 peekBlockFuzzy idx =
        peekBlock idx
+  <|> peekBlockMetamethod idx
   <|> (Plain <$!> peekInlinesFuzzy idx)
   <|> (failPeek =<<
        typeMismatchMessage "Block or list of Inlines" idx)
