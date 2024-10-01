@@ -128,7 +128,7 @@ peekInlineFuzzy :: LuaError e => Peeker e Inline
 peekInlineFuzzy idx = retrieving "Inline" $ liftLua (ltype idx) >>= \case
   TypeString   -> Str <$!> peekText idx
   TypeTable    -> peekInlineMetamethod idx <|> peekInline idx
-  _            -> peekInline idx
+  _            -> peekInline idx <|> peekInlineMetamethod idx
 {-# INLINABLE peekInlineFuzzy #-}
 
 -- | Try extra-hard to return the value at the given index as a list of
