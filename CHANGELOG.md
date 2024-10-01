@@ -2,6 +2,19 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.2.9
+
+Released 2024-10-01.
+
+-   Update list module, thereby introducing a new method `iter`;
+    the function returns an iterator that steps through list
+    values on each call.
+
+-   Added support for `__toinline` and `__toblock` metamethods. If
+    the metamethods are available on a Lua object and return an
+    appropriate value, then that returned value will be used
+    during unmarshalling.
+
 ## 0.2.8
 
 Released 2024-09-21.
