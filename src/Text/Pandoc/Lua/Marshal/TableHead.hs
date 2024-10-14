@@ -32,7 +32,7 @@ peekTableHead = peekUD typeTableHead
 
 -- | Row object type.
 typeTableHead :: LuaError e => DocumentedType e TableHead
-typeTableHead = deftype "pandoc TableHead"
+typeTableHead = deftype "TableHead"
   [ operation Eq $ defun "__eq"
      ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
      <#> parameter (optional . peekTableHead) "TableHead" "self" ""

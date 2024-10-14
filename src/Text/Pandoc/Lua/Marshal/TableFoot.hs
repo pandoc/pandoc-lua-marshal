@@ -32,7 +32,7 @@ peekTableFoot = peekUD typeTableFoot
 
 -- | Row object type.
 typeTableFoot :: LuaError e => DocumentedType e TableFoot
-typeTableFoot = deftype "pandoc TableFoot"
+typeTableFoot = deftype "TableFoot"
   [ operation Eq $ defun "__eq"
      ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
      <#> parameter (optional . peekTableFoot) "TableFoot" "self" ""

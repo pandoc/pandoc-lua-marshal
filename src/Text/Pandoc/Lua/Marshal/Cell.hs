@@ -54,7 +54,7 @@ peekCellFuzzy idx = liftLua (ltype idx) >>= \case
 
 -- | Cell object type.
 typeCell :: LuaError e => DocumentedType e Cell
-typeCell = deftype "pandoc Cell"
+typeCell = deftype "Cell"
   [ operation Eq $ defun "__eq"
      ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
      <#> parameter (optional . peekCell) "Cell" "self" ""

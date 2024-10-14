@@ -47,7 +47,7 @@ peekRowFuzzy idx = liftLua (ltype idx) >>= \case
 
 -- | Row object type.
 typeRow :: LuaError e => DocumentedType e Row
-typeRow = deftype "pandoc Row"
+typeRow = deftype "Row"
   [ operation Eq $ defun "__eq"
      ### liftPure2 (\a b -> fromMaybe False ((==) <$> a <*> b))
      <#> parameter (optional . peekRow) "Row" "self" ""
