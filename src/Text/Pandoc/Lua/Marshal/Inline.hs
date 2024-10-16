@@ -27,19 +27,19 @@ module Text.Pandoc.Lua.Marshal.Inline
   ) where
 
 import Control.Applicative ((<|>), optional)
-import Control.Monad.Catch (throwM)
 import Control.Monad ((<$!>))
 import Data.Aeson (encode)
 import Data.Data (showConstr, toConstr)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
-import HsLua
+import HsLua hiding (peek, push)
+import HsLua.Typing (TypeSpec, stringType)
+import HsLua.Core.Utf8 as Utf8
+import HsLua.ObjectOrientation.SumType
 import Text.Pandoc.Definition (Inline (..), nullAttr)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
-import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy)
+import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
 import Text.Pandoc.Lua.Marshal.Citation (peekCitation, pushCitation)
-import Text.Pandoc.Lua.Marshal.Content
-  ( Content (..), contentTypeDescription, peekContent, pushContent )
 import Text.Pandoc.Lua.Marshal.Filter (Filter, peekFilter)
 import Text.Pandoc.Lua.Marshal.Format (peekFormat, pushFormat)
 import Text.Pandoc.Lua.Marshal.List (pushPandocList, newListMetatable)
@@ -52,7 +52,9 @@ import qualified Text.Pandoc.Builder as B
 
 -- | Pushes an Inline value as userdata object.
 pushInline :: LuaError e => Pusher e Inline
-pushInline = pushUD typeInline
+pushInline inlns = do
+  pushUD typeInline inlns
+
 {-# INLINE pushInline #-}
 
 -- | Retrieves an Inline value.
@@ -146,9 +148,200 @@ peekInlinesFuzzy idx = liftLua (ltype idx) >>= \case
                   typeMismatchMessage "Inline, list of Inlines, or string" idx
 {-# INLINABLE peekInlinesFuzzy #-}
 
+defprop
+  :: LuaError e
+  => Name                               -- ^ property name
+  -> TypeSpec                           -- ^ type of the property value
+  -> Text                               -- ^ property description
+  -> (Pusher e b, a -> Possible b)      -- ^ how to get the property value
+  -> (Peeker e b, a -> b -> Possible a) -- ^ how to set a new property value
+  -> Property e a
+defprop name typespec desc (push, get) (peek, set) =
+  Property
+  { propertyGet = \x -> do
+      case get x of
+        Actual y -> NumResults 1 <$ push y
+        Absent   -> return (NumResults 0)
+  , propertySet = Just $ \idx x -> do
+      value  <- forcePeek $ peek idx
+      case set x value of
+        Actual y -> return y
+        Absent   -> failLua $ "Trying to set unavailable property "
+                            <> Utf8.toString (fromName name)
+                            <> "."
+  , propertyType = typespec
+  , propertyDescription = desc
+  }
+
+-- | @attr@ property
+attrProperty :: LuaError e => Property e Inline
+attrProperty = defprop "attr"
+  "Attr"
+  "element attributes"
+  (pushAttr, \case
+      Code attr _    -> Actual attr
+      Image attr _ _ -> Actual attr
+      Link attr _ _  -> Actual attr
+      Span attr _    -> Actual attr
+      _withoutAttr   -> Absent)
+  (peekAttr, \case
+      Code _ cs       -> Actual . (`Code` cs)
+      Image _ cpt tgt -> Actual . \attr -> Image attr cpt tgt
+      Link _ cpt tgt  -> Actual . \attr -> Link attr cpt tgt
+      Span _ inlns    -> Actual . (`Span` inlns)
+      _withoutAttr    -> const Absent)
+
+-- | Accessors for citations
+citationsProperty :: LuaError e => Property e Inline
+citationsProperty = defprop "citations"
+  "{Citation,...}"
+  "list of citations"
+  (pushPandocList pushCitation, \case
+      Cite cs _    -> Actual cs
+      _noCitations -> Absent)
+  (peekList peekCitation, \case
+      Cite _ inlns -> Actual . (`Cite` inlns)
+      _noCitations -> const Absent)
+
+-- | @format@ property
+formatProperty :: LuaError e => Property e Inline
+formatProperty = defprop "format"
+  "string"
+  "format of raw text"
+  (pushFormat, \case
+      RawInline fmt _ -> Actual fmt
+      _               -> Absent)
+  (peekFormat, \case
+      RawInline _ txt -> Actual . (`RawInline` txt)
+      _               -> const Absent)
+
+
+--
+-- Content property (Inlines)
+--
+
+-- | Inlines element content
+blocksContentProperty :: LuaError e => Property e Inline
+blocksContentProperty = defprop "content"
+  "Blocks"
+  "Blocks content"
+  (pushBlocks, \case
+      Note blks    -> Actual blks
+      _otherInline -> Absent)
+  (peekBlocksFuzzy, \case
+      Note _       -> Actual . Note
+      _otherInline -> const Absent)
+
+-- | Inlines element content
+inlinesContentProperty :: LuaError e => Property e Inline
+inlinesContentProperty = defprop "content"
+  "Inlines"
+  "inlines content"
+  (pushInlines, \case
+      Cite _ inlns      -> Actual inlns
+      Emph inlns        -> Actual inlns
+      Link _ inlns _    -> Actual inlns
+      Quoted _ inlns    -> Actual inlns
+      SmallCaps inlns   -> Actual inlns
+      Span _ inlns      -> Actual inlns
+      Strikeout inlns   -> Actual inlns
+      Strong inlns      -> Actual inlns
+      Subscript inlns   -> Actual inlns
+      Superscript inlns -> Actual inlns
+      Underline inlns   -> Actual inlns
+      _otherInline      -> Absent)
+  (peekInlinesFuzzy, \case
+      Cite cs _     -> Actual . Cite cs
+      Emph _        -> Actual . Emph
+      Link a _ tgt  -> Actual . (\inlns -> Link a inlns tgt)
+      Quoted qt _   -> Actual . Quoted qt
+      SmallCaps _   -> Actual . SmallCaps
+      Span attr _   -> Actual . Span attr
+      Strikeout _   -> Actual . Strikeout
+      Strong _      -> Actual . Strong
+      Subscript _   -> Actual . Subscript
+      Superscript _ -> Actual . Superscript
+      Underline _   -> Actual . Underline
+      _otherInline  -> const Absent)
+
+-- | @quotetype@ property
+quotetypeProperty :: LuaError e => Property e Inline
+quotetypeProperty = defprop "quotetype"
+  "string"
+  "type of quotes (single or double)"
+  (pushQuoteType, \case
+      Quoted qt _     -> Actual qt
+      _               -> Absent)
+  (peekQuoteType, \case
+      Quoted _ inlns  -> Actual . (`Quoted` inlns)
+      _               -> const Absent)
+
+-- | @text@ property
+textProperty :: LuaError e => Property e Inline
+textProperty = defprop "text"
+  "string"
+  "text content"
+  (pushText, \case
+      Code _ lst      -> Actual lst
+      Math _ str      -> Actual str
+      RawInline _ raw -> Actual raw
+      Str s           -> Actual s
+      _withoutText    -> Absent)
+  (peekText, \case
+      Code attr _     -> Actual . Code attr
+      Math mt _       -> Actual . Math mt
+      RawInline f _   -> Actual . RawInline f
+      Str _           -> Actual . Str
+      _withoutText    -> const Absent)
+
+--   , possibleProperty "caption" "image caption"
+--       (pushInlines, \case
+--           Image _ capt _ -> Actual capt
+--           _              -> Absent)
+--       (peekInlinesFuzzy, \case
+--           Image attr _ target -> Actual . (\capt -> Image attr capt target)
+--           _                   -> const Absent)
+
+--   , possibleProperty "target" "link target URL"
+--       (pushText, \case
+--           Link _ _ (tgt, _) -> Actual tgt
+--           _                 -> Absent)
+--       (peekText, \case
+--           Link attr capt (_, title) -> Actual . Link attr capt . (,title)
+--           _                         -> const Absent)
+
+titleProperty :: LuaError e => Property e Inline
+titleProperty = defprop "title"
+  stringType
+  "title text"
+  (pushText, \case
+      Image _ _ (_, tit) -> Actual tit
+      Link _ _ (_, tit)  -> Actual tit
+      _                  -> Absent)
+  (peekText, \case
+      Image attr capt (src, _) -> Actual . Image attr capt . (src,)
+      Link attr capt (src, _)  -> Actual . Link attr capt . (src,)
+      _                        -> const Absent)
+
+-- | Userdata type for objects that have the same type but different
+-- behavior.
+type DocumentedSumType e a = UDSumTypeGeneric e (DocumentedFunction e) a
+
+-- | Defines a new type, defining the behavior of objects in Lua.
+-- Note that the type name must be unique.
+defsumtype
+  :: LuaError e
+  => Name                                 -- ^ type name
+  -> [(Operation, DocumentedFunction e)]  -- ^ operations
+  -> [Member e (DocumentedFunction e) a]  -- ^ methods
+  -> (a -> Name)
+  -> [Constructor e a]                    -- ^ sum-type definitions
+  -> DocumentedSumType e a
+defsumtype = defsumtypeGeneric pushDocumentedFunction
+
 -- | Inline object type.
-typeInline :: forall e. LuaError e => DocumentedType e Inline
-typeInline = deftype "Inline"
+typeInline :: forall e. LuaError e => DocumentedSumType e Inline
+typeInline = defsumtype "Inline"
   [ operation Tostring $ lambda
     ### liftPure (show @Inline)
     <#> parameter peekInline "inline" "Inline" "Object"
@@ -163,140 +356,14 @@ typeInline = deftype "Inline"
     <#> udparam typeInline "self" ""
     =#> functionResult pushLazyByteString "string" "JSON representation"
   ]
-  [ possibleProperty "attr" "element attributes"
-      (pushAttr, \case
-          Code attr _    -> Actual attr
-          Image attr _ _ -> Actual attr
-          Link attr _ _  -> Actual attr
-          Span attr _    -> Actual attr
-          _              -> Absent)
-      (peekAttr, \case
-          Code _ cs       -> Actual . (`Code` cs)
-          Image _ cpt tgt -> Actual . \attr -> Image attr cpt tgt
-          Link _ cpt tgt  -> Actual . \attr -> Link attr cpt tgt
-          Span _ inlns    -> Actual . (`Span` inlns)
-          _               -> const Absent)
-
-  , possibleProperty "caption" "image caption"
-      (pushInlines, \case
-          Image _ capt _ -> Actual capt
-          _              -> Absent)
-      (peekInlinesFuzzy, \case
-          Image attr _ target -> Actual . (\capt -> Image attr capt target)
-          _                   -> const Absent)
-
-  , possibleProperty "citations" "list of citations"
-      (pushPandocList pushCitation, \case
-          Cite cs _    -> Actual cs
-          _            -> Absent)
-      (peekList peekCitation, \case
-          Cite _ inlns -> Actual . (`Cite` inlns)
-          _            -> const Absent)
-
-  , possibleProperty "content" "element contents"
-      (pushContent, \case
-          Cite _ inlns      -> Actual $ ContentInlines inlns
-          Emph inlns        -> Actual $ ContentInlines inlns
-          Link _ inlns _    -> Actual $ ContentInlines inlns
-          Quoted _ inlns    -> Actual $ ContentInlines inlns
-          SmallCaps inlns   -> Actual $ ContentInlines inlns
-          Span _ inlns      -> Actual $ ContentInlines inlns
-          Strikeout inlns   -> Actual $ ContentInlines inlns
-          Strong inlns      -> Actual $ ContentInlines inlns
-          Subscript inlns   -> Actual $ ContentInlines inlns
-          Superscript inlns -> Actual $ ContentInlines inlns
-          Underline inlns   -> Actual $ ContentInlines inlns
-          Note blks         -> Actual $ ContentBlocks blks
-          _                 -> Absent)
-      (peekContent,
-        let inlineContent = \case
-              ContentInlines inlns -> inlns
-              c -> throwM . luaException @e $
-                   "expected Inlines, got " <> contentTypeDescription c
-            blockContent = \case
-              ContentBlocks blks -> blks
-              ContentInlines []  -> []
-              c -> throwM . luaException @e $
-                   "expected Blocks, got " <> contentTypeDescription c
-        in \case
-          -- inline content
-          Cite cs _     -> Actual . Cite cs . inlineContent
-          Emph _        -> Actual . Emph . inlineContent
-          Link a _ tgt  -> Actual . (\inlns -> Link a inlns tgt) . inlineContent
-          Quoted qt _   -> Actual . Quoted qt . inlineContent
-          SmallCaps _   -> Actual . SmallCaps . inlineContent
-          Span attr _   -> Actual . Span attr . inlineContent
-          Strikeout _   -> Actual . Strikeout . inlineContent
-          Strong _      -> Actual . Strong . inlineContent
-          Subscript _   -> Actual . Subscript . inlineContent
-          Superscript _ -> Actual . Superscript . inlineContent
-          Underline _   -> Actual . Underline . inlineContent
-          -- block content
-          Note _        -> Actual . Note . blockContent
-          _             -> const Absent
-      )
-
-  , possibleProperty "format" "format of raw text"
-      (pushFormat, \case
-          RawInline fmt _ -> Actual fmt
-          _               -> Absent)
-      (peekFormat, \case
-          RawInline _ txt -> Actual . (`RawInline` txt)
-          _               -> const Absent)
-
-  , possibleProperty "mathtype" "math rendering method"
-      (pushMathType, \case
-          Math mt _  -> Actual mt
-          _          -> Absent)
-      (peekMathType, \case
-          Math _ txt -> Actual . (`Math` txt)
-          _          -> const Absent)
-
-  , possibleProperty "quotetype" "type of quotes (single or double)"
-      (pushQuoteType, \case
-          Quoted qt _     -> Actual qt
-          _               -> Absent)
-      (peekQuoteType, \case
-          Quoted _ inlns  -> Actual . (`Quoted` inlns)
-          _               -> const Absent)
-
-  , possibleProperty "src" "image source"
-      (pushText, \case
-          Image _ _ (src, _) -> Actual src
-          _                  -> Absent)
-      (peekText, \case
-          Image attr capt (_, title) -> Actual . Image attr capt . (,title)
-          _                          -> const Absent)
-
-  , possibleProperty "target" "link target URL"
-      (pushText, \case
-          Link _ _ (tgt, _) -> Actual tgt
-          _                 -> Absent)
-      (peekText, \case
-          Link attr capt (_, title) -> Actual . Link attr capt . (,title)
-          _                         -> const Absent)
-  , possibleProperty "title" "title text"
-      (pushText, \case
-          Image _ _ (_, tit) -> Actual tit
-          Link _ _ (_, tit)  -> Actual tit
-          _                  -> Absent)
-      (peekText, \case
-          Image attr capt (src, _) -> Actual . Image attr capt . (src,)
-          Link attr capt (src, _)  -> Actual . Link attr capt . (src,)
-          _                        -> const Absent)
-
-  , possibleProperty "text" "text contents"
-      (pushText, getInlineText)
-      (peekText, setInlineText)
-
-  , readonly "tag" "type of Inline"
-      (pushString, showConstr . toConstr )
-
-  , alias "t" "tag" ["tag"]
+  [ alias "t" "tag" ["tag"]
   , alias "c" "content" ["content"]
   , alias "identifier" "element identifier"       ["attr", "identifier"]
   , alias "classes"    "element classes"          ["attr", "classes"]
   , alias "attributes" "other element attributes" ["attr", "attributes"]
+
+  , readonly "tag" "type of Inline"
+      (pushString, showConstr . toConstr)
 
   , method $ defun "clone"
       ### return
@@ -309,28 +376,168 @@ typeInline = deftype "Inline"
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushInline "Inline" "modified element"
   ]
+  (\case
+      Cite{}        -> "Cite"
+      Code{}        -> "Code"
+      Emph{}        -> "Emph"
+      Image{}       -> "Image"
+      LineBreak{}   -> "LineBreak"
+      Link{}        -> "Link"
+      Math{}        -> "Math"
+      Note{}        -> "Note"
+      Quoted{}      -> "Quoted"
+      RawInline{}   -> "RawInline"
+      SmallCaps{}   -> "SmallCaps"
+      SoftBreak{}   -> "SoftBreak"
+      Space{}       -> "Space"
+      Span{}        -> "Span"
+      Strikeout{}   -> "Strikeout"
+      Strong{}      -> "Strong"
+      Str{}         -> "Str"
+      Subscript{}   -> "Subscript"
+      Superscript{} -> "Superscript"
+      Underline{}   -> "Underline")
+  [ defconstructor "Cite"
+      "Citation"
+      [ ("citations", citationsProperty)
+      , ("content", inlinesContentProperty)]
 
---
--- Text
---
+  , defconstructor "Code"
+      "Inline code"
+      [ ("attr", attrProperty)
+      , ("text", textProperty)
+      ]
 
--- | Gets the text property of an Inline, if present.
-getInlineText :: Inline -> Possible Text
-getInlineText = \case
-  Code _ lst      -> Actual lst
-  Math _ str      -> Actual str
-  RawInline _ raw -> Actual raw
-  Str s           -> Actual s
-  _               -> Absent
+  , defconstructor "Emph"
+      "Emphasized text"
+      [ ("content", inlinesContentProperty)
+      ]
 
--- | Sets the text property of an Inline, if present.
-setInlineText :: Inline -> Text -> Possible Inline
-setInlineText = \case
-  Code attr _     -> Actual . Code attr
-  Math mt _       -> Actual . Math mt
-  RawInline f _   -> Actual . RawInline f
-  Str _           -> Actual . Str
-  _               -> const Absent
+  , defconstructor "Image"
+      "Image"
+      [ ("attr", attrProperty)
+      , ("caption", defprop "caption"
+          "Inlines"
+          "inlines content"
+          (pushInlines, \case
+              Image _ inlns _ -> Actual inlns
+              _otherInline    -> Absent)
+          (peekInlinesFuzzy, \case
+              Image a _ tgt -> Actual . (\inlns -> Image a inlns tgt)
+              _otherInline  -> const Absent))
+
+      , ("src", defprop "src"
+          "string"
+          "image source"
+          (pushText, \case
+              Image _ _ (src, _) -> Actual src
+              _                  -> Absent)
+          (peekText, \case
+              Image attr capt (_, title) -> Actual . Image attr capt . (,title)
+              _                          -> const Absent))
+      , ("title", titleProperty)
+      ]
+
+  , defconstructor "LineBreak"
+      "Hard line break"
+      []
+
+  , defconstructor "Link"
+      "Hyperlink"
+      [ ("attr", attrProperty)
+      , ("content", inlinesContentProperty)
+      , ("target", defprop "target"
+          "string"
+          "link target"
+          (pushText, \case
+              Link _ _ (tgt, _) -> Actual tgt
+              _                 -> Absent)
+          (peekText, \case
+              Link attr cs (_, title) -> Actual . Link attr cs . (,title)
+              _                       -> const Absent))
+      , ("title", titleProperty)
+      ]
+
+  , defconstructor "Math"
+      "TeX math"
+      [ ("text", textProperty)
+      , ("mathtype", defprop "mathtype"
+          "string"
+          "math rendering method"
+          (pushMathType, \case
+              Math mt _  -> Actual mt
+              _          -> Absent)
+          (peekMathType, \case
+              Math _ txt -> Actual . (`Math` txt)
+              _          -> const Absent))
+      ]
+
+  , defconstructor "Note"
+      "Footnote"
+      [ ("content", blocksContentProperty)
+      ]
+
+  , defconstructor "Quoted"
+      "Quoted text"
+      [ ("content", inlinesContentProperty)
+      , ("quotetype", quotetypeProperty)
+      ]
+
+  , defconstructor "RawInline"
+      "Raw inline"
+      [ ("text", textProperty)
+      , ("format", formatProperty)
+      ]
+
+  , defconstructor "SmallCaps"
+      "Small caps text"
+      [ ("content", inlinesContentProperty)
+      ]
+
+  , defconstructor "SoftBreak"
+      "Soft line break"
+      []
+
+  , defconstructor "Space"
+      "Inter-word space"
+      []
+
+  , defconstructor "Str"
+      "a string, usually, but not necessarily, without internal whitespace."
+      [ ("text", textProperty)
+      ]
+
+  , defconstructor "Span"
+      "Inlines with extra attributes"
+      [ ("content", inlinesContentProperty)
+      , ("attr"   , attrProperty)
+      ]
+
+  , defconstructor "Strikeout"
+      "Strikeout text"
+      [ ("content", inlinesContentProperty)
+      ]
+
+  , defconstructor "Strong"
+      "Strongly emphasized text"
+      [ ("content", inlinesContentProperty)
+      ]
+
+  , defconstructor "Subscript"
+      "Subscripted text"
+      [ ("content", inlinesContentProperty)
+      ]
+
+  , defconstructor "Superscript"
+      "Superscripted text"
+      [ ("content", inlinesContentProperty)
+      ]
+
+  , defconstructor "Underline"
+      "Underlined text"
+      [ ("content", inlinesContentProperty)
+      ]
+  ]
 
 -- | Constructor functions for 'Inline' elements.
 inlineConstructors :: LuaError e =>  [DocumentedFunction e]

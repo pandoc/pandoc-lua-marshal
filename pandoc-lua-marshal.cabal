@@ -101,7 +101,8 @@ library
                      , Text.Pandoc.Lua.Topdown
                      , Text.Pandoc.Lua.SpliceList
                      , Text.Pandoc.Lua.Walk
-  build-depends:       hslua-list           >= 1.1     && < 1.2
+  build-depends:       hslua-list              >= 1.1     && < 1.2
+                     , hslua-objectorientation >= 2.2      && < 2.4
 
 test-suite pandoc-lua-marshal-test
   import:              common-options
