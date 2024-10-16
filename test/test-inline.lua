@@ -497,6 +497,20 @@ return {
           Inlines(bad_inline)
         )
       end),
+
+      test("objects can be used as singleton lists", function ()
+        local function toinline (t)
+          return Code(t.code, {id = t.id, class = t.class})
+        end
+        local my_code = setmetatable(
+          {code = 'open access', id='opn'},
+          {__toinline = toinline}
+        )
+        assert.are_equal(
+          Inlines(Code('open access', {'opn'})),
+          Inlines(my_code)
+        )
+      end)
     }
   }
 }

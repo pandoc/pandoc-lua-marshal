@@ -710,6 +710,21 @@ return {
           Blocks{Plain{'b'}, bad_block}
         )
       end),
+
+      test('object with metamethod can be used as singleton list', function ()
+        local function toblock (t)
+          return CodeBlock(t.code, {id = t.id, class = t.class})
+        end
+        local my_code = setmetatable(
+          {code = 'open access', id='opn'},
+          {__toblock = toblock}
+        )
+        assert.are_equal(
+          Div(CodeBlock('open access', {'opn'})),
+          Div(my_code)
+        )
+      end),
+
     }
   }
 }

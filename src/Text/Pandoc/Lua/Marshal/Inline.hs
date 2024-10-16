@@ -128,7 +128,9 @@ peekInlineFuzzy :: LuaError e => Peeker e Inline
 peekInlineFuzzy idx = retrieving "Inline" $ liftLua (ltype idx) >>= \case
   TypeString   -> Str <$!> peekText idx
   TypeTable    -> peekInlineMetamethod idx <|> peekInline idx
-  _            -> peekInline idx <|> peekInlineMetamethod idx
+  TypeUserdata -> peekInline idx <|> peekInlineMetamethod idx
+  _type        -> failPeek =<<
+                  typeMismatchMessage "Inline-ish" idx
 {-# INLINABLE peekInlineFuzzy #-}
 
 -- | Try extra-hard to return the value at the given index as a list of
@@ -136,11 +138,12 @@ peekInlineFuzzy idx = retrieving "Inline" $ liftLua (ltype idx) >>= \case
 peekInlinesFuzzy :: LuaError e
                  => Peeker e [Inline]
 peekInlinesFuzzy idx = liftLua (ltype idx) >>= \case
-  TypeString -> B.toList . B.text <$> peekText idx
-  _ ->  peekList peekInlineFuzzy idx
-    <|> (pure <$> peekInlineFuzzy idx)
-    <|> (failPeek =<<
-         typeMismatchMessage "Inline, list of Inlines, or string" idx)
+  TypeString   -> B.toList . B.text <$> peekText idx
+  TypeTable    -> ((:[]) <$> peekInlineMetamethod idx)
+                  <|> peekList peekInlineFuzzy idx
+  TypeUserdata -> ((:[]) <$> peekInlineFuzzy idx)
+  _type        -> failPeek =<<
+                  typeMismatchMessage "Inline, list of Inlines, or string" idx
 {-# INLINABLE peekInlinesFuzzy #-}
 
 -- | Inline object type.

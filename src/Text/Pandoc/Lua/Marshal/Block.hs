@@ -128,7 +128,7 @@ peekBlockMetamethod idx = do
       liftLua (pop 1)   -- drop "__toblock" field
       failPeek "__toblock metafield does not contain a function"
 
--- | Try extra hard to retrieve an Block value from the stack. Treats
+-- | Try extra hard to retrieve a Block value from the stack. Treats
 -- bare strings as @Str@ values.
 peekBlockFuzzy :: LuaError e
                => Peeker e Block
@@ -141,11 +141,12 @@ peekBlockFuzzy idx =
 {-# INLINABLE peekBlockFuzzy #-}
 
 -- | Try extra-hard to return the value at the given index as a list of
--- inlines.
+-- 'Block's.
 peekBlocksFuzzy :: LuaError e
                 => Peeker e [Block]
 peekBlocksFuzzy idx =
-      peekList peekBlockFuzzy idx
+      ((:[]) <$> peekBlockMetamethod idx)
+  <|> peekList peekBlockFuzzy idx
   <|> (pure <$!> peekBlockFuzzy idx)
   <|> (failPeek =<<
        typeMismatchMessage "Block, list of Blocks, or compatible element" idx)
