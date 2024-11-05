@@ -172,6 +172,20 @@ return {
         assert.are_equal(elem, Quoted(DoubleQuote, {'a'}))
       end)
     },
+    group 'RawInline' {
+      test('has property `format`', function ()
+        local elem = RawInline('html', '<mark>nice</mark>')
+        assert.are_same(elem.format, 'html')
+        elem.format = 'html5'
+        assert.are_equal(elem, RawInline('html5', '<mark>nice</mark>'))
+      end),
+      test('has property `text`', function ()
+        local elem = RawInline('html', '<mark>nice</mark>')
+        assert.are_same(elem.text, '<mark>nice</mark>')
+        elem.text = '<var>x</var>'
+        assert.are_equal(elem, RawInline('html', '<var>x</var>'))
+      end)
+    },
     group 'SmallCaps' {
       test('has property `content`', function ()
         local elem = SmallCaps{'two', Space(), 'words'}
