@@ -47,6 +47,7 @@ import Text.Pandoc.Lua.Marshal.MathType (peekMathType, pushMathType)
 import Text.Pandoc.Lua.Marshal.QuoteType (peekQuoteType, pushQuoteType)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Walk (SpliceList, Walkable, walkSplicing, walkStraight)
+import qualified Data.ByteString.Char8 as Char8
 import qualified Data.Text as T
 import qualified Text.Pandoc.Builder as B
 
@@ -376,27 +377,7 @@ typeInline = defsumtype "Inline"
     <#> parameter peekFilter "Filter" "lua_filter" "table of filter functions"
     =#> functionResult pushInline "Inline" "modified element"
   ]
-  (\case
-      Cite{}        -> "Cite"
-      Code{}        -> "Code"
-      Emph{}        -> "Emph"
-      Image{}       -> "Image"
-      LineBreak{}   -> "LineBreak"
-      Link{}        -> "Link"
-      Math{}        -> "Math"
-      Note{}        -> "Note"
-      Quoted{}      -> "Quoted"
-      RawInline{}   -> "RawInline"
-      SmallCaps{}   -> "SmallCaps"
-      SoftBreak{}   -> "SoftBreak"
-      Space{}       -> "Space"
-      Span{}        -> "Span"
-      Strikeout{}   -> "Strikeout"
-      Strong{}      -> "Strong"
-      Str{}         -> "Str"
-      Subscript{}   -> "Subscript"
-      Superscript{} -> "Superscript"
-      Underline{}   -> "Underline")
+  (Name . Char8.pack . showConstr . toConstr)
   [ defconstructor "Cite"
       "Citation"
       [ ("citations", citationsProperty)
