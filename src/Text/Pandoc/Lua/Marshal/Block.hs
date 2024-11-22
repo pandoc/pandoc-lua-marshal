@@ -36,6 +36,7 @@ import Data.Proxy (Proxy (Proxy))
 import Data.Text (Text)
 import HsLua hiding (Div)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
+import Text.Pandoc.Lua.Marshal.Caption (peekCaptionFuzzy, pushCaption)
 import Text.Pandoc.Lua.Marshal.Content
   ( Content (..), contentTypeDescription, peekContent, pushContent
   , peekDefinitionItem )
@@ -47,8 +48,7 @@ import Text.Pandoc.Lua.Marshal.ListAttributes
   ( peekListAttributes, pushListAttributes )
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Marshal.TableParts
-  ( peekCaptionFuzzy, pushCaption
-  , peekColSpec, pushColSpec
+  ( peekColSpec, pushColSpec
   , peekTableBody, pushTableBody
   , peekTableFoot, pushTableFoot
   , peekTableHead, pushTableHead

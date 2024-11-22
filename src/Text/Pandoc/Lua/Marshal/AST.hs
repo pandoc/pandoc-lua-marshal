@@ -11,6 +11,7 @@ module Text.Pandoc.Lua.Marshal.AST
   , module Text.Pandoc.Lua.Marshal.Alignment
   , module Text.Pandoc.Lua.Marshal.Attr
   , module Text.Pandoc.Lua.Marshal.Block
+  , module Text.Pandoc.Lua.Marshal.Caption
   , module Text.Pandoc.Lua.Marshal.Cell
   , module Text.Pandoc.Lua.Marshal.Citation
   , module Text.Pandoc.Lua.Marshal.CitationMode
@@ -29,6 +30,7 @@ module Text.Pandoc.Lua.Marshal.AST
 import Text.Pandoc.Lua.Marshal.Alignment
 import Text.Pandoc.Lua.Marshal.Attr
 import Text.Pandoc.Lua.Marshal.Block
+import Text.Pandoc.Lua.Marshal.Caption
 import Text.Pandoc.Lua.Marshal.Cell
 import Text.Pandoc.Lua.Marshal.Citation
 import Text.Pandoc.Lua.Marshal.CitationMode

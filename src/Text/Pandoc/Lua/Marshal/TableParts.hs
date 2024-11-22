@@ -9,10 +9,7 @@ Marshaling/unmarshaling functions of types that are used exclusively
 with tables.
 -}
 module Text.Pandoc.Lua.Marshal.TableParts
-  ( peekCaption
-  , peekCaptionFuzzy
-  , pushCaption
-  , peekColSpec
+  ( peekColSpec
   , pushColSpec
   , peekRow
   , peekRowFuzzy
@@ -29,41 +26,16 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , mkTableHead
   ) where
 
-import Control.Applicative ((<|>), optional)
+import Control.Applicative (optional)
 import Control.Monad ((<$!>))
 import HsLua
 import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
-import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Block
-  ( peekBlocksFuzzy, pushBlocks )
-import {-# SOURCE #-} Text.Pandoc.Lua.Marshal.Inline
-  ( peekInlinesFuzzy, pushInlines )
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Lua.Marshal.Row
 import Text.Pandoc.Lua.Marshal.TableFoot
 import Text.Pandoc.Lua.Marshal.TableHead
 import Text.Pandoc.Definition
-
--- | Push Caption element
-pushCaption :: LuaError e => Caption -> LuaE e ()
-pushCaption (Caption shortCaption longCaption) = do
-  newtable
-  addField "short" (maybe pushnil pushInlines shortCaption)
-  addField "long" (pushBlocks longCaption)
-
--- | Peek Caption element
-peekCaption :: LuaError e => Peeker e Caption
-peekCaption idx = do
-  short <- optional $ peekFieldRaw peekInlinesFuzzy "short" idx
-  long <- peekFieldRaw peekBlocksFuzzy "long" idx
-  return $! Caption short long
-
-peekCaptionFuzzy :: LuaError e => Peeker e Caption
-peekCaptionFuzzy = retrieving "Caption" . \idx -> do
-      peekCaption idx
-  <|> (Caption Nothing <$!> peekBlocksFuzzy idx)
-  <|> (failPeek =<<
-       typeMismatchMessage "Caption, list of Blocks, or compatible element" idx)
 
 -- | Push a ColSpec value as a pair of Alignment and ColWidth.
 pushColSpec :: LuaError e => Pusher e ColSpec

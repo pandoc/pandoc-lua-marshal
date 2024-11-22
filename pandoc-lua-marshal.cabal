@@ -79,6 +79,7 @@ library
                      , Text.Pandoc.Lua.Marshal.Alignment
                      , Text.Pandoc.Lua.Marshal.Attr
                      , Text.Pandoc.Lua.Marshal.Block
+                     , Text.Pandoc.Lua.Marshal.Caption
                      , Text.Pandoc.Lua.Marshal.Cell
                      , Text.Pandoc.Lua.Marshal.Citation
                      , Text.Pandoc.Lua.Marshal.CitationMode

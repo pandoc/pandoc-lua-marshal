@@ -181,7 +181,7 @@ return {
         local figure = Figure('word', {short='short', long='caption'})
         assert.are_equal(figure.caption.long, Blocks 'caption')
         assert.are_equal(figure.caption.short, Inlines 'short')
-        assert.are_equal(type(figure.caption), 'table')
+        assert.are_equal(type(figure.caption), 'userdata')
 
         figure.caption = {long = 'One day I was...', short = 'My day'}
         assert.are_equal(
@@ -334,15 +334,15 @@ return {
       test('access caption via property `caption`', function ()
         local caption = {long = {Plain 'cap'}}
         local tbl = Table(caption, {}, TableHead(), {}, TableFoot())
-        assert.are_same(tbl.caption, {long = {Plain 'cap'}})
+        assert.are_same(tbl.caption, Caption{Plain 'cap'})
 
         tbl.caption.short = 'brief'
         tbl.caption.long  = {Plain 'extended'}
 
-        local new_caption = {
-          short = 'brief',
-          long = {Plain 'extended'}
-        }
+        local new_caption = Caption(
+          {Plain 'extended'},
+          'brief'
+        )
         assert.are_equal(
           Table(new_caption, {}, TableHead(), {}, TableFoot()),
           tbl
@@ -395,9 +395,9 @@ return {
         )
       end),
       test('caption field accepts list of blocks', function ()
-        local caption = {long = {Plain 'cap'}}
+        local caption = {Plain 'cap'}
         local tbl = Table(caption, {}, TableHead(), {}, TableFoot())
-        assert.are_same(tbl.caption, {long = {Plain 'cap'}})
+        assert.are_same(tbl.caption.long, {Plain 'cap'})
 
         tbl.caption = {Plain 'extended'}
 

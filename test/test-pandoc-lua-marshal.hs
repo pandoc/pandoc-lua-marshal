@@ -53,6 +53,7 @@ main = do
 
   blockTests <- run @Lua.Exception $ do
     registerDefault
+    register' mkCaption
     translateResultsFromFile "test/test-block.lua"
 
   cellTests <- run @Lua.Exception $ do
