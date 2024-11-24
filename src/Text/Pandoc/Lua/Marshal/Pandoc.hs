@@ -35,7 +35,6 @@ import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Walk (applyStraight)
 import Text.Pandoc.Walk (Walkable (walk))
-import qualified Data.Foldable as Foldable
 import qualified Text.Pandoc.Builder as B
 
 -- | Pushes a 'Pandoc' value as userdata.
