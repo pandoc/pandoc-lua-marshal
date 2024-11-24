@@ -60,6 +60,48 @@ return {
       assert.are_same(Blocks{'different'}, copy.blocks)
     end),
   },
+  group 'normalize' {
+    test('removes repeated whitespace', function ()
+      local doc = Pandoc{
+        Plain{'before', Space(), SoftBreak(), 'after'}
+      }
+      assert.are_equal(
+        Blocks{Plain{'before', SoftBreak(), 'after'}},
+        doc:normalize().blocks
+      )
+    end),
+    test('normalizes table', function ()
+      local attr = Attr('test')
+      local caption = Blocks('Sample caption')
+      local colspecs = {{'AlignDefault', 0.5}, {'AlignLeft', 0.5}}
+      local thead = TableHead({Row{Cell'header cell'}})
+      local tbody = {
+        attr = Attr(),
+        body = List{
+          Row{Cell'body cell 1', Cell'body cell 2'},
+          Row{Cell('hi')}},
+        },
+        head = List{},
+        row_head_columns = 0,
+      }
+      local tfoot = TableFoot()
+      local tbl = Table(caption, colspecs, thead, {tbody}, tfoot)
+      print(tbl.bodies)
+      local expected_body = tbody
+      expected_body.body[2][2]:insert(Cell{})
+      local doc = Pandoc{tbl}
+      assert.are_same(
+        Table(
+          caption,
+          colspecs,
+          TableHead({Row{Cell'header cell', Cell{}}}),
+          {expected_body},
+          tfoot
+        ),
+        doc:normalize().blocks[1]
+      )
+    end)
+  },
   group 'walk' {
     test('uses `Meta` function', function ()
       local meta = {

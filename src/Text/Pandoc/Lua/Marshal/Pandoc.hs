@@ -1,4 +1,7 @@
+{-# LANGUAGE FlexibleContexts     #-}
+{-# LANGUAGE LambdaCase           #-}
 {-# LANGUAGE OverloadedStrings    #-}
+{-# LANGUAGE TypeApplications     #-}
 {- |
 Copyright               : © 2021-2024 Albert Krewinkel
 SPDX-License-Identifier : MIT
@@ -25,12 +28,15 @@ import Control.Monad ((<$!>))
 import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
 import HsLua
+import Text.Pandoc.Definition (Pandoc (..), Meta (..), nullMeta)
 import Text.Pandoc.Lua.Marshal.Block (peekBlocksFuzzy, pushBlocks)
 import Text.Pandoc.Lua.Marshal.Filter
 import Text.Pandoc.Lua.Marshal.MetaValue (peekMetaValue, pushMetaValue)
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Walk (applyStraight)
-import Text.Pandoc.Definition (Pandoc (..), Meta (..), nullMeta)
+import Text.Pandoc.Walk (Walkable (walk))
+import qualified Data.Foldable as Foldable
+import qualified Text.Pandoc.Builder as B
 
 -- | Pushes a 'Pandoc' value as userdata.
 pushPandoc :: LuaError e => Pusher e Pandoc
@@ -73,6 +79,11 @@ typePandoc = deftype "Pandoc"
       ### return
       <#> parameter peekPandoc "Pandoc" "doc" "self"
       =#> functionResult pushPandoc "Pandoc" "cloned Pandoc document"
+
+  , method $ defun "normalize"
+      ### liftPure normalize
+      <#> udparam typePandoc "self" ""
+      =#> udresult typePandoc "cloned and normalized document"
 
   , method $ defun "walk"
     ### flip applyFully
@@ -149,3 +160,17 @@ applyFully filter' doc = case filterWalkingOrder filter' of
   WalkTopdown     -> applyPandocFunction filter' doc
                  >>= applyMetaFunction filter'
                  >>= walkBlocksAndInlines filter'
+
+-- | Normalize a document
+normalize :: (Walkable [B.Inline] a, Walkable B.Block a) => a -> a
+normalize =
+  let normalizeBlock = \case
+        B.Table attr capt specs th tbs tf ->
+          let twidth = length specs
+              th'  = B.normalizeTableHead twidth th
+              tbs' = map (B.normalizeTableBody twidth) tbs
+              tf'  = B.normalizeTableFoot twidth tf
+          in B.Table attr capt specs th' tbs' tf'
+        x -> x
+  in walk normalizeBlock .
+     walk (B.toList . mconcat . map (B.singleton @B.Inline))
