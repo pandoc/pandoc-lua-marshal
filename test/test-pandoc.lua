@@ -79,7 +79,7 @@ return {
         attr = Attr(),
         body = List{
           Row{Cell'body cell 1', Cell'body cell 2'},
-          Row{Cell('hi')}},
+          Row{Cell('hi')},
         },
         head = List{},
         row_head_columns = 0,
@@ -88,7 +88,7 @@ return {
       local tbl = Table(caption, colspecs, thead, {tbody}, tfoot)
       print(tbl.bodies)
       local expected_body = tbody
-      expected_body.body[2][2]:insert(Cell{})
+      expected_body.body[2].cells:insert(Cell{})
       local doc = Pandoc{tbl}
       assert.are_same(
         Table(
