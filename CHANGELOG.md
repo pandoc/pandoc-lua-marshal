@@ -2,6 +2,22 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.3.0
+
+Released 2024-12-07.
+
+  * Add method `normalize` to Pandoc objects.
+    This returns a normalized document by merging adjacent spaces in inlines
+    and by modifying tables.
+
+  * Push Captions as userdata, move code to separate module.
+
+  * Add tests for RawInline and its properties
+
+  * Allow treatment of custom elements as singleton lists.
+
+  * Remove `pandoc` prefix on table components (jgm/pandoc#8574).
+
 ## 0.2.9
 
 Released 2024-10-01.
