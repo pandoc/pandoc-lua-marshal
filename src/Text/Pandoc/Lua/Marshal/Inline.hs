@@ -337,7 +337,7 @@ inlineConstructors :: LuaError e =>  [DocumentedFunction e]
 inlineConstructors =
   [ defun "Cite"
     ### liftPure2 (flip Cite)
-    <#> parameter peekInlinesFuzzy "content" "Inlines" "placeholder content"
+    <#> parameter peekInlinesFuzzy "Inlines" "content" "placeholder content"
     <#> parameter (peekList peekCitation) "{Citation,...}" "citations"
         "List of Citations"
     =#> functionResult pushInline "Inline" "cite element"
