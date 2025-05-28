@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE OverloadedStrings    #-}
 {- |
-Copyright   : © 2021-2024 Albert Krewinkel
+Copyright   : © 2021-2025 Albert Krewinkel
 License     : MIT
 Maintainer  : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
