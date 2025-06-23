@@ -2,6 +2,16 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.3.1
+
+Released 2025-06-23.
+
+  * Fix docs of the `Cite` constructor function
+
+  * Relax upper bounds for hslua and QuickCheck.
+
+  * Dropped support for GHC 8.6.
+
 ## 0.3.0
 
 Released 2024-12-07.
