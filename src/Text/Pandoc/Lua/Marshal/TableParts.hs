@@ -15,6 +15,7 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , peekRowFuzzy
   , pushRow
   , peekTableBody
+  , peekTableBodyFuzzy
   , pushTableBody
   , peekTableFoot
   , pushTableFoot
@@ -22,6 +23,7 @@ module Text.Pandoc.Lua.Marshal.TableParts
   , pushTableHead
     -- * Constructors
   , mkRow
+  , mkTableBody
   , mkTableFoot
   , mkTableHead
   ) where
@@ -33,6 +35,7 @@ import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
 import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
 import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Lua.Marshal.Row
+import Text.Pandoc.Lua.Marshal.TableBody
 import Text.Pandoc.Lua.Marshal.TableFoot
 import Text.Pandoc.Lua.Marshal.TableHead
 import Text.Pandoc.Definition
@@ -55,27 +58,6 @@ pushColWidth :: LuaError e => Pusher e ColWidth
 pushColWidth = \case
   (ColWidth w)    -> push w
   ColWidthDefault -> pushnil
-
--- | Pushes a 'TableBody' value as a Lua table with fields @attr@,
--- @row_head_columns@, @head@, and @body@.
-pushTableBody :: LuaError e => Pusher e TableBody
-pushTableBody (TableBody attr (RowHeadColumns rowHeadColumns) head' body) = do
-    newtable
-    addField "attr" (pushAttr attr)
-    addField "row_head_columns" (pushIntegral rowHeadColumns)
-    addField "head" (pushPandocList pushRow head')
-    addField "body" (pushPandocList pushRow body)
-
--- | Retrieves a 'TableBody' value from a Lua table with fields @attr@,
--- @row_head_columns@, @head@, and @body@.
-peekTableBody :: LuaError e => Peeker e TableBody
-peekTableBody = fmap (retrieving "TableBody")
-  . typeChecked "table" istable
-  $ \idx -> TableBody
-  <$!> peekFieldRaw peekAttr "attr" idx
-  <*>  peekFieldRaw (fmap RowHeadColumns . peekIntegral) "row_head_columns" idx
-  <*>  peekFieldRaw (peekList peekRowFuzzy) "head" idx
-  <*>  peekFieldRaw (peekList peekRowFuzzy) "body" idx
 
 -- | Add a value to the table at the top of the stack at a string-index.
 addField :: LuaError e => Name -> LuaE e () -> LuaE e ()
