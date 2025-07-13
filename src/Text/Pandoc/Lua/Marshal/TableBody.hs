@@ -35,7 +35,7 @@ peekTableBody = peekUD typeTableBody
 -- 'pandoc TableBody' userdata object or a table with fields @attr@,
 -- @body@, @head@, @row_head_columns@.
 peekTableBodyFuzzy :: LuaError e => Peeker e TableBody
-peekTableBodyFuzzy idx = retrieving "TableBody" liftlua (ltype idx) >>= \case
+peekTableBodyFuzzy idx = retrieving "TableBody" $ liftlua (ltype idx) >>= \case
   TypeUserdata -> peekTableBody idx
   TypeTable -> do
     attr <- peekFieldRaw peekAttr "attr" idx
