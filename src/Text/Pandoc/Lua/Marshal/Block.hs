@@ -49,7 +49,7 @@ import Text.Pandoc.Lua.Marshal.ListAttributes
 import Text.Pandoc.Lua.Marshal.Shared (walkBlocksAndInlines)
 import Text.Pandoc.Lua.Marshal.TableParts
   ( peekColSpec, pushColSpec
-  , peekTableBody, pushTableBody
+  , peekTableBodyFuzzy, pushTableBody
   , peekTableFoot, pushTableFoot
   , peekTableHead, pushTableHead
   )
@@ -188,7 +188,7 @@ typeBlock = deftype "Block"
       (pushPandocList pushTableBody, \case
           Table _ _ _ _ bs _ -> Actual bs
           _                  -> Absent)
-      (peekList peekTableBody, \case
+      (peekList peekTableBodyFuzzy, \case
           Table attr c cs h _ f -> Actual . (\bs -> Table attr c cs h bs f)
           _                     -> const Absent)
   , possibleProperty "caption" "element caption"
@@ -455,7 +455,7 @@ blockConstructors =
     <#> parameter (peekList peekColSpec) "{ColSpec,...}" "colspecs"
                   "column alignments and widths"
     <#> parameter peekTableHead "TableHead" "head" "table head"
-    <#> parameter (peekList peekTableBody) "{TableBody,...}" "bodies"
+    <#> parameter (peekList peekTableBodyFuzzy) "{TableBody,...}" "bodies"
                   "table bodies"
     <#> parameter peekTableFoot "TableFoot" "foot" "table foot"
     <#> optAttrParam

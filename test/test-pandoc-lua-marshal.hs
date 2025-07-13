@@ -182,7 +182,7 @@ roundtrips = testGroup "Roundtrip through Lua stack"
     ioProperty . roundtripEqual pushQuoteType peekQuoteType
 
   , testProperty "TableBody" $
-    ioProperty . roundtripEqual pushTableBody peekTableBody
+    ioProperty . roundtripEqual pushTableBody peekTableBodyFuzzy
 
   , testProperty "TableHead" $
     ioProperty . roundtripEqual pushTableHead peekTableHead
