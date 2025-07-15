@@ -58,10 +58,3 @@ pushColWidth :: LuaError e => Pusher e ColWidth
 pushColWidth = \case
   (ColWidth w)    -> push w
   ColWidthDefault -> pushnil
-
--- | Add a value to the table at the top of the stack at a string-index.
-addField :: LuaError e => Name -> LuaE e () -> LuaE e ()
-addField key pushFieldValue = do
-  pushName key
-  pushFieldValue
-  rawset (nth 3)
