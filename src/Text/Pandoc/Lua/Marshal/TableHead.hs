@@ -26,11 +26,11 @@ import Text.Pandoc.Definition
 pushTableHead :: LuaError e => TableHead -> LuaE e ()
 pushTableHead = pushUD typeTableHead
 
--- | Retrieves a 'Cell' from the stack.
+-- | Retrieves a TableHead from the stack.
 peekTableHead :: LuaError e => Peeker e TableHead
 peekTableHead = peekUD typeTableHead
 
--- | Row object type.
+-- | TableHead object type.
 typeTableHead :: LuaError e => DocumentedType e TableHead
 typeTableHead = deftype "TableHead"
   [ operation Eq $ defun "__eq"
@@ -66,7 +66,7 @@ typeTableHead = deftype "TableHead"
     =#> functionResult pushTableHead "TableHead" "cloned object"
   ]
 
--- | Constructor function for 'Row' values.
+-- | Constructor function for TableHead values.
 mkTableHead :: LuaError e => DocumentedFunction e
 mkTableHead = defun "TableHead"
   ### liftPure2 (\mRows mAttr -> TableHead

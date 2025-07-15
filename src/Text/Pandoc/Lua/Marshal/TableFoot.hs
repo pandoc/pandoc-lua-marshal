@@ -26,11 +26,11 @@ import Text.Pandoc.Definition
 pushTableFoot :: LuaError e => TableFoot -> LuaE e ()
 pushTableFoot = pushUD typeTableFoot
 
--- | Retrieves a 'Cell' from the stack.
+-- | Retrieves a TableFoot from the stack.
 peekTableFoot :: LuaError e => Peeker e TableFoot
 peekTableFoot = peekUD typeTableFoot
 
--- | Row object type.
+-- | TableFoot object type.
 typeTableFoot :: LuaError e => DocumentedType e TableFoot
 typeTableFoot = deftype "TableFoot"
   [ operation Eq $ defun "__eq"
@@ -66,7 +66,7 @@ typeTableFoot = deftype "TableFoot"
     =#> functionResult pushTableFoot "TableFoot" "cloned object"
   ]
 
--- | Constructor function for 'Row' values.
+-- | Constructor function for TableFoot values.
 mkTableFoot :: LuaError e => DocumentedFunction e
 mkTableFoot = defun "TableFoot"
   ### liftPure2 (\mCells mAttr -> TableFoot
