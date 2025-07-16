@@ -37,14 +37,14 @@ peekTableBody = peekUD typeTableBody
 -- 'pandoc TableBody' userdata object or a table with fields @attr@,
 -- @body@, @head@, @row_head_columns@.
 peekTableBodyFuzzy :: LuaError e => Peeker e TableBody
-peekTableBodyFuzzy idx = retrieving "TableBody" $ liftlua (ltype idx) >>= \case
+peekTableBodyFuzzy idx = retrieving "TableBody" $ liftLua (ltype idx) >>= \case
   TypeUserdata -> peekTableBody idx
   TypeTable -> do
     attr <- peekFieldRaw peekAttr "attr" idx
     body <- peekFieldRaw (peekList peekRowFuzzy) "body" idx
-    head <- peekFieldRaw (peekList peekRowFuzzy) "head" idx
+    ihead <- peekFieldRaw (peekList peekRowFuzzy) "head" idx
     rhc <- peekFieldRaw (fmap RowHeadColumns . peekIntegral) "row_head_columns" idx
-    return $! TableBody attr body head rhc
+    return $! TableBody attr rhc ihead body
   _ -> failPeek =<< typeMismatchMessage "Cell or table" idx
 
 -- | TableBody object type.
@@ -66,20 +66,20 @@ typeTableBody = deftype "TableBody"
   ]
   [ property "attr" "table body attributes"
       (pushAttr, \(TableBody attr _ _ _) -> attr)
-      (peekAttr, \(TableBody _ body head rhc) attr ->
-                   TableBody attr body head rhc)
-  , property "body" "table body rows"
-      (pushPandocList pushRow, \(TableBody _ body _ _) -> body)
-      (peekList peekRowFuzzy, \(TableBody attr _ head rhc) body ->
-                                TableBody attr body head rhc)
-  , property "head" "intermediate head"
-      (pushPandocList pushRow, \(TableBody _ _ head _) -> head)
-      (peekList peekRowFuzzy, \(TableBody attr body _ rhc) head ->
-                                TableBody attr body head rhc)
+      (peekAttr, \(TableBody _ body ihead rhc) attr ->
+                   TableBody attr body ihead rhc)
   , property "row_head_columns" "number of columns taken up by the row head of each row of the TableBody"
-      (pushIntegral, \(TableBody _ _ _ rhc) -> rhc)
-      (peekIntegral, \(TableBody attr body head _) rhc ->
-                                TableBody attr body head rhc)
+    (pushIntegral, \(TableBody _ (RowHeadColumns rhc) _ _) -> rhc)
+    (peekIntegral, \(TableBody attr _ ihead body) rhc ->
+                      TableBody attr (RowHeadColumns rhc) ihead body)
+  , property "head" "intermediate head"
+      (pushPandocList pushRow, \(TableBody _ _ ihead _) -> ihead)
+      (peekList peekRowFuzzy, \(TableBody attr rhc _ body) ihead ->
+                                TableBody attr rhc ihead body)
+  , property "body" "table body rows"
+      (pushPandocList pushRow, \(TableBody _ _ _ body) -> body)
+      (peekList peekRowFuzzy, \(TableBody attr rhc ihead _) body ->
+                                TableBody attr rhc ihead body)
   , alias "identifier" "cell ID"         ["attr", "identifier"]
   , alias "classes"    "cell classes"    ["attr", "classes"]
   , alias "attributes" "cell attributes" ["attr", "attributes"]
@@ -95,14 +95,14 @@ mkTableBody :: LuaError e => DocumentedFunction e
 mkTableBody = defun "TableBody"
   ### liftPure4 (\mBody mHead mRhc mAttr -> TableBody
                   (fromMaybe nullAttr mAttr)
-                  (fromMaybe [] mBody)
+                  (maybe 0 RowHeadColumns mRhc)
                   (fromMaybe [] mHead)
-                  (fromMaybe 0 mRhc))
+                  (fromMaybe [] mBody))
   <#> opt (parameter (peekList peekRowFuzzy) "{Row,...}" "body"
            "list of table rows")
   <#> opt (parameter (peekList peekRowFuzzy) "{Row,...}" "head"
            "intermediate head")
-  <#> opt (integralParam "integer" "row_head_columns"
+  <#> opt (parameter peekIntegral "integer" "row_head_columns"
            "number of columns taken up by the row head of each row of the TableBody")
   <#> opt (parameter peekAttr "Attr" "attr" "table body attributes")
   =#> functionResult pushTableBody "TableBody" "new TableBody object"
