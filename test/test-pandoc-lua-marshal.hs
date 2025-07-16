@@ -74,6 +74,10 @@ main = do
     registerDefault
     translateResultsFromFile "test/test-pandoc.lua"
 
+  tableTests <- run @Lua.Exception $ do
+    registerDefault
+    translateResultsFromFile "test/test-table.lua"
+
   defaultMain $ testGroup "pandoc-lua-marshal"
     [ roundtrips
     , listAttributeTests
@@ -85,6 +89,7 @@ main = do
     , simpleTableTests
     , metavalueTests
     , pandocTests
+    , tableTests
     ]
 
 -- | Registers all constructors and string constants in the global
@@ -102,6 +107,7 @@ registerDefault = do
   register' mkPandoc
   register' mkRow
   register' mkSimpleTable
+  register' mkTableBody
   register' mkTableHead
   register' mkTableFoot
   registerConstants (Proxy @Alignment)
@@ -182,7 +188,7 @@ roundtrips = testGroup "Roundtrip through Lua stack"
     ioProperty . roundtripEqual pushQuoteType peekQuoteType
 
   , testProperty "TableBody" $
-    ioProperty . roundtripEqual pushTableBody peekTableBody
+    ioProperty . roundtripEqual pushTableBody peekTableBodyFuzzy
 
   , testProperty "TableHead" $
     ioProperty . roundtripEqual pushTableHead peekTableHead

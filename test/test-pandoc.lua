@@ -86,7 +86,6 @@ return {
       }
       local tfoot = TableFoot()
       local tbl = Table(caption, colspecs, thead, {tbody}, tfoot)
-      print(tbl.bodies)
       local expected_body = tbody
       expected_body.body[2].cells:insert(Cell{})
       local doc = Pandoc{tbl}
