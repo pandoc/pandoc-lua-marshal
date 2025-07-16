@@ -32,8 +32,6 @@ import Control.Applicative (optional)
 import Control.Monad ((<$!>))
 import HsLua
 import Text.Pandoc.Lua.Marshal.Alignment (peekAlignment, pushAlignment)
-import Text.Pandoc.Lua.Marshal.Attr (peekAttr, pushAttr)
-import Text.Pandoc.Lua.Marshal.List (pushPandocList)
 import Text.Pandoc.Lua.Marshal.Row
 import Text.Pandoc.Lua.Marshal.TableBody
 import Text.Pandoc.Lua.Marshal.TableFoot
