@@ -83,6 +83,9 @@ typePandoc = deftype "Pandoc"
       ### liftPure normalize
       <#> udparam typePandoc "self" ""
       =#> udresult typePandoc "cloned and normalized document"
+      #? "Perform a normalization of Pandoc documents. E.g., multiple\
+          \ successive spaces are collapsed, and tables are normalized, so\
+          \ that all rows and columns contain the same number of cells."
 
   , method $ defun "walk"
     ### flip applyFully
