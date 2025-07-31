@@ -206,7 +206,7 @@ typeInline = deftype "Inline"
           Subscript inlns   -> Actual $ ContentInlines inlns
           Superscript inlns -> Actual $ ContentInlines inlns
           Underline inlns   -> Actual $ ContentInlines inlns
-          Note blks         -> Actual $ ContentBlocks blks
+          Note _ blks       -> Actual $ ContentBlocks blks
           _                 -> Absent)
       (peekContent,
         let inlineContent = \case
@@ -232,7 +232,7 @@ typeInline = deftype "Inline"
           Superscript _ -> Actual . Superscript . inlineContent
           Underline _   -> Actual . Underline . inlineContent
           -- block content
-          Note _        -> Actual . Note . blockContent
+          Note label _  -> Actual . Note label . blockContent
           _             -> const Absent
       )
 
@@ -258,6 +258,14 @@ typeInline = deftype "Inline"
           _               -> Absent)
       (peekQuoteType, \case
           Quoted _ inlns  -> Actual . (`Quoted` inlns)
+          _               -> const Absent)
+
+  , possibleProperty "label" "footnote label"
+      (pushText, \case
+          Note label _    -> Actual label
+          _               -> Absent)
+      (peekText, \case
+          Note _ blks     -> Actual . (`Note` blks)
           _               -> const Absent)
 
   , possibleProperty "src" "image source"
@@ -384,8 +392,9 @@ inlineConstructors =
     =#> functionResult pushInline "Inline" "math element"
     #? "Creates a Math element, either inline or displayed."
   , defun "Note"
-    ### liftPure Note
+    ### (\content mlabel -> return $ Note (fromMaybe "" mlabel) content)
     <#> parameter peekBlocksFuzzy "Blocks" "content" "footnote block content"
+    <#> opt (textParam "label" "footnote block content")
     =#> functionResult pushInline "Inline" "note"
     #? "Creates a Note inline element"
   , defun "Quoted"
