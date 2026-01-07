@@ -19,7 +19,7 @@ license:             MIT
 license-file:        LICENSE
 author:              Albert Krewinkel, John MacFarlane
 maintainer:          Albert Krewinkel <albert@zeitkraut.de>
-copyright:           © 2017-2025 Albert Krewinkel, John MacFarlane
+copyright:           © 2017-2026 Albert Krewinkel, John MacFarlane
 category:            Foreign
 build-type:          Simple
 extra-doc-files:     README.md
@@ -53,9 +53,9 @@ common common-options
                      , bytestring            >= 0.10     && < 0.13
                      , containers            >= 0.6      && < 0.8
                      , exceptions            >= 0.8      && < 0.11
-                     , hslua                 >= 2.2      && < 2.5
+                     , hslua                 >= 2.2      && < 2.6
                      , hslua-list            >= 1.1.4    && < 1.2
-                     , hslua-marshalling     >= 2.2      && < 2.4
+                     , hslua-marshalling     >= 2.3      && < 2.4
                      , pandoc-types          >= 1.23     && < 1.24
                      , safe                  >= 0.3      && < 0.4
                      , text                  >= 1.1.1.0  && < 1.3
