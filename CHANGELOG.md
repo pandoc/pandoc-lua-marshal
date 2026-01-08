@@ -2,6 +2,19 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.3.2
+
+Released 2026-01-08.
+
+  * Added a docstring to the `Pandoc.normalize` method.
+
+  * Added `TableBody` constructor. (Sean Soon)
+
+  * Fixed comments in files `TableFoot.hs` and `TableHead.hs`
+    (Sean Soon).
+
+  * Allow hslua-2.5.
+
 ## 0.3.1
 
 Released 2025-06-23.

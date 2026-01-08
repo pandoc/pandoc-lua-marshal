@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 {-# LANGUAGE TypeApplications     #-}
 {- |
-Copyright               : © 2021-2025 Albert Krewinkel
+Copyright               : © 2021-2026 Albert Krewinkel
 SPDX-License-Identifier : MIT
 Maintainer              : Albert Krewinkel <tarleb+pandoc@moltkeplatz.de>
 
