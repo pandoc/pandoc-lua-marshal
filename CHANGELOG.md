@@ -13,7 +13,7 @@ Released 2026-01-08.
   * Fixed comments in files `TableFoot.hs` and `TableHead.hs`
     (Sean Soon).
 
-  * Allow hslua-2.5.
+  * Allow hslua-2.5 and containers-0.8.\*.
 
 ## 0.3.1
 
