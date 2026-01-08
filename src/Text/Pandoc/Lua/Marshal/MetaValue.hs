@@ -55,7 +55,7 @@ peekMetaValue = retrieving "MetaValue" . \idx -> do
       (MetaInlines . (:[]) <$!> peekInline idx) <|>
       (MetaBlocks . (:[]) <$!> peekBlock idx)
 
-    TypeTable   -> optional (getName idx) >>= \case
+    TypeTable   -> optional (getName' idx) >>= \case
       Just "Inlines" -> MetaInlines <$!> peekInlinesFuzzy idx
       Just "Blocks"  -> MetaBlocks  <$!> peekBlocksFuzzy idx
       Just "List"    -> MetaList <$!> peekList peekMetaValue idx
@@ -71,7 +71,7 @@ peekMetaValue = retrieving "MetaValue" . \idx -> do
     _ -> failPeek "could not get meta value"
 
  where
-  getName idx = liftLua (getmetafield idx "__name") >>= \case
+  getName' idx = liftLua (getmetafield idx "__name") >>= \case
     TypeNil -> failPeek "no name"
     _ -> peekName idx `lastly` pop 1
 
