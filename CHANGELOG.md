@@ -2,6 +2,13 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.3.2.1
+
+Released 2026-01-09.
+
+  * Added missing entry `test/test-table.lua` to
+    *extra-source-files* in cabal file.
+
 ## 0.3.2
 
 Released 2026-01-08.

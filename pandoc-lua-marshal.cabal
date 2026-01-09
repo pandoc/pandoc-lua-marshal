@@ -37,6 +37,7 @@ extra-source-files:  test/test-attr.lua
                    , test/test-metavalue.lua
                    , test/test-pandoc.lua
                    , test/test-simpletable.lua
+                   , test/test-table.lua
 
 source-repository head
   type:                git
