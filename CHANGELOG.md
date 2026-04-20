@@ -6,6 +6,12 @@
 
 Release pending.
 
+  * Allow singleton TableBody as list of table bodies.
+
+    It's now possible to pass a bare TableBody value whenever a
+    list of TableBody elements is expected. This should simplify
+    the construction of table values.
+
   * Fixed the failure method in `peekAttr`: peeking failures are
     now kept within the *Peek* monad. Previously, this function
     would raise Lua exceptions in certain cases. The change

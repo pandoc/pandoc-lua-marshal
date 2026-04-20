@@ -410,6 +410,18 @@ return {
           tbl
         )
       end),
+      test('bodies field accepts single TableBody', function ()
+        local th, tf = TableHead(), TableFoot()
+        local tbl = Table({long={}}, {}, th, TableBody{}, tf)
+        assert.are_same(tbl.bodies, {TableBody{}})
+
+        tbl.bodies = TableBody{Row{}}
+
+        assert.are_equal(
+          Table({}, {}, th, {TableBody{Row{}}}, tf),
+          tbl
+        )
+      end),
     },
   },
   group "Blocks" {

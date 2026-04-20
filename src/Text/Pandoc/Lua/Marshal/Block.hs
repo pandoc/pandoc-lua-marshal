@@ -188,7 +188,7 @@ typeBlock = deftype "Block"
       (pushPandocList pushTableBody, \case
           Table _ _ _ _ bs _ -> Actual bs
           _                  -> Absent)
-      (peekList peekTableBodyFuzzy, \case
+      (peekTableBodies, \case
           Table attr c cs h _ f -> Actual . (\bs -> Table attr c cs h bs f)
           _                     -> const Absent)
   , possibleProperty "caption" "element caption"
@@ -455,8 +455,8 @@ blockConstructors =
     <#> parameter (peekList peekColSpec) "{ColSpec,...}" "colspecs"
                   "column alignments and widths"
     <#> parameter peekTableHead "TableHead" "head" "table head"
-    <#> parameter (peekList peekTableBodyFuzzy) "{TableBody,...}" "bodies"
-                  "table bodies"
+    <#> parameter peekTableBodies "TableBody|{TableBody,...}" "bodies"
+          "table bodies"
     <#> parameter peekTableFoot "TableFoot" "foot" "table foot"
     <#> optAttrParam
     =#> blockResult "Table element"
@@ -471,6 +471,11 @@ blockConstructors =
 
   optAttrParam = opt (parameter peekAttr "Attr" "attr" "element attributes")
 
+peekTableBodies :: LuaError e => Peeker e [TableBody]
+peekTableBodies = choice
+  [ fmap (:[]) . peekTableBodyFuzzy
+  , peekList peekTableBodyFuzzy
+  ]
 
 -- | Constructor for a list of `Block` values.
 mkBlocks :: LuaError e => DocumentedFunction e
