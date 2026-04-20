@@ -12,6 +12,8 @@ Release pending.
     un-breaks the use of this function within the *Peek* monad and
     will result in better error messages in some cases.
 
+  * Allow QuickCheck 2.18.
+
 ## 0.3.2.1
 
 Released 2026-01-09.
