@@ -204,7 +204,7 @@ peekAttr idx = retrieving "Attr" $ liftLua (ltype idx) >>= \case
   TypeString -> (,[],[]) <$!> peekText idx -- treat string as ID
   TypeUserdata -> peekUD typeAttr idx
   TypeTable -> peekAttrTable idx
-  x -> liftLua . failLua $ "Cannot get Attr from " ++ show x
+  x -> fail $ "Cannot get Attr from " <> show x
 
 -- | Helper function which gets an Attr from a Lua table.
 peekAttrTable :: LuaError e => Peeker e Attr

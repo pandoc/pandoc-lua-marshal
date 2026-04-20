@@ -2,6 +2,16 @@
 
 `pandoc-lua-marshal` uses [PVP Versioning][].
 
+## 0.3.3
+
+Release pending.
+
+  * Fixed the failure method in `peekAttr`: peeking failures are
+    now kept within the *Peek* monad. Previously, this function
+    would raise Lua exceptions in certain cases. The change
+    un-breaks the use of this function within the *Peek* monad and
+    will result in better error messages in some cases.
+
 ## 0.3.2.1
 
 Released 2026-01-09.
