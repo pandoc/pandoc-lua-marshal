@@ -74,4 +74,24 @@ return {
       end),
     },
   },
+  group "Row" {
+    group "Constructor" {
+      test('Can be called without arguments', function ()
+        assert.are_equal(Row(), Row{})
+      end),
+    },
+    group "unmarshalling" {
+      test('A list can be used instead', function ()
+        assert.are_equal(
+          TableHead{Row({Cell "hi"}, "row-1")},
+          TableHead{{"row-1", {Cell "hi"}}}
+        )
+        assert.are_equal(
+          TableHead{Row({Cell "hi"})},
+          TableHead{{Cell "hi"}}
+        )
+        -- assert.are_equal(Row({Cell "hi"}, "row-1"), {"row-1", {Cell "hi"}})
+      end),
+    },
+  }
 }

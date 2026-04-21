@@ -15,7 +15,7 @@ module Text.Pandoc.Lua.Marshal.Row
   , mkRow
   ) where
 
-import Control.Applicative (optional)
+import Control.Applicative ((<|>), optional)
 import Control.Monad ((<$!>))
 import Data.Aeson (encode)
 import Data.Maybe (fromMaybe)
@@ -42,8 +42,10 @@ peekRow = peekUD typeRow
 peekRowFuzzy :: LuaError e => Peeker e Row
 peekRowFuzzy idx = liftLua (ltype idx) >>= \case
   TypeUserdata -> peekRow idx
-  TypeTable -> uncurry Row <$!> peekPair peekAttr (peekList peekCellFuzzy) idx
-  _ -> failPeek =<< typeMismatchMessage "Cell or table" idx
+  TypeTable ->
+    (uncurry Row <$!> peekPair peekAttr (peekList peekCellFuzzy) idx) <|>
+    (Row nullAttr <$!> peekList peekCellFuzzy idx)
+  _ -> failPeek =<< typeMismatchMessage "Row or table" idx
 
 -- | Row object type.
 typeRow :: LuaError e => DocumentedType e Row

@@ -12,6 +12,9 @@ Release pending.
     list of TableBody elements is expected. This should simplify
     the construction of table values.
 
+  * Allow rows to be given as simple lists of cells instead of
+    always having to use the `Row` constructor function.
+
   * Fixed the failure method in `peekAttr`: peeking failures are
     now kept within the *Peek* monad. Previously, this function
     would raise Lua exceptions in certain cases. The change
